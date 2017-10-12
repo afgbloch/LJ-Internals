@@ -1,0 +1,18 @@
+%!TEX root = ../FYP_Dissertation.tex
+First we need to get the FlameGraph tool.
+\begin{center}
+\begin{lstlisting}
+  git clone https://github.com/brendangregg/FlameGraph
+\end{lstlisting}
+\end{center}
+Then we need to, generate the raw dump from luajit and use FlameGraph to generate
+the svg file. Assuming \emph{\$flamegraph} contains the path to the tool (/FlameGraph/flamegraph.pl)
+
+\begin{center}
+\begin{lstlisting}
+  export flamegraph=./FlameGraph/flamegraph.pl
+  luajit -jp=G,myapp.out myapp.lua
+  $flamegraph myapp.out > myapp.svg
+\end{lstlisting}
+\end{center}
+Then you can open myapp.svg with your favorite viewer.

@@ -1,0 +1,158 @@
+%!TEX root = ../FYP_Dissertation.tex
+\section{Verbose mode}
+
+This module shows verbose information about the progress of the
+JIT compiler. It prints one line for each generated trace. This module
+is useful to see which code has been compiled or where the compiler
+punts and falls back to the interpreter.
+
+Example usage:
+
+\begin{lstlisting}
+  luajit -jv -e "for i=1,1000 do for j=1,1000 do end end"
+  luajit -jv=myapp.out myapp.lua
+\end{lstlisting}
+To redirect the output to a file, pass a
+filename as an argument (use '-' for stdout) or set the environment
+variable LUAJIT\_VERBOSEFILE. The file is overwritten every time the
+module is started.
+
+The output from the second example could look like this:
+
+\begin{center}
+[TRACE   1 myapp.lua:1 loop]
+
+[TRACE   2 (1/3) myapp.lua:1 $->$ 1]
+\end{center}
+
+The first number in each line is the internal trace number. Next are
+the file name ('myapp.lua') and the line number (':1') where the
+trace has started. Side traces also show the parent trace number and
+the exit number where they are attached to in parentheses ('(1/3)').
+An arrow at the end shows where the trace links to ('$->$ 1'), unless
+it loops to itself.
+
+In this case the inner loop gets hot and is traced first, generating
+a root trace. Then the last exit from the 1st trace gets hot, too,
+and triggers generation of the 2nd trace. The side trace follows the
+path along the outer loop and \textit{around} the inner loop, back to its
+start, and then links to the 1st trace.
+
+Aborted traces are shown like this:
+\begin{center}
+[TRACE --- foo.lua:44 -- leaving loop in root trace at foo:lua:50]
+\end{center}
+
+Trace aborts are quite common, even in programs which
+can be fully compiled. The compiler may retry several times until it
+finds a suitable trace. This doesn't work with features that are
+not-yet-implemented (NYI error messages). The VM simply falls back to the
+interpreter. This may not matter at all if the particular trace is not very high
+up in the CPU usage profile, plus the interpreter is quite fast, too.
+
+\section{Profiler}
+\label{Sec:Profiler}
+
+This module is a simple command line interface to the built-in
+low-overhead profiler of LuaJIT. The lower-level API of the profiler
+is accessible via the "jit.profile" module or the luaJIT\_profile\_* C API.
+
+Example usage:
+\begin{lstlisting}
+  luajit -jp myapp.lua
+  luajit -jp=s myapp.lua
+  luajit -jp=-s myapp.lua
+  luajit -jp=vl myapp.lua
+  luajit -jp=G,profile.txt myapp.lua
+\end{lstlisting}
+The following dump features are available:
+ \begin{itemize}%[label={--}]
+  \item \textbf{f} - Shows function name (Default mode).
+  \item \textbf{F} - Shows function name with module prepend.
+  \item \textbf{l} - Shows line granularity ('module':'line').
+  \item \textbf{\textless number\textgreater} - Stack dump depth (callee\textless caller - Default: 1)
+  \item \textbf{-\textless number\textgreater} - Inverse stack dump depth (caller\textgreater callee).
+  \item \textbf{s} - Split stack dump after first stack level. Implies $\mid depth\mid$
+  \textgreater= 2.
+  \item \textbf{p} - Show full path for module names.
+  \item \textbf{v} - Show VM states (See bellow).
+  \item \textbf{z} - Show zones (See bellow).
+  \item \textbf{r} - Show raw sample counts (Default: percentages).
+  \item \textbf{a} - Annotate excerpts from source code files.
+  \item \textbf{A} - Annotate complete source code files.
+  \item \textbf{G} - Produce raw output suitable for graphical tools (See bellow).
+  \item \textbf{m\textless number\textgreater} - Minimum sample percentage to be shown (Default: 3).
+  \item \textbf{i\textless number\textgreater} - Sampling interval in milliseconds (Default: 10).
+ \end{itemize}
+
+ Many of those options can be activated at ones.\\
+
+\textbf{\emph{VM states:}}\\
+This options allows to shows the time spent in which state of the VM.
+States can be of the following types :
+
+\{Compiled - Interpreted - C code - Garbage Collector - JIT Compiler\} \\
+
+\textbf{\emph{Zone:}}\\
+statistics can be grouped in user defined zone. Bellow is an example a such a
+definition.
+\begin{lstlisting}
+    local zone = require("jit.zone")
+    zone("MyZone")
+      -- Lua code here
+    zone()
+\end{lstlisting}
+
+\textbf{\emph{Graphical tools:}}\\
+This option can be used to graphically show the dump in a nice image format
+(see Appendix \ref{Apendix:fl})
+
+\section{Dump mode}
+
+This module can be used to debug the JIT compiler itself. It dumps the
+code representations and structures used in various compiler stages.
+
+Example usage:
+\begin{lstlisting}
+  luajit -jdump -e "
+    local x=0
+    for i=1,1e6 do x=x+i end
+    print(x)
+  "
+  luajit -jdump=im -e "
+    for i=1,1000 do
+      for j=1,1000 do end
+    end
+  " | less -R
+  luajit -jdump=is myapp.lua | less -R
+  luajit -jdump=-b myapp.lua
+  luajit -jdump=+aH,myapp.html myapp.lua
+  luajit -jdump=ixT,myapp.dump myapp.lua
+\end{lstlisting}
+The first argument specifies the dump mode. The second argument gives
+the output file name. Default output is to stdout, unless the environment
+variable LUAJIT\_DUMPFILE is set. The file is overwritten every time the
+module is started. Different features can be turned on or off with the dump mode.
+If the mode starts with a '+', the following features are added to the default
+set of features; a '-' removes them. Otherwise the features are replaced.\\
+The following dump features are available (* marks the default):
+
+\begin{itemize}
+  \item \textbf{t *} - Print a line for each started, ended or aborted trace (see also -jv).
+  \item \textbf{b *} - Dump the traced bytecode.
+  \item \textbf{i *} - Dump the IR (intermediate representation).
+  \item \textbf{r} - Augment the IR with register/stack slots.
+  \item \textbf{s} - Dump the snapshot map.
+  \item \textbf{m *} - Dump the generated machine code.
+  \item \textbf{x} - Print each taken trace exit.
+  \item \textbf{X} - Print each taken trace exit and the contents of all registers.
+  \item \textbf{a} - Print the IR of aborted traces, too.
+\end{itemize}
+The output format can be set with the following characters:
+\begin{itemize}
+   \item \textbf{T} - Plain text output.
+   \item \textbf{A} - ANSI-colored text output
+   \item \textbf{H} - Colorized HTML + CSS output.
+\end{itemize}
+The default output format is plain text. It's set to ANSI-colored text
+if the COLORTERM variable is set.

@@ -1,0 +1,151 @@
+GCproto : Function literal (prototype)
+    is followed in memory by func bytecodes
+GCfuncL : closure
+================================================================================
+lj_api.c: Lua c api (stack handling etc...)
+lj_record.c: core trace recorder, converts bytecode into IR
+lj_trace.c: more trace management
+lj_snap.c: handles/creates trace snapshots
+lj_ffrecord.c: records data for fast functions
+lj_crecord.c: records C data ops
+lj_opt_*.c: IR optimisation implementation for * opti.
+lib_*.c: lua api for different part of luajit.
+================================================================================
+JBC
+0006 => UGET     2   0      ; find
+ - 1st column : bc number
+ - 2nd column : branch targets of a function
+ - 3rd column : bc instruction
+ - other-1... : bc arguments
+ - last       : comment corresponding lua code
+================================================================================
+JDUMP USER side
+                        **************************
+IR DUMPT format:
+- 1st column: IR instruction number (implicit SSA ref)
+- 2nd column: physical CPU register or physical CPU stack slot that
+    value is written to when converted to machine code.
+    '[%x+]' (rather than register name) indicates hexadecimal offset
+    from stack pointer.
+    (This column is only present if the 'r' flags is included in -jdump, which
+    augments the IR with register/stack slots.  It is not part of the IR itself.)
+- 3nd column: Instruction flags:
+    ">" (IRT_GUARD = 0x80 instruction flag) are locations of
+        guards (leading to possible side exits from the trace).
+    "+" (IRT_ISPHI = 0x40 instruction flag) indicates
+        instruction is left or right PHI operand. (i.e referred
+        to in some PHI instruction).
+- 4rd column: IR type (see IR Types below)
+- 5th column: IR opcode (see opcode reference)
+- 6th/7th column: IR operands (SSA refs or literals)
+    '#' prefixes refer to slot numbers, used in SLOADS.
+        #0 is the base frame (modified only in tail calls).
+        #1 is the first slot in the first frame (register 0 in
+        the bytecode)
+    '[+-]' prefixes indicate positive or negative numeric literals.
+    '[0x%d+]' and NULL are memory addresses.
+    '"..."' are strings.
+    '@' prefixes indicate hash slot where the key is to be found (in a table).
+    Other possible values: "bias" (number 2^52+2^51 ?), "userdata:%p",
+        "userdata:%p" (table)--when do these occur?.
+See also SSA dump format comments: http://lua-users.org/lists/lua-l/2008-06/msg00225.html
+(older version). See formatk in dump.lua.
+                        **************************
+Each snaphot (SNAP) lists the modified stack slots and their values. The i-th
+value in the snapshot list represents the index of the IR that writes a value in
+slot number #i. '---' indicates that the slot is not written. Frames are
+separated by '|'. For further comments on snapshots, see
+http://lua-users.org/lists/lua-l/2009-11/msg00089.html.
+                        **************************
+SLOAD op2
+P => PARENT     =>  Coalesce with parent trace.
+F => FRAME      =>  Load 32 bits of ftsz.
+T => TYPECHECK  =>  Needs type check.
+C => CONVERT    =>  Number to integer conversion.
+R => READONLY   =>  Read-only, omit slot store.
+I => INHERIT    =>  Inherited by exits/side traces.
+XLOAD
+R => READONLY   => Load from read-only data.
+V => VOLATILE   => Load from volatile data.
+U => UNALIGNED  => Unaligned load.
+[...] do the same for other (look in lj_ir.h)
+                        **************************
+---- TRACE 30 start 21/0 subObject.lua:103
+this is how a side trace is shown
+  - 30 : trace number
+  - 21 : parent number
+  - 0  : exit number inside parent trace
+                        **************************
+Trace stitching is feature which allows traces to stop at a classic C function
+or a not-compiled built-in, return to the interpreter, run the C function or
+built-in and then start a new trace after it returns.
+eg:
+  ---- TRACE 29 start 25/0 subObject.lua:6
+    [...]
+    0000  . FUNCC               ; os.clock (not compiled)
+  ---- TRACE 29 stop -> stitch
+  ---- TRACE 33 start 29/stitch subObject.lua:335
+                        **************************
+BC DUMPT format:
+0007  . . CALL     2   2   2  ;comment
+ - 1st column : bc number, numbered by function
+ - 2nd column : represent depth (call hierarchy)
+ - 3rd column : bc instruction
+ - other-1... : bc arguments
+ - last       : comment corresponding lua code
+--------------------------------------------------------------------------------
+JIT side
+- lib_jit.c
+    - jit_attach : used by dump.lua to attach handler to jit for a specific event.
+    - traceinfo : push back more info to lua world.
+        - jit_trlinkname (linked to TraceLink in lj_jit.h)
+            - none           : LJ_TRLINK_NONE    => Incomplete trace. No link, yet.
+            - root           : LJ_TRLINK_ROOT    => Link to other root trace.
+            - loop           : LJ_TRLINK_LOOP    => Loop to same trace.
+            - tail-recursion : LJ_TRLINK_TAILREC => Tail-recursion.
+            - up-recursion   : LJ_TRLINK_UPREC   => Up-recursion.
+            - down-recursion : LJ_TRLINK_DOWNREC => Down-recursion.
+            - interpreter    : LJ_TRLINK_INTERP  => Fallback to interpreter.
+            - return         : LJ_TRLINK_RETURN  => Return to interpreter.
+            - stitch         : LJ_TRLINK_STITCH  => race stitching.
+- lj_vmevent.h
+    - VMEvent enum (BC, TRACE, RECORD, TEXIT)
+    - lj_vmevent_send to `send back to dump.lua`
+- lj_vmevent.c
+    - lj_vmevent_prepare : find the handler attached to an event
+    - lj_vmevent_call : call that handler if any
+- lj_trace.h (lj_traceerr.h)
+    - TraceError : all different error types -> similar as *traceerr* in vmdef.lua
+- lj_trace.c
+    - trace_state : State machine for the trace compiler.
+        - LJ_TRACE_START : start recording (call to trace_start).
+        - LJ_TRACE_RECORD : recording in process.
+        - LJ_TRACE_END : end of recording + apply optimizations on IR.
+        - LJ_TRACE_ASM : assemble the trace.
+        - LJ_TRACE_ERR : abort (trace_abort).
+    - trace_start
+    - trace_stop
+    - trace_abort
+================================================================================
+How does tracing work:
+    In the vm (asm) each tracable loop-like/call-like BC decrement a pc-hashed
+position of a (64-entry) table. When the counter underflows it start recording
+etc... (go back to c). add the end it patch the BC with a call to the trace.
+    For Loop
+        - hotloop : hash the pc and decrement the corresponding counter.
+        - vm_hotloop :
+        - lj_trace_hot: start recording a trace
+    For Function
+        - hotcall : hash the pc and decrement the corresponding counter.
+        - vm_hotcall :
+        - lj_dispatch_call : start recording a trace
+================================================================================
+Programming advice:
+  1) for i=1,#s do end
+  2) for v in ipairs(s) do end
+1) is better in terms of performance. (to be confirmed)
+                        **************************
+Jitting start always jiting the inner loop first
+                        **************************
+When starting a record hotcount is reseted
+
