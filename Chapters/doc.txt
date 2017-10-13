@@ -130,13 +130,16 @@ JIT side
 How does tracing work:
     In the vm (asm) each tracable loop-like/call-like BC decrement a pc-hashed
 position of a (64-entry) table. When the counter underflows it start recording
-etc... (go back to c). add the end it patch the BC with a call to the trace.
-    For Loop
-        - hotloop : hash the pc and decrement the corresponding counter.
+etc... (go back to c). At the end it patch the BC with a call to the compiled
+trace.
+    - For Loop
+        - hotloop : hash the pc, decrement the corresponding counter
+            jmp to vm_hotloop if it underflows.
         - vm_hotloop :
         - lj_trace_hot: start recording a trace
-    For Function
-        - hotcall : hash the pc and decrement the corresponding counter.
+    - For Function
+        - hotcall : hash the pc, decrement the corresponding counter
+            jmp to vm_hotcall if it underflows.
         - vm_hotcall :
         - lj_dispatch_call : start recording a trace
 ================================================================================
