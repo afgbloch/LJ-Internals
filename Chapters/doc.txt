@@ -58,17 +58,59 @@ separated by '|'. For further comments on snapshots, see
 http://lua-users.org/lists/lua-l/2009-11/msg00089.html.
                         **************************
 SLOAD op2
-P => PARENT     =>  Coalesce with parent trace.
-F => FRAME      =>  Load 32 bits of ftsz.
-T => TYPECHECK  =>  Needs type check.
-C => CONVERT    =>  Number to integer conversion.
-R => READONLY   =>  Read-only, omit slot store.
-I => INHERIT    =>  Inherited by exits/side traces.
+    P => PARENT     =>  Coalesce with parent trace.
+    F => FRAME      =>  Load 32 bits of ftsz.
+    T => TYPECHECK  =>  Needs type check.
+    C => CONVERT    =>  Number to integer conversion.
+    R => READONLY   =>  Read-only, omit slot store.
+    I => INHERIT    =>  Inherited by exits/side traces.
 XLOAD
-R => READONLY   => Load from read-only data.
-V => VOLATILE   => Load from volatile data.
-U => UNALIGNED  => Unaligned load.
-[...] do the same for other (look in lj_ir.h)
+    R => READONLY   => Load from read-only data.
+    V => VOLATILE   => Load from volatile data.
+    U => UNALIGNED  => Unaligned load.
+FLOAD == FREF
+    str.len       => STR_LEN
+    func.env      => FUNC_ENV
+    func.pc       => FUNC_PC
+    func.ffid     => FUNC_FFID     => Function id
+    thread.env    => THREAD_ENV
+    tab.meta      => TAB_META
+    tab.array     => TAB_ARRAY
+    tab.node      => TAB_NODE      => Hash part
+    tab.asize     => TAB_ASIZE     => Size of array part
+    tab.hmask     => TAB_HMASK     => Size of hash part - 1
+    tab.nomm      => TAB_NOMM      => Negative cache for fast metamethods (bitmap marking absent fields of the metatable)
+    udata.meta    => UDATA_META
+    udata.udtype  => UDATA_UDTYPE
+        UDTYPE_USERDATA => Regular userdata.
+        UDTYPE_IO_FILE  => I/O library FILE.
+        UDTYPE_FFI_CLIB => FFI C library namespace.
+    udata.file    => UDATA_FILE    => udata payload
+    cdata.ctypeid => CDATA_CTYPEID
+    cdata.ptr     => CDATA_PTR     => cdata payload
+    cdata.int     => CDATA_INT     => cdata payload
+    cdata.int64   => CDATA_INT64   => cdata payload
+    cdata.int64_4 => CDATA_INT64_4 => cdata payload
+FPMATH
+    floor => FPM_FLOOR
+    ceil  => FPM_CEIL
+    trunc => FPM_TRUNC
+    sqrt  => FPM_SQRT
+    exp   => FPM_EXP
+    exp2  => FPM_EXP2
+    log   => FPM_LOG
+    log2  => FPM_LOG2
+    log10 => FPM_LOG10
+    sin   => FPM_SIN
+    cos   => FPM_COS
+    tan   => FPM_TAN
+BUFHDR
+    IRBUFHDR_RESET  => Reset buffer
+    IRBUFHDR_APPEND => Append to buffer
+TOSTR
+    INT  => IRTOSTR_INT  => Convert integer to string.
+    NUM  => IRTOSTR_NUM  => Convert number to string.
+    CHAR => IRTOSTR_CHAR => Convert char value to string.
                         **************************
 ---- TRACE 30 start 21/0 subObject.lua:103
 this is how a side trace is shown
