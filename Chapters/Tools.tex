@@ -1,5 +1,6 @@
 %!TEX root = ../FYP_Dissertation.tex
 \section{Verbose mode}
+\label{Sec:Verbose}
 
 This module shows verbose information about the progress of the
 JIT compiler. It prints one line for each generated trace. This module
@@ -87,13 +88,13 @@ The following dump features are available:
 
  Many of those options can be activated at ones.\\
 
-\textbf{\emph{VM states:}}\\
+\paratitle{VM states:}\\
 This options allows to shows the time spent in which state of the VM.
 States can be of the following types :
 
 \{Compiled - Interpreted - C code - Garbage Collector - JIT Compiler\} \\
 
-\textbf{\emph{Zone:}}\\
+\paratitle{Zone:}\\
 statistics can be grouped in user defined zone. Bellow is an example a such a
 definition.
 \begin{lstlisting}
@@ -103,11 +104,12 @@ definition.
     zone()
 \end{lstlisting}
 
-\textbf{\emph{Graphical tools:}}\\
+\paratitle{Graphical tools:}\\
 This option can be used to graphically show the dump in a nice image format
 (see Appendix \ref{Apendix:fl})
 
 \section{Dump mode}
+\label{Sec:Dump-mode}
 
 This module can be used to debug the JIT compiler itself. It dumps the
 code representations and structures used in various compiler stages.

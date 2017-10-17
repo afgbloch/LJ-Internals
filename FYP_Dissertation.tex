@@ -67,6 +67,8 @@
 \newtheorem{lemma}{Lemma}
 \newtheorem{definition}{Definition}
 
+\newcommand{\paratitle}[1]{\underline{\textbf{\emph{#1}}}}
+\newcommand{\keyword}[1]{\textcolor{red}{\emph{#1}}}
 % \usepackage{enumitem}
 
 % --------------------------------------------------------------------------------
@@ -238,6 +240,7 @@
 
   \chapter{Bytecode interpreter}
   \label{Chapt:BI}
+  \input{./Chapters/Bytecode-interpreter}
 
   \chapter{Foreign function interface}
   \label{Chapt:FFI}
@@ -260,8 +263,8 @@
   \chapter{Optimizer}
   \label{Chapt:Optimizer}
 
-  \chapter{DynASM: Assembler}
-  \label{Chapt:DynASM}
+  \chapter{Machine code emitter}
+  \label{Chapt:mcode}
 %--------------------------------------------------------------------------------
 % Prints out any appendices (comment/delete if you do not need any)
 %--------------------------------------------------------------------------------
@@ -274,6 +277,11 @@
 \label{Apendix:fl}
 \lhead{Appendix \ref{Apendix:fl}. \emph{Flame graphs}}
 \input{./Chapters/Flame}
+
+\chapter{DynASM: Assembler}
+\label{Apendix:DynASM}
+\lhead{Appendix \ref{Apendix:DynASM}. \emph{DynASM: Assembler}}
+\input{./Chapters/DynASM}
 
 \addtocontents{toc}{\vspace{2em}} % Add a gap in the Contents, for aesthetics
 

@@ -1,0 +1,54 @@
+%!TEX root = ../FYP_Dissertation.tex
+DynASM is a Dynamic Assembler for code generation engines, it has been developed
+primarily as a tool for LuaJIT and its source code can be found in the dynasm
+folder of the LuaJIT project \cite{luajit-src}. It is currently used in LuaJIT
+v2 has a tool to write the fast VM interpreting the bytecode. It support the
+following platforms : x86, x64, ARM, PowerPC, and MIPS. An unofficial
+documentation with tutorials is available \cite{dynasm}. In the remaining part
+of this appendix, a minimum amount of information is presented to give the
+ability to read and understand a DynASM file (\emph{.dasc}).
+
+
+\paratitle{Main directives}
+
+\begin{itemize}
+	\item \keyword{.arch} : Specifies the architecture of the assembly code.
+	\item \keyword{.type} name, ctype [, default\_reg] : Makes easier to manipulate registers of type \emph{ctype*}. The provided syntactic sugar is depicted in
+Table~\ref{tab:type-sugar}.
+	\item \keyword{.macro} [...] \keyword{.endmacro} : Create a multi-lines
+macro instruction that can be invoked as a normal instruction and where arguments
+will be substituted.
+ 	\item \keyword{.define} : Defines a prepreprocessor substitution.
+	\item \keyword{.if} [...] \keyword{.elif} [...] \keyword{.else} [...] \keyword{.endif} : Preprocessor conditional construct similar as c preprocessor.
+\end{itemize}
+
+\begin{table}
+\centering
+\begin{tabular}{|l|l|}
+\hline
+\multicolumn{1}{|c|}{Sugar} & \multicolumn{1}{c|}{Expansion} \\\hline
+\#name						& sizeof(ctype)\\
+name:reg-\textgreater field	& [reg + offsetof(ctype,field)]\\
+name:reg[imm32]				& [reg + sizeof(ctype)*imm32]\\
+name:reg[imm32].field 		& [reg + sizeof(ctype)*imm32 + offsetof(ctype,field)]\\
+name:reg...					& [reg + (int)(ptrdiff\_t)\&(((ctype*)0)...)]\\\hline
+\end{tabular}
+\caption{Syntactic sugar provided by \keyword{.type} macro}
+\label{tab:type-sugar}
+\end{table}
+
+\paratitle{Line markers}\\
+Typical DynASM lines that emit some assembler instructions has to start with a
+vertical bare ("$\vert$"). If we want to emit some lines of \emph{C} code but
+still want DynASM's preprocessor to do substitution, the line has to start with a double vertical bar ("$\vert\vert$"). Finally lines with no starting markers are
+truly untouched and discarded by DynASM. To be noted that lines of \emph{C} code that
+has to be inlined with a macro must start with a double vertical bar. \\
+
+\paratitle{Labels}\\
+They exist multiple types of labels to refer to. The first category is global
+labels that have two types, static label ($\vert-$\textgreater name:) and dynamic ones ($\vert$=\textgreater imm32:).
+Those labels have to be unique in a DynASM file. The second category is local
+labels that use a single digit from 1 to 9 ($\vert$i:). They can be define
+multiple times inside a same DynASM file and are used by jump instructions by
+means of the syntax \textless i or \textgreater i. They respectively point to
+the most recent, the next definition of i as the jump target.
