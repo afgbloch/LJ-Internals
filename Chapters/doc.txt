@@ -135,7 +135,7 @@ JIT side
 - lib_jit.c
     - jit_attach : used by dump.lua to attach handler to jit for a specific event.
     - traceinfo : push back more info to lua world.
-        - jit_trlinkname (linked to TraceLink in lj_jit.h)
+        - jit_trlinkname (lib_jit.c) (linked to TraceLink in lj_jit.h)
             - none           : LJ_TRLINK_NONE    => Incomplete trace. No link, yet.
             - root           : LJ_TRLINK_ROOT    => Link to other root trace.
             - loop           : LJ_TRLINK_LOOP    => Loop to same trace.

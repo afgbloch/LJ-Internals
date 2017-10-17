@@ -1,6 +1,6 @@
 %!TEX root = ../FYP_Dissertation.tex
 \section{How to use it}
-\label{Sec:usage}
+\label{Sec:dump-usage}
 This module can be used to debug the JIT compiler itself. It dumps the
 code representations and structures used in various compiler stages.
 
@@ -49,15 +49,85 @@ The output format can be set with the following characters:
 The default output format is plain text. It's set to ANSI-colored text
 if the COLORTERM variable is set.
 
-\section{Understanding trace states dump}
-\label{Sec:dump-ir}
+\section{Understanding states dump}
+\label{Sec:dump-states}
+This command looks like the verbose mode (-jv) and print informations for each start,
+end or abortion of a trace. The output can have one of those three shapes.\\
+---- TRACE 1 start foo.lua:125\\
+---- TRACE 1 stop -\textgreater [link]\\
+---- TRACE 1 abort foo.lua:142 -- [message]\\
+The first one is emitted when a recording starts. It shows the potential
+trace number, the file and the source line where that trace start.
+The second one is emitted when a trace has been successfully recorded. In
+addition of the trace number, it shows to what the trace link to (See Table
+\ref{tab-link} for [link] possible values).
+
+\begin{table}
+\centering
+\begin{tabular}{|l|l|l|}
+\hline
+\multicolumn{1}{|c|}{value} & \multicolumn{1}{c|}{Macro} & \multicolumn{1}{c|}{Meaning}\\\hline
+none           & LJ\_TRLINK\_NONE    & Incomplete trace. No link, yet.\\
+root           & LJ\_TRLINK\_ROOT    & Link to other root trace.\\
+loop           & LJ\_TRLINK\_LOOP    & Loop to same trace.\\
+tail-recursion & LJ\_TRLINK\_TAILREC & Tail-recursion.\\
+up-recursion   & LJ\_TRLINK\_UPREC   & Up-recursion.\\
+down-recursion & LJ\_TRLINK\_DOWNREC & Down-recursion.\\
+interpreter    & LJ\_TRLINK\_INTERP  & Fallback to interpreter.\\
+return         & LJ\_TRLINK\_RETURN  & Return to interpreter.\\
+stitch         & LJ\_TRLINK\_STITCH  & race stitching.\\\hline
+\end{tabular}
+\caption{Possible value for [link] \\(See jit\_trlinkname,TraceLink (lib\_jit.c, lj\_jit.h))}
+\label{tab:dump-link}
+\end{table}
+
+
+
+
+
+
+
+
+
+
+
+        % - jit_trlinkname (lib_jit.c) (linked to TraceLink in lj_jit.h)
+        %     - none           : LJ_TRLINK_NONE    => Incomplete trace. No link, yet.
+        %     - root           : LJ_TRLINK_ROOT    => Link to other root trace.
+        %     - loop           : LJ_TRLINK_LOOP    => Loop to same trace.
+        %     - tail-recursion : LJ_TRLINK_TAILREC => Tail-recursion.
+        %     - up-recursion   : LJ_TRLINK_UPREC   => Up-recursion.
+        %     - down-recursion : LJ_TRLINK_DOWNREC => Down-recursion.
+        %     - interpreter    : LJ_TRLINK_INTERP  => Fallback to interpreter.
+        %     - return         : LJ_TRLINK_RETURN  => Return to interpreter.
+        %     - stitch         : LJ_TRLINK_STITCH  => race stitching.
+%                         **************************
+% ---- TRACE 30 start 21/0 subObject.lua:103
+% this is how a side trace is shown
+%   - 30 : trace number
+%   - 21 : parent number
+%   - 0  : exit number inside parent trace
+%                         **************************
+% Trace stitching is feature which allows traces to stop at a classic C function
+% or a not-compiled built-in, return to the interpreter, run the C function or
+% built-in and then start a new trace after it returns.
+% eg:
+%   ---- TRACE 29 start 25/0 subObject.lua:6
+%     [...]
+%     0000  . FUNCC               ; os.clock (not compiled)
+%   ---- TRACE 29 stop -> stitch
+%   ---- TRACE 33 start 29/stitch subObject.lua:335
+
 
 \section{Understanding BC dump}
-\label{Sec:dump-ir}
+\label{Sec:dump-bc}
 
 \section{Understanding IR dump}
 \label{Sec:dump-ir}
 
 \section{Understanding mcode dump}
-\label{Sec:dump-ir}
+\label{Sec:dump-mcode}
+
+\section{How does it works}
+\label{Sec:dump-internals}
 
