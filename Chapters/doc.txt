@@ -2,8 +2,6 @@ GCproto : Function literal (prototype)
     is followed in memory by func bytecodes
 GCfuncL : closure
 ================================================================================
-lj_record.c: core trace recorder, converts bytecode into IR
-lj_trace.c: more trace management
 lj_snap.c: handles/creates trace snapshots
 lj_ffrecord.c: records data for fast functions
 lj_crecord.c: records C data ops
