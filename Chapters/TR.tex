@@ -1,3 +1,27 @@
 %!TEX root = ../FYP_Dissertation.tex
 \section{Hotpath detection}
-\label{Sec:Verbose}
+\label{Sec:Hotpath}
+LuaJIT does trace compilation. For that, it needs to detect that a certain
+portion of the code gets hot and compile it as a trace. Two types of trace entry
+are detected, loops and function. In the vm (See Part \ref{Part:VM}) each
+traceable loop-like or call-like BC (byte-code) decrement a counter that is the
+hashed pc (program counter) position of a (64-entries) table. When the counter underflows it start recording. At the end of the recording phase, it patch the
+BC with a call to the compiled trace.
+
+\paratitle{Loops:}
+
+\begin{itemize}
+	\item \emph{hotloop} : hash the pc, decrement the corresponding counter and
+jmp to vm\_hotloop if it underflows (vm\_(arch).dasc).
+	\item \emph{vm\_hotloop} : Prepare the stack and call lj\_trace\_hot.
+	\item \emph{lj\_trace\_hot} : start recording a trace (lj\_trace.c).
+\end{itemize}
+
+\paratitle{Functions:}
+
+\begin{itemize}
+	\item \emph{hotcall} : hash the pc, decrement the corresponding counter and
+jmp to vm\_hotcall if it underflows (vm\_(arch).dasc).
+	\item \emph{vm\_hotcall} : Prepare the stack and call lj\_dispatch\_call.
+	\item \emph{lj\_dispatch\_call} : start recording a trace (lj\_dispatch.c).
+\end{itemize}
