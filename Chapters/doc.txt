@@ -191,5 +191,5 @@ Programming advice:
                         **************************
 Jitting start always jiting the inner loop first
                         **************************
-When starting a record hotcount is reseted
+When starting a record hotcount is reseted even if trace endup aborted.
 

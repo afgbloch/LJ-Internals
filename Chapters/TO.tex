@@ -1,0 +1,43 @@
+%!TEX root = ../FYP_Dissertation.tex
+
+We can differentiate in the code, three types of optimizations.
+First of all there are the optimizations present in the optimization engine.
+They are implemented in the \emph{lj\_opt\_*.c} files and thus easy to spot out.
+Those optimization are of two kind, global optimization that are run on the
+entire IR at once at the end of the recording phase (See \ref{Sec:opt-dce}, \ref{Sec:opt-loop}, \ref{Sec:opt-split}, \ref{Sec:opt-sinking}) and the local
+optimizations that are applied while recording a trace (See \ref{Sec:narrowing},
+\ref{Sec:mao}, \ref{Sec:fold}).
+Finally, there is a plethora of optimization and heuristic applied here and
+there (See ).\todo{add references}
+% ------------------------------------------------------------------------------
+% Optimization Engine : Global Optimizations (end of recording phase)
+% ------------------------------------------------------------------------------
+
+\section{Dead code elimination}
+\label{Sec:opt-dce}
+
+\section{Loop optimizations}
+\label{Sec:opt-loop}
+
+\section{Split optimizations}
+\label{Sec:opt-split}
+
+\section{Sinking optimizations}
+\label{Sec:opt-sinking}
+
+% ------------------------------------------------------------------------------
+% Optimization Engine : Local Optimizations (During recording phase)
+% ------------------------------------------------------------------------------
+
+\section{Narrowing optimizations}
+\label{Sec:narrowing}
+
+\section{Memory access optimizations}
+\label{Sec:mao}
+
+\section{Fold optimizations}
+\label{Sec:fold}
+
+% ------------------------------------------------------------------------------
+% Embeded Optimizations
+% ------------------------------------------------------------------------------

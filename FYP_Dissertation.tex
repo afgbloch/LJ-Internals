@@ -54,6 +54,7 @@
 \usepackage{algpseudocode}        % more layout options for algorithm pseudo code
 \usepackage{listings}             % to add non-formatted text e.g. source code
 
+\usepackage{todonotes}
 \lstdefinestyle{myLuastyle}
 {
   language         = {[5.2]Lua},
@@ -253,15 +254,19 @@
 
   \chapter{Trace record}
   \label{Chapt:TR}
+  \input{./Chapters/TR.tex}
 
   \chapter{Intermediate representation}
   \label{Chapt:IR}
+  \input{./Chapters/IR.tex}
 
   \chapter{Trace manager}
   \label{Chapt:TM}
+  \input{./Chapters/TM.tex}
 
-  \chapter{Optimizer}
-  \label{Chapt:Optimizer}
+  \chapter{Trace optimizer}
+  \label{Chapt:TO}
+  \input{./Chapters/TO.tex}
 
   \chapter{Machine code emitter}
   \label{Chapt:mcode}
