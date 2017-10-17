@@ -7,7 +7,6 @@ lj_trace.c: more trace management
 lj_snap.c: handles/creates trace snapshots
 lj_ffrecord.c: records data for fast functions
 lj_crecord.c: records C data ops
-lib_*.c: lua api for different part of luajit.
 ================================================================================
 JBC
 0006 => UGET     2   0      ; find

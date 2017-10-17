@@ -1,0 +1,54 @@
+%!TEX root = ../FYP_Dissertation.tex
+This module is a simple command line interface to the built-in
+low-overhead profiler of LuaJIT. The lower-level API of the profiler
+is accessible via the "jit.profile" module or the luaJIT\_profile\_* C API.
+
+Example usage:
+\begin{lstlisting}
+  luajit -jp myapp.lua
+  luajit -jp=s myapp.lua
+  luajit -jp=-s myapp.lua
+  luajit -jp=vl myapp.lua
+  luajit -jp=G,profile.txt myapp.lua
+\end{lstlisting}
+The following dump features are available:
+ \begin{itemize}%[label={--}]
+  \item \textbf{f} - Shows function name (Default mode).
+  \item \textbf{F} - Shows function name with module prepend.
+  \item \textbf{l} - Shows line granularity ('module':'line').
+  \item \textbf{\textless number\textgreater} - Stack dump depth (callee\textless caller - Default: 1)
+  \item \textbf{-\textless number\textgreater} - Inverse stack dump depth (caller\textgreater callee).
+  \item \textbf{s} - Split stack dump after first stack level. Implies $\mid depth\mid$
+  \textgreater= 2.
+  \item \textbf{p} - Show full path for module names.
+  \item \textbf{v} - Show VM states (See bellow).
+  \item \textbf{z} - Show zones (See bellow).
+  \item \textbf{r} - Show raw sample counts (Default: percentages).
+  \item \textbf{a} - Annotate excerpts from source code files.
+  \item \textbf{A} - Annotate complete source code files.
+  \item \textbf{G} - Produce raw output suitable for graphical tools (See bellow).
+  \item \textbf{m\textless number\textgreater} - Minimum sample percentage to be shown (Default: 3).
+  \item \textbf{i\textless number\textgreater} - Sampling interval in milliseconds (Default: 10).
+ \end{itemize}
+
+ Many of those options can be activated at ones.\\
+
+\paratitle{VM states:}\\
+This options allows to shows the time spent in which state of the VM.
+States can be of the following types :
+
+\{Compiled - Interpreted - C code - Garbage Collector - JIT Compiler\} \\
+
+\paratitle{Zone:}\\
+statistics can be grouped in user defined zone. Bellow is an example a such a
+definition.
+\begin{lstlisting}
+    local zone = require("jit.zone")
+    zone("MyZone")
+      -- Lua code here
+    zone()
+\end{lstlisting}
+
+\paratitle{Graphical tools:}\\
+This option can be used to graphically show the dump in a nice image format
+(see Appendix \ref{Apendix:fl})
