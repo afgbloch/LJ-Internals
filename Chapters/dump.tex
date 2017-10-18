@@ -52,10 +52,12 @@ if the COLORTERM variable is set.
 \section{Understanding states dump}
 \label{Sec:dump-states}
 This command looks like the verbose mode (-jv) and print informations for each start,
-end or abortion of a trace. The output can have one of those three shapes.\\
----- TRACE 1 start foo.lua:125\\
----- TRACE 1 stop -\textgreater [link]\\
----- TRACE 1 abort foo.lua:142 -- [message]\\
+end or abortion of a trace. The output can have one of those three shapes.
+\begin{verbatim}
+---- TRACE 1 start foo.lua:125
+---- TRACE 1 stop -> [link]
+---- TRACE 1 abort foo.lua:142 -- [message]
+\end{verbatim}
 The first one is emitted when a recording starts. It shows the potential
 trace number, the file and the source line where that trace start.
 The second one is emitted when a trace has been successfully recorded. In
@@ -90,23 +92,33 @@ stitch                      & race stitching.\\\hline
 
 
 \paratitle{Side trace}\\
-% ---- TRACE 30 start 21/0 subObject.lua:103
-% this is how a side trace is shown
-%   - 30 : trace number
-%   - 21 : parent number
-%   - 0  : exit number inside parent trace
+When instruction of a trace marked as guard fail, the normal execution of a
+trace is interrupted. We then call that spot a side exit of the trace. When a
+given side exit is taken enough time, it is said to be hot and generate a new
+trace starting from it. This new trace is called a side trace of the first one
+called the parent trace. Bellow is how the start of the recording of a side
+trace is shown in the dump.
+\begin{verbatim}
+---- TRACE 30 start 21/0 foo.lua:103
+\end{verbatim}
+Here 30 is the side trace number, 21 the parent trace from witch the side trace
+start from and 0 is the side exit number.
 
 \paratitle{Stitching}\\
-% Trace stitching is feature which allows traces to stop at a classic C function
-% or a not-compiled built-in, return to the interpreter, run the C function or
-% built-in and then start a new trace after it returns.
-% eg:
-%   ---- TRACE 29 start 25/0 subObject.lua:6
-%     [...]
-%     0000  . FUNCC               ; os.clock (not compiled)
-%   ---- TRACE 29 stop -> stitch
-%   ---- TRACE 33 start 29/stitch subObject.lua:335
-
+Trace stitching is feature which allows traces to stop at a classic C function
+or a not-compiled built-in, return to the interpreter, run the C function or
+built-in and then start a new trace after it returns. Bellow is an example of
+how trace stitching due to a not-compiled built-in can be shown in the dump.
+\begin{verbatim}
+---- TRACE 1 start foo.lua:6
+  [...]
+  0000  . FUNCC               ; os.clock
+---- TRACE 1 stop -> stitch
+---- TRACE 2 start 1/stitch foo.lua:35
+\end{verbatim}
+As you can see the trace prior to the stitching has its link marked as
+\emph{stitch} and the one after is shown like a side trace but with
+\emph{stitch} instead of the number of the side exit.
 
 \section{Understanding BC dump}
 \label{Sec:dump-bc}

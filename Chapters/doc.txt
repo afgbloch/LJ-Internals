@@ -107,22 +107,6 @@ TOSTR
     NUM  => IRTOSTR_NUM  => Convert number to string.
     CHAR => IRTOSTR_CHAR => Convert char value to string.
                         **************************
----- TRACE 30 start 21/0 subObject.lua:103
-this is how a side trace is shown
-  - 30 : trace number
-  - 21 : parent number
-  - 0  : exit number inside parent trace
-                        **************************
-Trace stitching is feature which allows traces to stop at a classic C function
-or a not-compiled built-in, return to the interpreter, run the C function or
-built-in and then start a new trace after it returns.
-eg:
-  ---- TRACE 29 start 25/0 subObject.lua:6
-    [...]
-    0000  . FUNCC               ; os.clock (not compiled)
-  ---- TRACE 29 stop -> stitch
-  ---- TRACE 33 start 29/stitch subObject.lua:335
-                        **************************
 BC DUMPT format:
 0007  . . CALL     2   2   2  ;comment
  - 1st column : bc number, numbered by function
