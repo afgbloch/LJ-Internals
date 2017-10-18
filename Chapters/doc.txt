@@ -107,13 +107,6 @@ TOSTR
     NUM  => IRTOSTR_NUM  => Convert number to string.
     CHAR => IRTOSTR_CHAR => Convert char value to string.
                         **************************
-BC DUMPT format:
-0007  . . CALL     2   2   2  ;comment
- - 1st column : bc number, numbered by function
- - 2nd column : represent depth (call hierarchy)
- - 3rd column : bc instruction
- - other-1... : bc arguments
- - last       : comment corresponding lua code
 --------------------------------------------------------------------------------
 JIT side
 - lib_jit.c

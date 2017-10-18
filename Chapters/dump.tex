@@ -122,6 +122,19 @@ As you can see the trace prior to the stitching has its link marked as
 
 \section{Understanding BC dump}
 \label{Sec:dump-bc}
+Bellow is a example of how a BC instruction is shown in the dump. For a complete
+list of BC instruction and their corresponding arguments look at the wiki page
+\cite{luajit-bc}.
+\begin{verbatim}
+0007  . . CALL     2   2   2  ;comment
+\end{verbatim}
+\begin{itemize}
+  \item 1st column : bc number, numbered by function.
+  \item 2nd column : The dots represent the depth (call hierarchy).
+  \item 3rd column : bc instruction.
+  \item other-1... : bc arguments.
+  \item last       : comment helping to tie the instruction to the lua code.
+\end{itemize}
 
 \section{Understanding IR dump}
 \label{Sec:dump-ir}
