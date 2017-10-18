@@ -137,7 +137,179 @@ list of BC instruction and their corresponding arguments look at the wiki page
 \end{itemize}
 
 \section{Understanding IR dump}
+Bellow are some example of dumps of IR instructions.
 \label{Sec:dump-ir}
+\begin{verbatim}
+0001 rax   >  tab SLOAD  #46   T
+0014 rbp      int TOBIT  0005  bias
+0040 [1c]  >  tab HLOAD  0039
+0035  {sink}+ cdt CNEW   +16
+0023  {0021}  num XSTORE 0022  0018
+0155       >  p32 HREFK  0154  "assert" @131
+0159       >  fun EQ     0158  madl_gutil.mad:298
+\end{verbatim}
+
+\begin{itemize}
+  \item 1st column: IR instruction number (numbered per trace)
+  \item 2nd column: Show where the value is written to when converted to machine
+    code. This column is only present if the 'r' flags is included in -jdump,
+    which augments the IR with register/stack slots. It is not part of the IR
+    itself.
+    \begin{itemize}
+      \item '\%w' : physical CPU register
+      \item '[\%d+]' : physical CPU stack slot (hexadecimal offset from stack pointer).
+      \item \{sink\} : Show when a \emph{sink} optimization occur.
+      \item \{\%d+\} : Refers to the IR instruction where a \emph{sink}
+        optimization occur.
+    \end{itemize}
+  \item 3nd column: Instruction flags (See lj\_ir.h)
+  \begin{itemize}
+    \item "\textgreater" (IRT\_GUARD) are locations of
+        guards (leading to possible side exits from the trace).
+    \item "+" (IRT\_ISPHI) indicates
+        instruction is left or right PHI operand. (i.e referred
+        to in some PHI instruction).
+  \end{itemize}
+  \item 4rd column: IR type.
+  \item 5th column: IR opcode.
+  \item 6th/7th column: IR operands
+    \begin{itemize}
+      \item '\%d+' : reference to IR instruction (SSA ref).
+      \item '\#' : prefixes refer to slot numbers, used in SLOADS.
+        \#0 is the base frame (modified only in tail calls).
+        \#1 is the first slot in the first frame (register 0 in
+        the bytecode).
+      \item '(+$\vert$-)\%d+' : prefixes indicate positive or negative numeric literals.
+      \item '[0x\%d+]$\vert$NULL' : memory addresses.
+      \item '"..."' : strings.
+      \item '@\%d+' : indicate slot where the value of a key is to be found (in a table).
+      \item 'bias' : Used by \emph{TOBIT} represent the constant
+        $2^{52}+2^{51}$ added to the FP number.
+      \item \{0x\%d+\} : lua table.
+      \item 'userdata:\%p' : user data.
+      \item 'my\_func:ligne' : functions.
+      \item '(...)' : function arguments for call-type IR.
+    \end{itemize}
+\end{itemize}
+
+\begin{table}
+\centering
+\begin{tabular}{|l|l|l|}
+\hline
+\multicolumn{3}{|c|}{SLOAD}\\\hline
+P & PARENT    & Coalesce with parent trace.\\
+F & FRAME     & Load 32 bits of ftsz.\\
+T & TYPECHECK & Needs type check.\\
+C & CONVERT   & Number to integer conversion.\\
+R & READONLY  & Read-only, omit slot store.\\
+I & INHERIT   & Inherited by exits/side traces.\\
+\hline
+\end{tabular}
+\end{table}
+\begin{table}
+\centering
+\begin{tabular}{|l|l|l|}
+\hline
+\multicolumn{3}{|c|}{XLOAD}\\\hline
+R & READONLY  & Load from read-only data.\\
+V & VOLATILE  & Load from volatile data.\\
+U & UNALIGNED & Unaligned load.\\
+\hline
+\end{tabular}
+\end{table}
+\begin{table}
+\centering
+\begin{tabular}{|l|l|l|}
+\hline
+\multicolumn{3}{|c|}{FLOAD or FREF}\\\hline
+str.len        & IRFL\_STR\_LEN        & \\
+func.env       & IRFL\_FUNC\_ENV       & \\
+func.pc        & IRFL\_FUNC\_PC        & \\
+func.ffid      & IRFL\_FUNC\_FFID      & Function id\\
+thread.env     & IRFL\_THREAD\_ENV     & \\
+tab.meta       & IRFL\_TAB\_META       & \\
+tab.array      & IRFL\_TAB\_ARRAY      & \\
+tab.node       & IRFL\_TAB\_NODE       & Hash part\\
+tab.asize      & IRFL\_TAB\_ASIZE      & Size of array part\\
+tab.hmask      & IRFL\_TAB\_HMASK      & Size of hash part - 1\\
+% \multirow{2}{*}{tab.nomm\\} & \multirow{2}{*}{IRFL\_TAB\_NOMM} & \multirow{2}{*}{Negative cache for fast metamethods bitmap marking absent fields of the metatable}\\
+\multirow{3}{*}{tab.nomm} & \multirow{3}{*}{IRFL\_TAB\_NOMM} & Negative cache for fast \\
+& & metamethods bitmap, marking\\
+& & absent fields of the metatable\\
+udata.meta     & IRFL\_UDATA\_META     & \\
+udata.udtype   & IRFL\_UDATA\_UDTYPE   & See UDTYPE table\\
+udata.file     & IRFL\_UDATA\_FILE     & udata payload \\
+cdata.ctypeid  & IRFL\_CDATA\_CTYPEID  & \\
+cdata.ptr      & IRFL\_CDATA\_PTR      & cdata payload \\
+cdata.int      & IRFL\_CDATA\_INT      & cdata payload \\
+cdata.int64    & IRFL\_CDATA\_INT64    & cdata payload \\
+cdata.int64\_4 & IRFL\_CDATA\_INT64\_4 & cdata payload \\
+\hline
+\end{tabular}
+\end{table}
+\begin{table}
+\centering
+\begin{tabular}{|l|l|}
+\hline
+\multicolumn{2}{|c|}{UDTYPE}\\\hline
+UDTYPE\_USERDATA  & Regular userdata.\\
+UDTYPE\_IO\_FILE  & I/O library FILE.\\
+UDTYPE\_FFI\_CLIB & FFI C library namespace.\\\hline
+\end{tabular}
+\end{table}
+\begin{table}
+\centering
+\begin{tabular}{|l|l|}
+\hline
+\multicolumn{2}{|c|}{FPMATH}\\\hline
+floor & FPM\_FLOOR \\
+ceil  & FPM\_CEIL  \\
+trunc & FPM\_TRUNC \\
+sqrt  & FPM\_SQRT  \\
+exp   & FPM\_EXP   \\
+exp2  & FPM\_EXP2  \\
+log   & FPM\_LOG   \\
+log2  & FPM\_LOG2  \\
+log10 & FPM\_LOG10 \\
+sin   & FPM\_SIN   \\
+cos   & FPM\_COS   \\
+tan   & FPM\_TAN   \\
+\hline
+\end{tabular}
+\end{table}
+\begin{table}
+\centering
+\begin{tabular}{|l|l|}
+\hline
+\multicolumn{2}{|c|}{BUFHDR}\\\hline
+IRBUFHDR\_RESET  & Reset buffer \\
+IRBUFHDR\_APPEND & Append to buffer \\
+\hline
+\end{tabular}
+\end{table}
+\begin{table}
+\centering
+\begin{tabular}{|l|l|l|}
+\hline
+\multicolumn{3}{|c|}{TOSTR}\\\hline
+INT  & IRTOSTR\_INT  & Convert integer to string.  \\
+NUM  & IRTOSTR\_NUM  & Convert number to string.  \\
+CHAR & IRTOSTR\_CHAR & Convert char value to string.  \\\hline
+\end{tabular}
+\end{table}
+
+\paratitle{Snapshot}\\
+Each snaphot (SNAP), lists the modified stack slots and the corresponding values.
+Bellow are two examples of how snapshots are shown in ir dump. For further
+comments on why snapshots is used, see \todo{add ref}.
+\begin{verbatim}
+....    SNAP   #1   [ ---- ---- ---- ---- 0069 0070 0071 ---- ]
+....    SNAP   #1   [ foo.lua:120|---- ---- false ]
+\end{verbatim}
+The i-th value in the snapshot list represents the IR instruction number of the
+instruction that wrote a value in slot number i. '- - - -' indicates that the slot
+has not been modified. Function frames are separated by '$\vert$'.
+
 
 \section{Understanding mcode dump}
 \label{Sec:dump-mcode}
