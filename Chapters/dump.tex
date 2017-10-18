@@ -287,7 +287,8 @@ IRBUFHDR\_APPEND & Append to buffer \\
 \hline
 \end{tabular}
 \end{table}
-\begin{table}
+
+\begin{table}[h!]
 \centering
 \begin{tabular}{|l|l|l|}
 \hline
@@ -313,6 +314,34 @@ has not been modified. Function frames are separated by '$\vert$'.
 
 \section{Understanding mcode dump}
 \label{Sec:dump-mcode}
+Bellow is a example of a small typical trace. It start with some initialization
+followed most of the time by a loop part clearly indicated by the label.
+Each line is composed of two parts, the mcode instruction's address and the
+corresponding assembler instruction.
+\begin{verbatim}
+10020ff93  mov dword [0x00041410], 0x1
+10020ff9e  cvttsd2si ebp, [rdx+0x10]
+10020ffa3  xorps xmm7, xmm7
+10020ffa6  cvtsi2sd xmm7, ebp
+10020ffaa  cmp ebp, +0x5a
+10020ffad  jz 0x100200014 ->1
+10020ffb3  cmp dword [rdx+0x4], 0xfffeffff
+10020ffba  jnb 0x100200018  ->2
+10020ffc0  addsd xmm7, [rdx]
+10020ffc4  add ebp, +0x01
+10020ffc7  cmp ebp, +0x64
+10020ffca  jg 0x10020001c ->3
+->LOOP:
+10020ffd0  xorps xmm6, xmm6
+10020ffd3  cvtsi2sd xmm6, ebp
+10020ffd7  cmp ebp, +0x5a
+10020ffda  jz 0x100200024 ->5
+10020ffe0  addsd xmm7, xmm6
+10020ffe4  add ebp, +0x01
+10020ffe7  cmp ebp, +0x64
+10020ffea  jle 0x10020ffd0  ->LOOP
+10020ffec  jmp 0x100200028  ->6
+\end{verbatim}
 
 \section{How does it works}
 \label{Sec:dump-internals}
