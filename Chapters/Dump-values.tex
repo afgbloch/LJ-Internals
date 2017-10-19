@@ -7,14 +7,15 @@ and their corresponding meaning.
 \begin{tabular}{|l|l|}
 \hline
 \multicolumn{1}{|c|}{value} & \multicolumn{1}{c|}{Meaning}\\\hline
-none                        & Incomplete trace. No link, yet.\\
-root                        & Link to other root trace.\\
-loop                        & Loop to same trace.\\
-tail-recursion              & Tail-recursion.\\
-up-recursion                & Up-recursion.\\
-down-recursion              & Down-recursion.\\
-interpreter                 & Fallback to interpreter.\\
-return                      & Return to interpreter.\\
+none                        & Incomplete trace. No link, yet.\\\hline
+root                        & Link to other root trace.\\\hline
+loop                        & Loop to same trace.\\\hline
+tail-recursion              & Tail-recursion.\\\hline
+up-recursion                & Up-recursion.\\\hline
+down-recursion              & Down-recursion.\\\hline
+\multirow{2}{*}{interpreter}& Fallback to interpreter (stop a side trace record due\\
+& to maximum reached see \emph{sidecheck:} in lj\_record.c\\\hline
+return                      & Return to interpreter.\\\hline
 stitch                      & race stitching.\\\hline
 \end{tabular}
 \caption{
