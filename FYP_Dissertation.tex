@@ -139,8 +139,8 @@
 % -------------------------------------------------------------------------------
 % Prints out the copyright page (you do not need to modify this)
 %--------------------------------------------------------------------------------
-\clearpage
-\input{./Chapters/Copyright}
+% \clearpage
+% \input{./Chapters/Copyright}
 
 %--------------------------------------------------------------------------------
 % Prints out the abstract
@@ -198,27 +198,10 @@
 \pagestyle{fancy}
 
 \clearpage
-\chapter{Introduction}
-\label{Chapt:Introduction}
-\lhead{Chapter \thechapter. \emph{Introduction}}
-\input{./Chapters/Introduction}
-
-% \clearpage
-% \chapter{Overview}
-% \label{Chapt:Overview}
-% \lhead{Chapter \thechapter. \emph{Overview}}
-% \input{./Chapters/Overview}
-
-\part{Overview}
-\label{Part:Overview}
-
-  \chapter{Files hierarchy}
-  \label{Chapt:files}
-  \lhead{Chapter \thechapter. \emph{Files hierarchy}}
-  \input{./Chapters/Files}
-
-  \chapter{Major data structure}
-  \label{Chapt:ds}
+\chapter{Overview}
+\label{Chapt:Overview}
+\lhead{Chapter \thechapter. \emph{Overview}}
+\input{./Chapters/Overview}
 
 \part{Tools}
 \label{Part:Tools}
@@ -291,6 +274,20 @@
 \addtocontents{toc}{\vspace{2em}}
 \appendix
 \baselineskip=16pt
+
+\chapter{Files hierarchy}
+\label{Apendix:files}
+\lhead{Appendix \ref{Apendix:files}. \emph{Files hierarchy}}
+\input{./Chapters/Files}
+
+\chapter{Data structure}
+\label{Apendix:ds}
+\lhead{Appendix \ref{Apendix:ds}. \emph{Data structure}}
+
+\chapter{Dump values}
+\label{Apendix:dump-values}
+\lhead{Appendix \ref{Apendix:dump-values}. \emph{Dump values}}
+\input{./Chapters/Dump-values}
 
 \chapter{Flame graphs}
 \label{Apendix:fl}

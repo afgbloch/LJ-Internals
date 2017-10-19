@@ -68,29 +68,6 @@ responsible for the abortion and print a [message] depicting the reason. For
 a list of possible messages see TraceError in lj\_trace.h and macro in
 lj\_traceerr.h.
 
-\begin{table}
-\centering
-\begin{tabular}{|l|l|}
-\hline
-\multicolumn{1}{|c|}{value} & \multicolumn{1}{c|}{Meaning}\\\hline
-none                        & Incomplete trace. No link, yet.\\
-root                        & Link to other root trace.\\
-loop                        & Loop to same trace.\\
-tail-recursion              & Tail-recursion.\\
-up-recursion                & Up-recursion.\\
-down-recursion              & Down-recursion.\\
-interpreter                 & Fallback to interpreter.\\
-return                      & Return to interpreter.\\
-stitch                      & race stitching.\\\hline
-\end{tabular}
-\caption{
-  Possible value for [link] \\(See jit\_trlinkname and TraceLink in lib\_jit.c
-  and lj\_jit.h)
-}
-\label{tab:dump-link}
-\end{table}
-
-
 \paratitle{Side trace}\\
 When instruction of a trace marked as guard fail, the normal execution of a
 trace is interrupted. We then call that spot a side exit of the trace. When a
@@ -190,114 +167,10 @@ Bellow are some example of dumps of IR instructions.
       \item 'my\_func:ligne' : functions.
       \item '(...)' : function arguments for call-type IR.
     \end{itemize}
+    To see possible argument values for some specific instruction see from Table
+    \ref{} to \ref{}.
 \end{itemize}
 
-\begin{table}
-\centering
-\begin{tabular}{|l|l|l|}
-\hline
-\multicolumn{3}{|c|}{SLOAD}\\\hline
-P & PARENT    & Coalesce with parent trace.\\
-F & FRAME     & Load 32 bits of ftsz.\\
-T & TYPECHECK & Needs type check.\\
-C & CONVERT   & Number to integer conversion.\\
-R & READONLY  & Read-only, omit slot store.\\
-I & INHERIT   & Inherited by exits/side traces.\\
-\hline
-\end{tabular}
-\end{table}
-\begin{table}
-\centering
-\begin{tabular}{|l|l|l|}
-\hline
-\multicolumn{3}{|c|}{XLOAD}\\\hline
-R & READONLY  & Load from read-only data.\\
-V & VOLATILE  & Load from volatile data.\\
-U & UNALIGNED & Unaligned load.\\
-\hline
-\end{tabular}
-\end{table}
-\begin{table}
-\centering
-\begin{tabular}{|l|l|l|}
-\hline
-\multicolumn{3}{|c|}{FLOAD or FREF}\\\hline
-str.len        & IRFL\_STR\_LEN        & \\
-func.env       & IRFL\_FUNC\_ENV       & \\
-func.pc        & IRFL\_FUNC\_PC        & \\
-func.ffid      & IRFL\_FUNC\_FFID      & Function id\\
-thread.env     & IRFL\_THREAD\_ENV     & \\
-tab.meta       & IRFL\_TAB\_META       & \\
-tab.array      & IRFL\_TAB\_ARRAY      & \\
-tab.node       & IRFL\_TAB\_NODE       & Hash part\\
-tab.asize      & IRFL\_TAB\_ASIZE      & Size of array part\\
-tab.hmask      & IRFL\_TAB\_HMASK      & Size of hash part - 1\\
-% \multirow{2}{*}{tab.nomm\\} & \multirow{2}{*}{IRFL\_TAB\_NOMM} & \multirow{2}{*}{Negative cache for fast metamethods bitmap marking absent fields of the metatable}\\
-\multirow{3}{*}{tab.nomm} & \multirow{3}{*}{IRFL\_TAB\_NOMM} & Negative cache for fast \\
-& & metamethods bitmap, marking\\
-& & absent fields of the metatable\\
-udata.meta     & IRFL\_UDATA\_META     & \\
-udata.udtype   & IRFL\_UDATA\_UDTYPE   & See UDTYPE table\\
-udata.file     & IRFL\_UDATA\_FILE     & udata payload \\
-cdata.ctypeid  & IRFL\_CDATA\_CTYPEID  & \\
-cdata.ptr      & IRFL\_CDATA\_PTR      & cdata payload \\
-cdata.int      & IRFL\_CDATA\_INT      & cdata payload \\
-cdata.int64    & IRFL\_CDATA\_INT64    & cdata payload \\
-cdata.int64\_4 & IRFL\_CDATA\_INT64\_4 & cdata payload \\
-\hline
-\end{tabular}
-\end{table}
-\begin{table}
-\centering
-\begin{tabular}{|l|l|}
-\hline
-\multicolumn{2}{|c|}{UDTYPE}\\\hline
-UDTYPE\_USERDATA  & Regular userdata.\\
-UDTYPE\_IO\_FILE  & I/O library FILE.\\
-UDTYPE\_FFI\_CLIB & FFI C library namespace.\\\hline
-\end{tabular}
-\end{table}
-\begin{table}
-\centering
-\begin{tabular}{|l|l|}
-\hline
-\multicolumn{2}{|c|}{FPMATH}\\\hline
-floor & FPM\_FLOOR \\
-ceil  & FPM\_CEIL  \\
-trunc & FPM\_TRUNC \\
-sqrt  & FPM\_SQRT  \\
-exp   & FPM\_EXP   \\
-exp2  & FPM\_EXP2  \\
-log   & FPM\_LOG   \\
-log2  & FPM\_LOG2  \\
-log10 & FPM\_LOG10 \\
-sin   & FPM\_SIN   \\
-cos   & FPM\_COS   \\
-tan   & FPM\_TAN   \\
-\hline
-\end{tabular}
-\end{table}
-\begin{table}
-\centering
-\begin{tabular}{|l|l|}
-\hline
-\multicolumn{2}{|c|}{BUFHDR}\\\hline
-IRBUFHDR\_RESET  & Reset buffer \\
-IRBUFHDR\_APPEND & Append to buffer \\
-\hline
-\end{tabular}
-\end{table}
-
-\begin{table}[h!]
-\centering
-\begin{tabular}{|l|l|l|}
-\hline
-\multicolumn{3}{|c|}{TOSTR}\\\hline
-INT  & IRTOSTR\_INT  & Convert integer to string.  \\
-NUM  & IRTOSTR\_NUM  & Convert number to string.  \\
-CHAR & IRTOSTR\_CHAR & Convert char value to string.  \\\hline
-\end{tabular}
-\end{table}
 
 \paratitle{Snapshot}\\
 Each snaphot (SNAP), lists the modified stack slots and the corresponding values.
@@ -345,4 +218,36 @@ corresponding assembler instruction.
 
 \section{How does it works}
 \label{Sec:dump-internals}
+
+This section briefly present part of the code of luaJIT involved in the process of
+emitting the dump. The dump module (dump.lua) is responsible of setting up the
+jit as to emit traces and also of printing the results in a human understandable
+format. Depending of the dump it has to print (with respect to the provided
+parameters, see Section \ref{Sec:dump-usage})
+
+% JDUMP JIT side
+% - lib_jit.c
+%     - jit_attach : used by dump.lua to attach handler to jit for a specific event.
+%     - traceinfo : push back more info to lua world.
+%         - jit_trlinkname (lib_jit.c) (linked to TraceLink in lj_jit.h)
+%             none, root, loop, tail-recursion, up-recursion, down-recursion
+%             interpreter, return, stitch.
+% - lj_vmevent.h
+%     - VMEvent enum (BC, TRACE, RECORD, TEXIT)
+%     - lj_vmevent_send to `send back to dump.lua`
+% - lj_vmevent.c
+%     - lj_vmevent_prepare : find the handler attached to an event
+%     - lj_vmevent_call : call that handler if any
+% - lj_trace.h (lj_traceerr.h)
+%     - TraceError : all different error types -> similar as *traceerr* in vmdef.lua
+% - lj_trace.c
+%     - trace_state : State machine for the trace compiler.
+%         - LJ_TRACE_START : start recording (call to trace_start).
+%         - LJ_TRACE_RECORD : recording in process.
+%         - LJ_TRACE_END : end of recording + apply optimizations on IR.
+%         - LJ_TRACE_ASM : assemble the trace.
+%         - LJ_TRACE_ERR : abort (trace_abort).
+%     - trace_start
+%     - trace_stop
+%     - trace_abort
 
