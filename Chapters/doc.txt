@@ -14,21 +14,7 @@ lj_crecord.c: records C data ops
  - other-1... : bc arguments
  - last       : comment corresponding lua code
 ================================================================================
-JDUMP JIT side
-- lib_jit.c
-    - jit_attach : used by dump.lua to attach handler to jit for a specific event.
-    - traceinfo : push back more info to lua world.
-        - jit_trlinkname (lib_jit.c) (linked to TraceLink in lj_jit.h)
-            none, root, loop, tail-recursion, up-recursion, down-recursion
-            interpreter, return, stitch.
-- lj_vmevent.h
-    - VMEvent enum (BC, TRACE, RECORD, TEXIT)
-    - lj_vmevent_send to `send back to dump.lua`
-- lj_vmevent.c
-    - lj_vmevent_prepare : find the handler attached to an event
-    - lj_vmevent_call : call that handler if any
-- lj_trace.h (lj_traceerr.h)
-    - TraceError : all different error types -> similar as *traceerr* in vmdef.lua
+JIT
 - lj_trace.c
     - trace_state : State machine for the trace compiler.
         - LJ_TRACE_START : start recording (call to trace_start).
