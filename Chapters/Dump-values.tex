@@ -7,15 +7,15 @@ and their corresponding meaning.
 \begin{tabular}{|l|l|}
 \hline
 \multicolumn{1}{|c|}{value} & \multicolumn{1}{c|}{Meaning}\\\hline
-none                        & Incomplete trace. No link, yet.\\\hline
-root                        & Link to other root trace.\\\hline
-loop                        & Loop to same trace.\\\hline
-tail-recursion              & Tail-recursion.\\\hline
-up-recursion                & Up-recursion.\\\hline
+none                        & Incomplete trace. No link, yet.\\
+root                        & Link to other root trace.\\
+loop                        & Loop to same trace.\\
+tail-recursion              & Tail-recursion.\\
+up-recursion                & Up-recursion.\\
 down-recursion              & Down-recursion.\\\hline
 \multirow{2}{*}{interpreter}& Fallback to interpreter (stop a side trace record due\\
-& to maximum reached see \emph{sidecheck:} in lj\_record.c\\\hline
-return                      & Return to interpreter.\\\hline
+& to maximum reached see \emph{sidecheck:} in lj\_record.c)\\\hline
+return                      & Return to interpreter.\\
 stitch                      & race stitching.\\\hline
 \end{tabular}
 \caption{
@@ -68,10 +68,10 @@ tab.meta       & IRFL\_TAB\_META       & \\
 tab.array      & IRFL\_TAB\_ARRAY      & \\
 tab.node       & IRFL\_TAB\_NODE       & Hash part\\
 tab.asize      & IRFL\_TAB\_ASIZE      & Size of array part\\
-tab.hmask      & IRFL\_TAB\_HMASK      & Size of hash part - 1\\
+tab.hmask      & IRFL\_TAB\_HMASK      & Size of hash part - 1\\\hline
 \multirow{3}{*}{tab.nomm} & \multirow{3}{*}{IRFL\_TAB\_NOMM} & Negative cache for fast \\
 & & metamethods bitmap, marking\\
-& & absent fields of the metatable\\
+& & absent fields of the metatable\\\hline
 udata.meta     & IRFL\_UDATA\_META     & \\
 udata.udtype   & IRFL\_UDATA\_UDTYPE   & See UDTYPE table\\
 udata.file     & IRFL\_UDATA\_FILE     & udata payload \\
