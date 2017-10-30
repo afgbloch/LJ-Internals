@@ -175,7 +175,8 @@ Bellow are some example of dumps of IR instructions.
 \paratitle{Snapshot}\\
 Each snaphot (SNAP), lists the modified stack slots and the corresponding values.
 Bellow are two examples of how snapshots are shown in ir dump. For further
-comments on why snapshots is used, see \todo{add ref}.
+comments on why snapshots are used, see Section \ref{Sec:ir-snap}. Bellow is an
+example of how snapshot can be shown in the dump.
 \begin{verbatim}
 ....    SNAP   #1   [ ---- ---- ---- ---- 0069 0070 0071 ---- ]
 ....    SNAP   #1   [ foo.lua:120|---- ---- false ]
@@ -188,7 +189,7 @@ has not been modified. Function frames are separated by '$\vert$'.
 \section{Understanding mcode dump}
 \label{Sec:dump-mcode}
 Bellow is a example of a small typical trace. It start with some initialization
-followed most of the time by a loop part clearly indicated by the label.
+followed most of theje time by a loop part clearly indicated by the label.
 Each line is composed of two parts, the mcode instruction's address and the
 corresponding assembler instruction.
 \begin{verbatim}

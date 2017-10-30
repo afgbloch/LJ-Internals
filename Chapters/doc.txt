@@ -2,7 +2,6 @@ GCproto : Function literal (prototype)
     is followed in memory by func bytecodes
 GCfuncL : closure
 ================================================================================
-lj_snap.c: handles/creates trace snapshots
 lj_ffrecord.c: records data for fast functions
 lj_crecord.c: records C data ops
 ================================================================================
@@ -25,67 +24,6 @@ JIT
     - trace_start
     - trace_stop
     - trace_abort
-================================================================================
-Code sinking via snapshots: The VM must be in a consistent state
-  when a trace exits. This means that all updates (stores) to the
-  state (stack or objects) must track the original language
-  semantics.
-
-  Naive trace compilers achieve this by forcing a full update of
-  the state to memory before every exit. This causes many on-trace
-  stores and seriously diminishes code quality.
-
-  A better approach is to sink these stores to compensation code,
-  which is only executed if the trace exits are actually taken.
-  A common solution is to emit actual code for these stores. But
-  this causes code cache bloat and the information often needs to
-  be stored redundantly, for linking of side traces.
-
-  Code sinking via snapshots allows sinking of arbitrary code
-  without the overhead of the other approaches. A snapshot stores
-  a consistent view of all updates to the state before an exit. If
-  an exit is taken the on-trace machine state (registers and spill
-  slots) and the snapshot can be used to restore the VM state.
-
-  State restoration using this data-driven approach is slow of
-  course. But repeatedly taken side exits quickly trigger the
-  generation of side traces. The snapshot is used to initialize
-  the IR of the side trace with the necessary state using
-  pseudo-loads. These can be optimized together with the remainder
-  of the side trace. The pseudo-loads are unified with the machine
-  state of the parent trace by the backend to enable zero-cost
-  linking to side traces.
-
-  [Currently snapshots only allow store sinking of scalars. It''s
-  planned to extend this to allow arbitrary store and allocation
-  sinking, which together with store forwarding would be a unique
-  way to achieve scalar-replacement of aggregates.]
-
-- Sparse snapshots: Taking a full snapshot of all state updates
-  before every exit would need a considerable amount of storage.
-  Since all scalar stores are sunk, it''s feasible to reduce the
-  snapshot density. The basic idea is that it doesn''t matter which
-  state is restored on a taken exit, as long as it''s consistent.
-
-  This is a form of transactional state management. Every snapshot
-  is a commit; a taken exit causes a rollback to the last commit.
-  The on-trace state may advance beyond the last commit as long as
-  this doesn''t affect the possibility of a rollback. In practice
-  this means that all on-trace updates to the state (non-scalar
-  stores that are not sunk) need to force a new snapshot for the
-  next exit.
-
-  Otherwise the trace recorder only generates a snapshot after
-  control-flow constructs that are present in the source, too.
-  Guards that have a low probability of being wrongly predicted do
-  not cause snapshots (e.g. function dispatch). This further
-  reduces the snapshot density. Sparse snapshots also improve
-  on-trace code quality, because they reduce the live range of the
-  results of intermediate computations. Scheduling decisions can
-  be made over a longer stream of instructions, too.
-
-  [It''s planned to switch to compressed snapshots. 2D-compression
-  across snapshots may be able to remove even more redundancy.]
 ================================================================================
 Programming advice:
   1) for i=1,#s do end
