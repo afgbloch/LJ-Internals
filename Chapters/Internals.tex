@@ -1,0 +1,31 @@
+%!TEX root = ../FYP_Dissertation.tex
+
+\section{String Internalization}
+\label{Sec:string-inter}
+
+All strings that are manipulated by LuaJIT are internalized. This includes, all
+the strings literals of the user lua code, all identifier and tokens of the lua
+code itself and also all the strings used internally by LuaJIT. Internalization
+mechanism does that, only one copy of a specific strings is kept in memory. If
+multiple copy of a same string are requested, a pointer to the internalized
+version of the string is returned, instead of doing a new string allocation.
+Strings need to be immutable and are zero-terminated. Strings function are
+implemented in the \emph{lj\_str.c} file and internalization is done by the
+\emph{lj\_str\_new} function.
+
+For that, it implements a hash table and use a very sparse but fast hash
+function. Collisions are handled by the use of singly-chained linked list.
+The table is resized and all string rehashed when a 100\% load is reached.
+The necessary states are saved in the \emph{global\_State} structure in the
+\emph{lj\_obj.h} file.
+
+\begin{lstlisting}[style=CStyle]
+typedef struct global_State {
+  GCRef *strhash; /* String hash table (hash chain anchors). */
+  MSize strmask;  /* String hash mask (size of hash table - 1). */
+  MSize strnum;   /* Number of strings in hash table. */
+  [...]
+}
+\end{lstlisting}
+
+
