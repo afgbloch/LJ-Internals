@@ -29,7 +29,7 @@ typedef struct global_State {
 \end{lstlisting}
 
 \section{Lua table}
-\label{Sec:string-inter}
+\label{Sec:table}
 
 Tables are garbage collectible objects represented by the structure bellow
 (\emph{GCtab} in \emph{lj\_obj.h}). Functions to manipulate them are in
@@ -61,5 +61,52 @@ typedef struct GCtab {
   MRef freetop;    /* Top of free elements. */
 #endif
 } GCtab;
+\end{lstlisting}
+
+\section{Garbage collector}
+\label{Sec:gc}
+% lj_gc.h
+% lj_gc.c
+% gc_onestep gc state machine
+
+LuaJIT garbage collector has currently a tri-color, incremental mark and sweep
+types implementation. You can find a presentation of it on the wiki
+\cite{luajit-gc} in the tri-color section. Its source code can be found in the
+\emph{lj\_gc.h} and \emph{lj\_gc.c} files. It uses the GCState structure has a
+principal structure. The \emph{gc\_onestep} function is the principal one as it
+implement the stat machine of the gc. Principal state with their meaning can be
+found in the enum bellow.
+
+\begin{lstlisting}[style=CStyle]
+enum {
+  GCSpause,
+  GCSpropagate,   /* One gray object is processed. */
+  GCSatomic,      /* Atomic transition from mark to sweep phase. */
+  GCSsweepstring, /* Sweep one chain of strings from the table. */
+  GCSsweep,       /* Sweep a few object from root. */
+  GCSfinalize     /* Finalize one userdata or cdata object. */
+};
+\end{lstlisting}
+
+\begin{lstlisting}[style=CStyle]
+typedef struct GCState {
+  GCSize total;         /* Memory currently allocated. */
+  GCSize threshold;     /* Memory threshold. */
+  uint8_t currentwhite; /* Current white color. */
+  uint8_t state;        /* GC state. */
+  uint8_t nocdatafin;   /* No cdata finalizer called. */
+  uint8_t unused2;
+  MSize sweepstr;       /* Sweep position in string table. */
+  GCRef root;           /* List of all collectable objects. */
+  MRef sweep;           /* Sweep position in root list. */
+  GCRef gray;           /* List of gray objects. */
+  GCRef grayagain;      /* List of objects for atomic traversal. */
+  GCRef weak;           /* List of weak tables (to be cleared). */
+  GCRef mmudata;        /* List of userdata (to be finalized). */
+  GCSize debt;          /* Debt (how much GC is behind schedule). */
+  GCSize estimate;      /* Estimate of memory actually in use. */
+  MSize stepmul;        /* Incremental GC step granularity. */
+  MSize pause;          /* Pause between successive GC cycles. */
+} GCState;
 \end{lstlisting}
 
