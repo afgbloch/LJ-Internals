@@ -35,5 +35,7 @@ Programming advice:
 Jitting start always jiting the inner loop first
                         **************************
 When starting a record hotcount is reseted even if trace endup aborted.
+                        **************************
+Indexing a table with a string should be as fast as with a reference (table).
 ================================================================================
 

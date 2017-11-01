@@ -28,4 +28,38 @@ typedef struct global_State {
 }
 \end{lstlisting}
 
+\section{Lua table}
+\label{Sec:string-inter}
+
+Tables are garbage collectible objects represented by the structure bellow
+(\emph{GCtab} in \emph{lj\_obj.h}). Functions to manipulate them are in
+\emph{lj\_tab.c} and \emph{lj\_tab.h} files. It is composed of an array part and
+a hash part. If the array part is small, it is allocated directly after the
+structure in memory (collocation functionality), otherwise it is separated. The
+hash part is a hash table used to store all non-integer key (or integer too big
+to fit in the array part). It is implemented has an array using singly-linked
+list for collision, where nodes of the linked list are within the array (not
+allocated) and a variation of \emph{Brent's hashing methods} is used. When a
+resizing occur the hash values are re-hashed and integer key that does fit now
+in the array part are reintroduce there. The \emph{nomm} field of GCtab is a
+negative cache for fast metamethods checks. It is a bitmap marking absent fields
+of the metatable.
+
+\begin{lstlisting}[style=CStyle]
+typedef struct GCtab {
+  GCHeader;
+  uint8_t nomm;    /* Negative cache for fast metamethods. */
+  int8_t colo;     /* Array colocation
+  (number of slot directly following in memory).*/
+  MRef array;      /* Array part. */
+  GCRef gclist;
+  GCRef metatable; /* Must be at same offset in GCudata. */
+  MRef node;       /* Hash part. */
+  uint32_t asize;  /* Size of array part (keys [0, asize-1]). */
+  uint32_t hmask;  /* Hash part mask (size of hash part - 1). */
+#if LJ_GC64
+  MRef freetop;    /* Top of free elements. */
+#endif
+} GCtab;
+\end{lstlisting}
 
