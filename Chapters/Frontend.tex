@@ -1,0 +1,69 @@
+%!TEX root = ../FYP_Dissertation.tex
+
+\section{Lexer}
+\label{Sec:Lexer}
+
+The lexer is implemented in the \emph{lj\_lex.c} and \emph{lj\_lex.h} files.
+It use \emph{LexState} as a principal data structure. The user-provided
+\emph{rfunc} function is used to read a chunk of data to process. It is accessed
+through the \emph{p} and \emph{pe} pointers. The main function is
+\emph{lex\_scan} that dispatches the work to other functions depending of the
+type of data to be processed (comment, string literal, long string, numbers
+etc...). TValues (\emph{tokval}, \emph{lookaheadval}) are used to store the
+token values were \emph{LexToken} (\emph{tok}, \emph{lookahead}) determine the
+type. The string buffer (\emph{sb}) is used to accumulate characters of a future
+string before internalizing it. All lua keyword are internalized as a string at
+the very beginning, GCstr has the field \emph{reserved} for marking them.
+
+\begin{lstlisting}[style=CStyle]
+typedef struct LexState {
+  struct FuncState *fs; /* Current FuncState. Defined in lj_parse.c. */
+  struct lua_State *L;  /* Lua state. */
+  TValue tokval;        /* Current token value. */
+  TValue lookaheadval;  /* Lookahead token value. */
+  const char *p;        /* Current position in input buffer. */
+  const char *pe;       /* End of input buffer. */
+  LexChar c;            /* Current character. */
+  LexToken tok;         /* Current token. */
+  LexToken lookahead;   /* Lookahead token. */
+  SBuf sb;              /* String buffer for tokens. */
+  lua_Reader rfunc;     /* Reader callback. */
+  void *rdata;          /* Reader callback data. */
+  BCLine linenumber;    /* Input line counter. */
+  BCLine lastline;      /* Line of last token. */
+  GCstr *chunkname;     /* Current chunk name (interned string). */
+  const char *chunkarg; /* Chunk name argument. */
+  const char *mode;     /* Allow loading bytecode (b) and/or source text (t). */
+  VarInfo *vstack;      /* Stack for names and extents of local variables. */
+  MSize sizevstack;     /* Size of variable stack. */
+  MSize vtop;           /* Top of variable stack. */
+  BCInsLine *bcstack;   /* Stack for bytecode instructions/line numbers. */
+  MSize sizebcstack;    /* Size of bytecode stack. */
+  uint32_t level;       /* Syntactical nesting level. */
+} LexState;
+\end{lstlisting}
+
+\section{Parser}
+\label{Sec:Parser}
+
+% also emit the BC
+% lj_parse.c
+% lj_parse.h
+% lj_bc.c
+% lj_bc.h
+
+\section{Bytecode frontend}
+\label{Sec:bc-frontend}
+
+Another frontend feature provided by luaJIT is the possibility to save and load
+bytecode directly, allowing to skip the lexer and parser phase.
+
+The writing part is handled by the module \emph{bcsave.lua} that use the
+\emph{lj\_bcwrite} function from \emph{lj\_bcwrite.c} to generate the data to be written.
+
+The reading part is done by the code in \emph{lj\_bcread.c} file. When it is
+detected that the input file is a bc dump instead of a plain lua code,
+\emph{cpparser} from \emph{lj\_load.c} calls \emph{lj\_bcread} instead of
+\emph{lj\_parse} normally. This reader also use \emph{LexState} as the principal
+data-structure.
+

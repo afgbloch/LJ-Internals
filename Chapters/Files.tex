@@ -22,7 +22,8 @@ For cross-compilation, they must be executed on the host, not on the target.\\
 \paratitle{src/host/minilua.c:}\\
 Minimal copy of Lua 5.1 used to build LuaJIT.\\
 \paratitle{src/jit/bc.lua:}\\
-\paratitle{src/jit/bcsave.lua:}\\{}
+\paratitle{src/jit/bcsave.lua:}\\
+Lua module used to save the bc of a source file.
 \paratitle{src/jit/dis\_*.lua:}\\
 LuaJIT disassembler module for a specific architecture, used as a help module by
 the dumper mode to dump code of generated trace (See dump.lua).\\
@@ -66,7 +67,9 @@ IR assembler, convert SSA IR into machine code for a specific architecture.
 \paratitle{src/lj\_bc.h:}\\
 \paratitle{src/lj\_bcdump.h:}\\
 \paratitle{src/lj\_bcread.c:}\\
+Bytecode reader to allow executing saved bc.
 \paratitle{src/lj\_bcwrite.c:}\\
+Bytecode writer to save bc.
 \paratitle{src/lj\_buf.c:}\\
 \paratitle{src/lj\_buf.h:}\\
 \paratitle{src/lj\_carith.c:}\\
