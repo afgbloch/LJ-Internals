@@ -23,7 +23,7 @@ For cross-compilation, they must be executed on the host, not on the target.\\
 Minimal copy of Lua 5.1 used to build LuaJIT.\\
 \paratitle{src/jit/bc.lua:}\\
 \paratitle{src/jit/bcsave.lua:}\\
-Lua module used to save the bc of a source file.
+Lua module used to save the bc of a source file.\\
 \paratitle{src/jit/dis\_*.lua:}\\
 LuaJIT disassembler module for a specific architecture, used as a help module by
 the dumper mode to dump code of generated trace (See dump.lua).\\
@@ -62,14 +62,14 @@ Lua/c api (e.g. stack handling)\\
 \paratitle{src/lj\_asm.[ch]:}\\
 Generic code for assembling a trace.\\
 \paratitle{src/lj\_asm\_*.h:}\\
-IR assembler, convert SSA IR into machine code for a specific architecture.
-\paratitle{src/lj\_bc.c:}\\
-\paratitle{src/lj\_bc.h:}\\
+IR assembler, convert SSA IR into machine code for a specific architecture.\\
+\paratitle{src/lj\_bc.[ch]:}\\
+Bytecode instruction format.\\
 \paratitle{src/lj\_bcdump.h:}\\
 \paratitle{src/lj\_bcread.c:}\\
-Bytecode reader to allow executing saved bc.
+Bytecode reader to allow executing saved bc.\\
 \paratitle{src/lj\_bcwrite.c:}\\
-Bytecode writer to save bc.
+Bytecode writer to save bc.\\
 \paratitle{src/lj\_buf.c:}\\
 \paratitle{src/lj\_buf.h:}\\
 \paratitle{src/lj\_carith.c:}\\
@@ -86,8 +86,8 @@ Bytecode writer to save bc.
 \paratitle{src/lj\_char.h:}\\
 \paratitle{src/lj\_clib.c:}\\
 \paratitle{src/lj\_clib.h:}\\
-\paratitle{src/lj\_cparse.c:}\\
-\paratitle{src/lj\_cparse.h:}\\
+\paratitle{src/lj\_cparse.[ch]:}\\
+Lua parser and bc generator\\
 \paratitle{src/lj\_crecord.c:}\\
 \paratitle{src/lj\_crecord.h:}\\
 \paratitle{src/lj\_ctype.c:}\\
@@ -117,7 +117,7 @@ Garbage collector implementation\\
 \paratitle{src/lj\_ircall.h:}\\
 \paratitle{src/lj\_jit.h:}\\
 \paratitle{src/lj\_lex.c:}\\
-Lexer (Lexical analyzer) for lua code.
+Lexer (Lexical analyzer) for lua code.\\
 \paratitle{src/lj\_lex.h:}\\
 Main header file used during the lexer, parser and bcreader.\\
 \paratitle{src/lj\_lib.c:}\\

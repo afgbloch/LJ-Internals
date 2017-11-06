@@ -46,11 +46,11 @@ typedef struct LexState {
 \section{Parser}
 \label{Sec:Parser}
 
-% also emit the BC
-% lj_parse.c
-% lj_parse.h
-% lj_bc.c
-% lj_bc.h
+The parser of luaJIT is implemented in \emph{lj\_parse.c} and \emph{lj\_parse.h}
+files. it also use \emph{LexState} as the principal data-structure. it is the on
+responsible of calling the lexer to get tokens. LuaJIT doesn't really have an
+abstract syntax tree representation of the parsed code. Instead it directly
+generates the bytecode on the fly using helpers from \emph{lj\_bc.h}.
 
 \section{Bytecode frontend}
 \label{Sec:bc-frontend}
