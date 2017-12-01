@@ -48,10 +48,41 @@ typedef struct LexState {
 
 The parser of luaJIT is implemented in \emph{lj\_parse.c} and \emph{lj\_parse.h}
 files. it also use \emph{LexState} as the principal data-structure. it is the on
-responsible of calling the lexer to get tokens. LuaJIT doesn't really have an
+responsible for calling the lexer to get tokens. LuaJIT doesn't really have an
 abstract syntax tree representation of the parsed code. Instead it directly
 generates the bytecode on the fly using helpers from \emph{lj\_bc.h}.
+The \emph{lj\_parse} function is the entry point and parse the main chunck as a
+vararg function. The unit of emission is the function (\emph{GCproto}) and the structure used for the construction is \emph{FuncState}. Parsing is a succession
+of chuncks (\emph{parse\_chunk}) were \emph{parse\_stmt} is the principal
+function called for each line, dispatching the work depending of the current
+token type.
 
+\begin{lstlisting}[style=CStyle]
+typedef struct FuncState {
+  GCtab *kt;              /* Hash table for constants. */
+  LexState *ls;           /* Lexer state. */
+  lua_State *L;           /* Lua state. */
+  FuncScope *bl;          /* Current scope. */
+  struct FuncState *prev; /* Enclosing function. */
+  BCPos pc;               /* Next bytecode position. */
+  BCPos lasttarget;       /* Bytecode position of last jump target. */
+  BCPos jpc;              /* Pending jump list to next bytecode. */
+  BCReg freereg;          /* First free register. */
+  BCReg nactvar;          /* Number of active local variables. */
+  BCReg nkn, nkgc;        /* Number of lua_Number/GCobj constants */
+  BCLine linedefined;     /* First line of the function definition. */
+  BCInsLine *bcbase;      /* Base of bytecode stack. */
+  BCPos bclim;            /* Limit of bytecode stack. */
+  MSize vbase;            /* Base of variable stack for this function. */
+  uint8_t flags;          /* Prototype flags. */
+  uint8_t numparams;      /* Number of parameters. */
+  uint8_t framesize;      /* Fixed frame size. */
+  uint8_t nuv;            /* Number of upvalues */
+  VarIndex varmap[...];   /* Map from register to variable idx. */
+  VarIndex uvmap[...];    /* Map from upvalue to variable idx. */
+  VarIndex uvtmp[...];    /* Temporary upvalue map. */
+} FuncState;
+\end{lstlisting}
 \section{Bytecode frontend}
 \label{Sec:bc-frontend}
 

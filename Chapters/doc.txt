@@ -25,7 +25,11 @@ JIT
     - trace_stop
     - trace_abort
 ================================================================================
-
+- Trace IR code is represented as an array in memory.
+- The array includes two different things: instructions and constants.
+- Instructions are stored at "upwards" indices 0,1,2,...
+- Constants are stored at "downwards" indices -1,-2,-3,...
+- References to array elements are "biased" by adding 0x8000.
 ================================================================================
 Programming advice:
   1) for i=1,#s do end
