@@ -107,3 +107,35 @@ typedef struct GCState {
 } GCState;
 \end{lstlisting}
 
+\section{Function}
+\label{Sec:func}
+
+There are two distinct representation for function, the function's prototype,
+and the function's closure. the Lua functions' prototypes are represented by \emph{GCproto} (\emph{lj\_obj.h}), and are followed by the functions' bytecodes in memory.
+The closures are represented by the GCfuncL for lua function and GCfuncC for
+c function (using lua's api). They contains the necessary information for
+upvalues. Upvalues are represented by the \emph{GCupval} that if close, contains
+the corresponding value or a reference to the stack slot containing the
+appropriate value otherwise. Closure can be manage by the functions present in
+\emph{lj\_func.c} allowing to create them, destroy them and closing their
+upvalues.
+
+\begin{lstlisting}[style=CStyle]
+typedef struct GCproto {
+  GCHeader;
+  uint8_t numparams; /* Number of parameters. */
+  uint8_t framesize; /* Fixed frame size. */
+  MSize sizebc;      /* Number of bytecode instructions. */
+  [...]
+  GCRef gclist;
+  MRef k;            /* Split constant array (ptr to the middle).*/
+  MRef uv;           /* Upvalue list. local slot or parent uv idx. */
+  MSize sizekgc;     /* Number of collectable constants. */
+  MSize sizekn;      /* Number of lua_Number constants. */
+  MSize sizept;      /* Total size including colocated arrays. */
+  uint8_t sizeuv;    /* Number of upvalues. */
+  uint8_t flags;     /* Miscellaneous flags. */
+  uint16_t trace;    /* Anchor for chain of root traces. */
+  [...]
+} GCproto;
+\end{lstlisting}

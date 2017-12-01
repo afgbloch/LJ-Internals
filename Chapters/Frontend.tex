@@ -55,7 +55,8 @@ The \emph{lj\_parse} function is the entry point and parse the main chunck as a
 vararg function. The unit of emission is the function (\emph{GCproto}) and the structure used for the construction is \emph{FuncState}. Parsing is a succession
 of chuncks (\emph{parse\_chunk}) were \emph{parse\_stmt} is the principal
 function called for each line, dispatching the work depending of the current
-token type.
+token type. \emph{FuncScope} is a linked-list of structure used for scope
+management.
 
 \begin{lstlisting}[style=CStyle]
 typedef struct FuncState {

@@ -1,7 +1,3 @@
-GCproto : Function literal (prototype)
-    is followed in memory by func bytecodes
-GCfuncL : closure
-================================================================================
 lj_ffrecord.c: records data for fast functions
 lj_crecord.c: records C data ops
 ================================================================================
