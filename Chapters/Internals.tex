@@ -39,9 +39,18 @@ structure in memory (collocation functionality), otherwise it is separated. The
 hash part is a hash table used to store all non-integer key (or integer too big
 to fit in the array part). It is implemented has an array using singly-linked
 list for collision, where nodes of the linked list are within the array (not
-allocated) and a variation of \emph{Brent's hashing methods} is used. When a
-resizing occur the hash values are re-hashed and integer key that does fit now
-in the array part are reintroduce there. The \emph{nomm} field of GCtab is a
+allocated) and a variation of \emph{Brent's hashing methods} is used.
+New integer key that are bigger than the array part are always inserted
+in the hash part until this one is full. It then trigger the resizing of the
+table. The new \emph{asize} and \emph{hmask} are both power of 2. The
+new \emph{asize} value correspond to the biggest power of 2 such that at least
+50 percent of the integers bellow it are used as key. The new \emph{hmask} is
+picket such that all non-integer keys plus the integer keys that are bigger than
+the new \emph{asize} fit in it. When a resizing occur the hash values are
+re-hashed and integer key that does fit now in the array part are reintroduce
+there.
+
+The \emph{nomm} field of GCtab is a
 negative cache for fast metamethods checks. It is a bitmap marking absent fields
 of the metatable.
 
