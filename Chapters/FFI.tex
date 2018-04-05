@@ -1,0 +1,171 @@
+%!TEX root = ../FYP_Dissertation.tex
+
+The FFI (Foreign Function Interface) is one of LuaJIT extensions modules. It
+allows to call external C functions and use C data structures from pure Lua code.
+A very small (not representative) example can be seen bellow.
+
+\begin{lstlisting}[style=myLuastyle]
+local ffi = require("ffi")
+ffi.cdef[[
+  typedef struct points { int x,y,z; } points;
+]]
+local p1 = ffi.new("points", { 1, 2, 3 })
+print(p1.x) --  1
+p1.x = 11
+print(p1.x) -- 11
+\end{lstlisting}
+There is some official documentation for FFI user on \emph{luajit.org}
+where you can find the motivation for the FFI module \cite{ffi-motivation},
+a small tutorial \cite{ffi-tuto}, the API documentation \cite{ffi-api} and the
+FFI semantics \cite{ffi-semantics}. There is also an unofficial reflection
+library for FFI ctypes \cite{ffi-reflect} and its documentation
+\cite{ffi-reflect-doc} for anyone interested in exploring the ctype of a given cdata.
+
+This chapter will present the internal implementation of the FFI and not its use.
+The organisation of the information will follow the actual implementation files.
+
+\paratitle{lib\_ffi.c:}\\
+This file is the top level file of the FFI library. It contains the
+implementation of the FFI API, the function that makes the connection between
+lua and c using the standard Lua \emph{C API}.
+It is also responsible for loading the FFI module (\emph{luaopen\_ffi}).
+This file mainly use and connect together functionalities implemented in other
+files. It is for example responsible to allocate and initialize the main state
+(\emph{CTState}) explained bellow.
+
+\paratitle{lj\_obj.h:}\\
+From this file, we are only interested for this chapter by the \emph{GCcdata}
+structure that is the garbage collectible object representing any c data use
+through and with the FFI. You can see its composition bellow. The main thing to
+see there is the \emph{ctypeid} which is the index of the ctype describing the
+attached data (the payload follows the structure in memory).
+\begin{lstlisting}[style=CStyle]
+typedef struct GCcdata {
+  GCHeader;
+  uint16_t ctypeid;	/* C type ID. */
+} GCcdata;
+\end{lstlisting}
+
+\paratitle{lj\_ctype.h:}\\
+Bellow is the \emph{CType} data structure responsible for describing to the ffi
+what kind of data the \emph{cdata} represent (e.g. variable, struct,
+function etc...). A detailed breakdown of how the information are laid out can
+be seen in Table \ref{tab:ffi-ctype}. The meaning of the abbreviations used in
+the previouse table can be seen in Table \ref{tab:ffi-ctype2}.
+\begin{lstlisting}[style=CStyle]
+typedef struct CType {
+  CTInfo info;   /* Type info. */
+  CTSize size;   /* Type size or other info. */
+  CTypeID1 sib;  /* Sibling element. */
+  CTypeID1 next; /* Next element in hash chain. */
+  GCRef name;    /* Element name (GCstr). */
+} CType;
+\end{lstlisting}
+
+%          +----------------------------+--------+-------+-------+-------+
+%          |            info            |        |       |       |       |
+%          +----------------------------+  size  |  sid  | next  | name  |
+%          |type|  flags | A  |   cid   |        |       |       |       |
+% +-------------------------------------+--------------------------------+
+% |size    | 4  |    8   | 4  |   16    |   32   |  16   |  16   | GCRef |
+% |--------+----------------------------+--------+-------+-------+-------+
+% |NUM     |0000|BFcvUL..| A  |    x    | size   |       | type  |       |
+% |STRUCT  |0001|..cvu..V| A  |    x    | size   | field | name? | name? |
+% |PTR     |0010|..cvR...| A  |   cid   | size   |       | type  |       |
+% |ARRAY   |0011|VCcv...V| A  |   cid   | size   |       | type  |       |
+% |VOID    |0100|..cv....| A  |    x    | size   |       | type  |       |
+% |ENUM    |0101|........| A  |   cid   | size   | const | name? | name? |
+% |FUNC    |0110|....VS..|..cc|   cid   | nargs  | field | name? | name? |
+% |TYPEDEF |0111|........|....|   cid   |   x    |       | name  | name  |
+% |ATTRIB  |1000|....|attrnum |   cid   | attr   | sib?  | type? |       |
+% |FIELD   |1001|........|....|   cid   | offset | field |       | name? |
+% |BITFIELD|1010|B.cvU| csz   |.bsz|.pos| offset | field |       | name? |
+% |CONSTVAL|1011|..c.....|....|   cid   | value  | const | name  | name  |
+% |EXTERN  |1100|........|....|   cid   |   x    | sib?  | name  | name  |
+% |KW      |1101|........|....|   tok   | size   |       | name  | name  |
+% +-------------------------------------+--------+-------+-------+-------+
+\begin{table}[H]
+\footnotesize
+\centering
+\caption{CType information summary}
+\label{tab:ffi-ctype}
+\begin{tabular}{l|c|c|c|c|c|l|c|c|c|c|}
+\cline{2-11}
+                               & \multicolumn{6}{c|}{info}                                                         & \multirow{2}{*}{size} & \multirow{2}{*}{sid} & \multirow{2}{*}{next} & \multirow{2}{*}{name} \\ \cline{2-7}
+                               & type & \multicolumn{2}{c|}{flags}          & A         & \multicolumn{2}{c|}{cid} &                       &                      &                       &                       \\ \hline
+\multicolumn{1}{|l|}{size}     & 4    & \multicolumn{2}{c|}{8}              & 4         & \multicolumn{2}{c|}{16}  & 32                    & 16                   & 16                    & GCRef                 \\ \hline
+\multicolumn{1}{|l|}{NUM}      & 0000 & \multicolumn{2}{c|}{BFcvUL..}       & A         & \multicolumn{2}{c|}{}    & size                  &                      & type                  &                       \\
+\multicolumn{1}{|l|}{STRUCT}   & 0001 & \multicolumn{2}{c|}{..cvu..V}       & A         & \multicolumn{2}{c|}{}    & size                  & field                & name                  & name                  \\
+\multicolumn{1}{|l|}{PTR}      & 0010 & \multicolumn{2}{c|}{..cvR...}       & A         & \multicolumn{2}{c|}{cid} & size                  &                      & type                  &                       \\
+\multicolumn{1}{|l|}{ARRAY}    & 0011 & \multicolumn{2}{c|}{$V^2$Ccv...V}   & A         & \multicolumn{2}{c|}{cid} & size                  &                      & type                  &                       \\
+\multicolumn{1}{|l|}{VOID}     & 0100 & \multicolumn{2}{c|}{..cv....}       & A         & \multicolumn{2}{c|}{}    & size                  &                      & type                  &                       \\
+\multicolumn{1}{|l|}{ENUM}     & 0101 & \multicolumn{2}{c|}{........}       & A         & \multicolumn{2}{c|}{cid} & size                  & const                & name                  & name                  \\
+\multicolumn{1}{|l|}{FUNC}     & 0110 & \multicolumn{2}{c|}{....$V^3$S..}   & ..cc      & \multicolumn{2}{c|}{cid} & nargs                 & field                & name                  & name                  \\
+\multicolumn{1}{|l|}{TYPEDEF}  & 0111 & \multicolumn{2}{c|}{........}       & ....      & \multicolumn{2}{c|}{cid} &                       &                      & name                  & name                  \\
+\multicolumn{1}{|l|}{ATTRIB}   & 1000 & ....             & \multicolumn{2}{c|}{attrnum} & \multicolumn{2}{c|}{cid} & attr                  & sib                  & type                  &                       \\
+\multicolumn{1}{|l|}{FIELD}    & 1001 & \multicolumn{2}{c|}{........}       & ....      & \multicolumn{2}{c|}{cid} & offset                & field                &                       & name                  \\
+\multicolumn{1}{|l|}{BITFIELD} & 1010 & B.cvU            & \multicolumn{2}{c|}{csz}     & .bsz        & .pos       & offset                & field                &                       & name                  \\
+\multicolumn{1}{|l|}{CONSTVAL} & 1011 & \multicolumn{2}{c|}{..c.....}       & ....      & \multicolumn{2}{c|}{cid} & value                 & const                & name                  & name                  \\
+\multicolumn{1}{|l|}{EXTERN}   & 1100 & \multicolumn{2}{c|}{........}       & ....      & \multicolumn{2}{c|}{cid} &                       & sib                  & name                  & name                  \\
+\multicolumn{1}{|l|}{KW}       & 1101 & \multicolumn{2}{c|}{........}       & ....      & \multicolumn{2}{c|}{tok} & size                  &                      & name                  & name                  \\ \hline
+\end{tabular}
+\end{table}
+
+\begin{table}[H]
+\footnotesize
+\centering
+\caption{My caption}
+\label{tab:ffi-ctype2}
+\begin{tabular}{ll|l|l|}
+\hline
+\multicolumn{2}{|c|}{\textit{\textbf{flags}}} & \multicolumn{2}{c|}{\textit{\textbf{A}}}                                    \\ \hline
+\multicolumn{1}{|l|}{B}      & Boolean        & A                      & allignement of $2^A$ bytes                         \\
+\multicolumn{1}{|l|}{F}      & Float          & cc                     & calling convention                                 \\
+\multicolumn{1}{|l|}{c}      & const          & attrnum                & Attributes number (see CTA\_* in lj\_ctype.h)      \\
+\multicolumn{1}{|l|}{v}      & volatile       & csz                    & size of the memory slot                            \\ \cline{3-4}
+\multicolumn{1}{|l|}{U}      & Unsigned       & \multicolumn{2}{c|}{\textit{\textbf{cid}}}                                  \\ \cline{3-4}
+\multicolumn{1}{|l|}{L}      & Long           & cid                    & child id                                           \\
+\multicolumn{1}{|l|}{u}      & union          & bsz                    & number of bits of the bit-field                    \\
+\multicolumn{1}{|l|}{V}      & VLA            & pos                    & starting position in bit inside the memory slot    \\
+\multicolumn{1}{|l|}{R}      & reference      & tok                    & token id                                           \\ \cline{3-4}
+\multicolumn{1}{|l|}{$V^2$}  & Vector         & \multicolumn{2}{c|}{\textit{\textbf{size}}}                                 \\ \cline{3-4}
+\multicolumn{1}{|l|}{C}      & Complex        & size                   & size in bytes                                      \\
+\multicolumn{1}{|l|}{$V^3$}  & Vararg         & nargs                  & number of fixed arguments of a function            \\
+\multicolumn{1}{|l|}{S}      & SSE arguments  & offset                 & offset in bytes from the start of the struct       \\ \cline{1-2}
+                             &                & value                  & the actual constant value                          \\
+                             &                & attr                   & value of the attribute                             \\ \cline{3-4}
+                             &                & \multicolumn{2}{c|}{\textit{\textbf{sib}}}                                  \\ \cline{3-4}
+                             &                & field                  & function args or struc/union field                 \\
+                             &                & const                  & constant value                                     \\
+                             &                & sib                    & chain of attribute or object of the attribute      \\ \cline{3-4}
+                             &                & \textit{\textbf{name}} & GCRef to a string containing the identifier.       \\ \cline{3-4}
+                             &                & \textit{\textbf{next}} & chain for hash collisions in cts-\textgreater hash \\ \cline{3-4}
+\end{tabular}
+\end{table}
+
+The most important struct of the FFI is the \emph{CTState} bellow. It contains
+all the internalize ctype in the \emph{tab} table. \emph{finalizer} is a weak
+keyed lua table (values can be garbage collected if the key is not referenced
+elsewhere ) containing all finalizer registered with the \emph{ffi.gc} method.
+\emph{miscmap} is a lua table mapping all metatable of ctypes registered using
+the \emph{ffi.metatype} method in the negative CTypeID range and all callback
+functions in the positive callback slot range. Any metatable added to miscmap is
+definitive and never collected. \emph{hash} is an array used as an hash table
+for quick CTypeID checks. It map both, the hashed name of named element and the
+hashed type (info and size) for unnamed element to the corresponding CTypeID.
+Collisions are handled in a linked list using the \emph{next} field of the
+\emph{CType} struct.
+
+\begin{lstlisting}[style=CStyle]
+typedef struct CTState {
+  CType *tab;        /* C type table. */
+  CTypeID top;       /* Current top of C type table. */
+  MSize sizetab;     /* Size of C type table. */
+  lua_State *L;      /* Lua state (for errors and allocations). */
+  global_State *g;   /* Global state. */
+  GCtab *finalizer;  /* Map of cdata to finalizer. */
+  GCtab *miscmap;    /* Map -CTypeID->metatable and cb slot->func. */
+  CCallback cb;      /* Temporary callback state. */
+  CTypeID1 hash[...];/* Hash anchors for C type table. */
+} CTState;
+\end{lstlisting}

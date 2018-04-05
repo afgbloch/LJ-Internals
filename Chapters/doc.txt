@@ -50,8 +50,6 @@ traces can have flow controle ? (if statement ?)
 ================================================================================
 ffi (cdata):
 ------------
-lib_ffi.c:
-  FFI library.
 lj_carith:
   C data arithmetic.
 lj_ccall:
@@ -69,93 +67,6 @@ lj_cparse:
 lj_ctype:
   C type management.
 
-lib_ffi.c:
-----------
-- all finilizer are stored in a weak keyed table stored in CTState.
-- standart lua api for the ffi library is implemented in lib_ffi.c
-
-Official Doc:
--------------
-- http://luajit.org/ext_ffi.html           : motivation and use
-- http://luajit.org/ext_ffi_tutorial.html  : small tutorial
-- http://luajit.org/ext_ffi_api.html       : FFI api documutation
-- http://luajit.org/ext_ffi_semantics.html : FFI Semantics
-Unofficial links:
-- https://github.com/corsix/ffi-reflect    : reflection library for ctypes
-- http://corsix.github.io/ffi-reflect      : related doc
-
-lj_ctype.h:
------------
-- ctype struct
-  typedef struct CType {
-    CTInfo info;    /* Type info. */
-    CTSize size;    /* Type size or other info. */
-    CTypeID1 sib;   /* Sibling element. */                (struct field, function argument, enum field)
-    CTypeID1 next;  /* Next element in hash chain. */
-    GCRef name;     /* Element name (GCstr). */
-  } CType;
-
-typedef struct CTState {
-  CType *tab;         /* C type table. */
-  CTypeID top;        /* Current top of C type table. */
-  MSize sizetab;      /* Size of C type table. */
-  lua_State *L;       /* Lua state (needed for errors and allocations). */
-  global_State *g;    /* Global state. */
-  GCtab *finalizer;   /* Map of cdata to finalizer. */
-  GCtab *miscmap;     /* Map of -CTypeID to metatable and cb slot to func. */
-  CCallback cb;       /* Temporary callback state. */
-  CTypeID1 hash[...]; /* Hash anchors for C type table. */
-} CTState;
-
-- size:
-  - size   : size in bytes
-  - nargs  : number of fixed arguments of a function
-  - offset : offset in bytes from the start of the struct
-  - value  : the actual constant value
-  - attr   : value of the attribute
-- sib :
-  - field : function args or struc/union field.
-  - const : constant value
-  - sib?  :
-    - ?? chain of attribute or object of the attribute
-- name: GCRef to a string containing the identifier.
-- next: chain for hash collisions in cts->hash (used for internalisation check)
-
-- GEN
-  cid : child id
-  A   : allignement of 2^A bytes
-- NUM
-  B   : Boolean
-  F   : Float
-  c   : const
-  v   : volatile
-  U   : Unsigned
-  L   : Long
-- STRUCT
-  u   : union
-  V   : VLA
-- PTR
-  R   : reference
-- ARRAY
-  V^2 : Vector
-  C   : Complex
-- FUNC
-  V^3 : Vararg
-  S   : SSE arguments
-  cc  : calling convention
-- ATTRIB
-  attrnum : Attributes number (type of the attribute,see CTA_* in lj_ctype.h)
-- BITFIELD
-  csz : size of the memory slot
-  bsz : number of bits of the bit-field
-  pos : starting position in bit inside the memory slot
-- KW
-  tok : token id
-
-
-- typdef chain is unrolled during parsing (typdef is style internalized for futur
-  reference but is not linked to the created type.)
-
 lj_ctype.c:
 -----------
 - C type representation : convert CType to string.
@@ -171,10 +82,6 @@ typedef struct CTRepr {
   int ok;               /* Indicate if buf is currently a valid type */
   char buf[CTREPR_MAX]; /* String buffer of the ctype being constructed */
 } CTRepr;
-
-lj_obj.h:
----------
-- GCcdata struct
 
 lj_cparse.h:
 ------------
@@ -219,6 +126,9 @@ typedef struct CPDecl {
   CTSize bits;       /* Field size in bits (if any). */
   CType stack[...];  /* Type declaration stack. */
 } CPDecl;
+
+- typdef chain is unrolled during parsing (typdef is style internalized for futur
+  reference but is not linked to the created type.)
 
 lj_cdata.c:
 -----------
@@ -309,8 +219,6 @@ typedef struct CLibrary {
   GCtab *cache; /* Cache for resolved symbols. Anchored in ud->env. */
 } CLibrary;
 
-NEXT ??? WHEN ???
-use for colision in the hash table ??
 ================================================================================
 - valgrin on linux
 - compile luajit whith uncommenting (CCDEBUG, DLUAJIT_USE_SYSMALLOC, DLUAJIT_USE_VALGRIND, DLUAJIT_ENABLE_GC64)
