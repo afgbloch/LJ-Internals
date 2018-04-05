@@ -46,6 +46,7 @@ Implement a library with an interface available through lua code.\\
 \paratitle{src/lib\_bit.c:}\\
 \paratitle{src/lib\_debug.c:}\\
 \paratitle{src/lib\_ffi.c:}\\
+FFI library.\\
 \paratitle{src/lib\_init.c:}\\
 \paratitle{src/lib\_io.c:}\\
 \paratitle{src/lib\_jit.c:}\\
@@ -72,26 +73,26 @@ Bytecode reader to allow executing saved bc.\\
 Bytecode writer to save bc.\\
 \paratitle{src/lj\_buf.c:}\\
 \paratitle{src/lj\_buf.h:}\\
-\paratitle{src/lj\_carith.c:}\\
-\paratitle{src/lj\_carith.h:}\\
-\paratitle{src/lj\_ccall.c:}\\
-\paratitle{src/lj\_ccall.h:}\\
-\paratitle{src/lj\_ccallback.c:}\\
-\paratitle{src/lj\_ccallback.h:}\\
-\paratitle{src/lj\_cconv.c:}\\
-\paratitle{src/lj\_cconv.h:}\\
-\paratitle{src/lj\_cdata.c:}\\
-\paratitle{src/lj\_cdata.h:}\\
+\paratitle{src/lj\_carith.[ch]:}\\
+C data arithmetic.\\
+\paratitle{src/lj\_ccall.[ch]:}\\
+FFI C call handling.\\
+\paratitle{src/lj\_ccallback.[ch]:}\\
+FFI C callback handling.\\
+\paratitle{src/lj\_cconv.[ch]:}\\
+C type conversions.\\
+\paratitle{src/lj\_cdata.[ch]:}\\
+C data management.\\
 \paratitle{src/lj\_char.c:}\\
 \paratitle{src/lj\_char.h:}\\
-\paratitle{src/lj\_clib.c:}\\
-\paratitle{src/lj\_clib.h:}\\
-\paratitle{src/lj\_cparse.c:}\\
-\paratitle{src/lj\_cparse.h:}\\
+\paratitle{src/lj\_clib.[ch]:}\\
+FFI C library loader.\\
+\paratitle{src/lj\_cparse.[ch]:}\\
+C declaration parser.\\
 \paratitle{src/lj\_crecord.c:}\\
 \paratitle{src/lj\_crecord.h:}\\
-\paratitle{src/lj\_ctype.c:}\\
-\paratitle{src/lj\_ctype.h:}\\
+\paratitle{src/lj\_ctype.[ch]:}\\
+C type management.\\
 \paratitle{src/lj\_debug.c:}\\
 \paratitle{src/lj\_debug.h:}\\
 \paratitle{src/lj\_def.h:}\\
