@@ -4,7 +4,7 @@ The FFI (Foreign Function Interface) is one of LuaJIT extensions modules. It
 allows to call external C functions and use C data structures from pure Lua code.
 A very small (not representative) example can be seen bellow.
 
-\begin{lstlisting}[style=myLuastyle]
+\begin{lstlisting}[style=LuaStyle]
 local ffi = require("ffi")
 ffi.cdef[[
   typedef struct points { int x,y,z; } points;
@@ -84,7 +84,7 @@ typedef struct CType {
 % |EXTERN  |1100|........|....|   cid   |   x    | sib?  | name  | name  |
 % |KW      |1101|........|....|   tok   | size   |       | name  | name  |
 % +-------------------------------------+--------+-------+-------+-------+
-\begin{table}[H]
+\begin{table}[p]
 \footnotesize
 \centering
 \caption{CType information summary}
@@ -111,7 +111,7 @@ typedef struct CType {
 \end{tabular}
 \end{table}
 
-\begin{table}[H]
+\begin{table}[p]
 \footnotesize
 \centering
 \caption{My caption}
@@ -156,6 +156,8 @@ hashed type (info and size) for unnamed element to the corresponding CTypeID.
 Collisions are handled in a linked list using the \emph{next} field of the
 \emph{CType} struct.
 
+\begin{adjustbox}{max width=\textwidth}
+\begin{minipage}{\linewidth}
 \begin{lstlisting}[style=CStyle]
 typedef struct CTState {
   CType *tab;        /* C type table. */
@@ -168,4 +170,187 @@ typedef struct CTState {
   CCallback cb;      /* Temporary callback state. */
   CTypeID1 hash[...];/* Hash anchors for C type table. */
 } CTState;
+\end{lstlisting}
+\end{minipage}
+\end{adjustbox}
+
+\paratitle{lj\_ctype.c:}\\
+This file provide functions to manage \emph{CType}. It is divided into three
+parts. The first one is the allocation, creation and internalization of
+\emph{CType}. The second one is providing getters to get C type information.
+The last one is  type representation, providing the necessary functions to
+convert a \emph{CType} to an human readable string representation.
+\emph{lj\_ctype\_repr} is the entry function that returns the internalize string
+representation. It uses the struct \emph{CTRepr} bellow to create the
+representation by appending/prepending characters through the pb/pe pointers
+into the buffer. The main function is the \emph{ctype\_repr} that contains a
+switch on the \emph{CType} info.
+
+\begin{lstlisting}[style=CStyle]
+typedef struct CTRepr {
+  char *pb, *pe; /* Points to begining/end inside the buffer*/
+  CTState *cts;  /* C type state. */
+  lua_State *L;
+  int needsp;    /* Next append needs an extra space character */
+  int ok;        /* Indicate if buf is currently a valid type */
+  char buf[...]; /* String buffer of the ctype being constructed */
+} CTRepr;
+\end{lstlisting}
+
+\paratitle{lj\_cparse.h:}\\
+The cparser is responsible for parsing the string making the C declarations
+for types or external symbols. Its code structure is quite close to the
+lua lexer/parser. Its principal struct is the \emph{CPState} bellow which is
+similar to \emph{LexState}. In this struct, \emph{tmask} is a mask constraining
+the possible ctype of the next identifier. The \emph{mode} define the behavior
+of the parser with respect to the imput. It's different behavior can be of the
+type: accepting multiple declaration, skiping error, accept/reject abstract
+declarators, accept/reject implicit declarators etc... (see CPARSE\_MODE\_* for
+full definition).
+
+\begin{adjustbox}{bgcolor=backgroundColour, max width=\textwidth}
+\begin{lstlisting}[style=CStyle]
+typedef struct CPState {
+  CPChar c;               /* Current character. */
+  CPToken tok;            /* Current token. */
+  CPValue val;            /* Token value. */
+  GCstr *str;             /* Interned string of identifier/keyword. */
+  CType *ct;              /* C type table entry. */
+  const char *p;          /* Current position in input buffer. */
+  SBuf sb;                /* String buffer for tokens. */
+  lua_State *L;           /* Lua state. */
+  CTState *cts;           /* C type state. */
+  TValue *param;          /* C type parameters. ($xyz)*/
+  const char *srcname;    /* Current source name. */
+  BCLine linenumber;      /* Input line counter. */
+  int depth;              /* Recursive declaration depth. */
+  uint32_t tmask;         /* Type mask for next identifier. */
+  uint32_t mode;          /* C parser mode. */
+  uint8_t packstack[...]; /* Stack for pack pragmas. */
+  uint8_t curpack;        /* Current position in pack pragma stack. */qerf
+} CPState;
+\end{lstlisting}
+\end{adjustbox}
+
+\paratitle{lj\_cparse.c:}\\
+This file contains the code of a simple lexer and a simplified, not valid c
+parser. It use the \emph{CPState} describe abose for the parsing of the input
+string and the \emph{CPDecl} structure bellow for the construction of the
+corresponding CType. During parsing the typdef chain is unrolled (typdef are
+still internalized for future reference but are not chained to the created
+ctype.)
+
+\begin{lstlisting}[style=CStyle]
+typedef struct CPDecl {
+  CPDeclIdx top;     /* Top of declaration stack. */
+  CPDeclIdx pos;     /* Insertion position in declaration chain. */
+  CPDeclIdx specpos; /* Saved position for declaration specifier. */
+  uint32_t mode;     /* Declarator mode (same as CPState) */
+  CPState *cp;       /* C parser state. */
+  GCstr *name;       /* Name of declared identifier (if direct). */
+  GCstr *redir;      /* Redirected symbol name. */
+  CTypeID nameid;    /* Existing typedef for declared identifier. */
+  CTInfo attr;       /* Attributes. */
+  CTInfo fattr;      /* Function attributes. */
+  CTInfo specattr;   /* Saved attributes. */
+  CTInfo specfattr;  /* Saved function attributes. */
+  CTSize bits;       /* Field size in bits (see Ctype bsz). */
+  CType stack[...];  /* Type declaration stack. */
+} CPDecl;
+\end{lstlisting}
+
+\paratitle{lj\_cdata.c:}\\
+This file contains the functions responsible for doing cdata management, such as
+allocations, free, finilizer, getter, setter and indexing.
+
+\paratitle{lj\_cconv.c:}\\
+This file is responsible for ctype conversion. It is divided in 5 parts: C type
+compatibility checks, C type to C type conversion, C type to TValue conversion,
+(from c to lua : i.e returned values), TValue to C type conversion (from lua to
+c: i.e passed arguments), and initializing C type with TValues (Initialization
+of struct/union/array with lua object)
+
+\paratitle{lj\_carith.c:}\\%
+This file contains the implementation far all built-in cdata arithmetics, such
+as pointers arithmetics and integer arithmetics. It mainly manipulate some
+\emph{CDArith} structure shown bellow.
+\begin{lstlisting}[style=CStyle]
+typedef struct CDArith {
+  uint8_t *p[2]; /* data  of the two operands */
+  CType  *ct[2]; /* ctype of the two operands */
+} CDArith;
+\end{lstlisting}
+
+\paratitle{lj\_ccall.c:}\\
+This file contains the code handling calls to c function. It does structure/array
+register classification (see CCALL\_RCL\_*), computing how it can be passed
+as argument/return values (in gp register, sse register or memory). it handle
+then the decomposition/packing depending of the calling convention picked.
+
+\paratitle{lj\_ccall.h:}\\
+Bellow is the main structure use for c function call.
+\begin{lstlisting}[style=CStyle]
+typedef struct CCallState {
+  void (*func)(void); /* Pointer to called function. */
+  uint32_t spadj;     /* Stack pointer adjustment. */
+  uint8_t nsp;        /* Number of stack slots. */
+  uint8_t retref;     /* Return value by reference. */
+  uint8_t ngpr;       /* Number of arguments in GPRs. */
+  uint8_t nfpr;       /* Number of arguments in FPRs. */
+  [...]
+  FPRArg fpr[...];    /* Arguments/results in FPRs. (SSE) */
+  GPRArg gpr[...];    /* Arguments/results in GPRs. */
+  GPRArg stack[...];  /* Stack slots. */
+} CCallState;
+\end{lstlisting}
+
+\paratitle{lj\_ccallback.c:}\\
+This file contains the FFI C callback handling. The principal structure is the
+\emph{CCallback} bellow (see \emph{lj\_ctype.h}) mainly use through the cb field of the \emph{CTState}
+structure. Each callback is associated with a unique cb slot and the
+\emph{cts-$>$miscmap} contains the mapping between cb slot and function
+pointers. The \emph{cts.cb.cbid} is a table mapping cb slot to the corresponding
+CTypeID. \emph{cts.cb.mcode} is an mmap'ed executable page that contains a push
+of slot id and a jump to \emph{lj\_vm\_ffi\_callback} (the entry in this page
+correspond to the cb address provided to the c code). Bellow is a description
+of the call order when a callback is called.
+
+\begin{itemize}
+	\item c call a callback address
+	\item arrive in the callback mcode page (push the appropriate slot id and call lj\_vm\_ffi\_callback)
+	\item arrive in lj\_vm\_ffi\_callback that charge in registers the callback.fpr/gpr + stack in registers
+	\item arrive in lj\_ccallback\_enter that prepare the lua state and do conversion of argument from c to lua type.
+	\item arrive in lj\_vm\_ffi\_callback : execute the callback with this lua state
+	\item lua callback
+	\item arrive in $|->$cont\_ffi\_callback: call lj\_ccallback\_leave
+	\item arrive in lj\_ccallback\_leave convert return value from lua to c.
+	\item arrive in $|->$cont\_ffi\_callback: return to c code with the return value in register/stack.
+	\item arrive in c code.
+\end{itemize}
+
+\begin{lstlisting}[style=CStyle]
+typedef struct CCallback {
+  FPRCBArg fpr[...]; /* Arguments/results in FPRs. */
+  intptr_t gpr[...]; /* Arguments/results in GPRs. */
+  intptr_t *stack;   /* Pointer to arguments on stack. */
+  void *mcode;       /* Machine code for callback func. pointers. */
+  CTypeID1 *cbid;    /* Callback type table. */
+  MSize sizeid;      /* Size of callback type table. */
+  MSize topid;       /* Highest unused callback type table slot. */
+  MSize slot;        /* Current callback slot. */
+} CCallback;
+\end{lstlisting}
+
+\paratitle{lj\_clib.c:}\\
+This file contain the necessary code to load/unload ffi library. It also handle
+the indexing of the external library using named symbol. It use platform
+specific tool to explore the exposed symbol. Every symbol is resolved only once
+and cached in the \emph{CLibrary} cache table.
+
+\paratitle{lj\_clib.h:}\\
+\begin{lstlisting}[style=CStyle]
+typedef struct CLibrary {
+  void *handle; /* Opaque handle for dynamic library loader. */
+  GCtab *cache; /* Cache for resolved symbols. Anchored in ud->env. */
+} CLibrary;
 \end{lstlisting}
