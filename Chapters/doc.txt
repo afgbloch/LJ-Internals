@@ -48,11 +48,6 @@ traces can have flow controle ? (if statement ?)
 ================================================================================
 - jflush option : does it mean that codes can be keept from a run to the other ?
 ================================================================================
-- valgrin on linux
-- compile luajit whith uncommenting (CCDEBUG, DLUAJIT_USE_SYSMALLOC, DLUAJIT_USE_VALGRIND, DLUAJIT_ENABLE_GC64)
-- use ./luajit/src/lj.supp file for the cmd bellow.
-- cmd: "valgrind --tool=memcheck --leak-check=full --track-origins=yes --log-file='tests.txt' --suppressions=lj.supp ./mad all.mad -v"
-================================================================================
 - randre a gcobject never collectable by by gc.
 - why allocator is global ?
 - does gc goes through the lua stack.
