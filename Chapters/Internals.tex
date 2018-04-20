@@ -1,5 +1,54 @@
 %!TEX root = ../FYP_Dissertation.tex
 
+\section{Tagged value}
+\label{Sec:tagged-value}
+
+LuaJIT represent all internal element as 64-bits \emph{TValue} (tagged value).
+It use the nan-tagging technique to differentiate between numbers and other
+types of element. In fact, \emph{lua\_number} are 64-bits floating-points numbers
+following the \emph{ieee} standard. Doing so, numeric nan are canonized by the
+cpu FPU (0xfff8 in msb and zero otherwise), letting the possibility to use the
+lower bits to represent arbitrary data. Internally, LuaJIT has two different
+representations, one for x86 and another for x64 bit (\emph{LJ\_GC64}) mode
+(see Table \ref{tab:tagged-gc32} and \ref{tab:tagged-gc64}). In those table,
+\emph{itypes} are numbers identifying the type of the object.
+GC object (Garbage Collectible Object) represent all allocated object
+that are managed by the garbage collector. \emph{GCRef} are references to such
+object.
+
+\begin{table}[H]
+\centering
+\caption{Internal object tagging for 32-bits mode}
+\label{tab:tagged-gc32}
+\begin{tabular}{l|c|c|c|}
+\cline{2-4}
+                                              & \multicolumn{2}{c|}{MSW}         & LSW         \\ \hline
+\multicolumn{1}{|l|}{size}                    & \multicolumn{2}{c|}{32-bits}     & 32-bits     \\ \hline
+\multicolumn{1}{|l|}{primitive types}         & \multicolumn{2}{c|}{itypes}      &             \\
+\multicolumn{1}{|l|}{lightuserdata (32-bits)} & \multicolumn{2}{c|}{itypes}      & void *      \\
+\multicolumn{1}{|l|}{lightuserdata (64-bits)} & 0xffff           & \multicolumn{2}{c|}{void *} \\
+\multicolumn{1}{|l|}{GC objects}              & \multicolumn{2}{c|}{itypes}      & GCRef       \\
+\multicolumn{1}{|l|}{int}                     & \multicolumn{2}{c|}{itypes}      & int         \\
+\multicolumn{1}{|l|}{number}                  & \multicolumn{3}{c|}{double}                    \\ \hline
+\end{tabular}
+\end{table}
+
+\begin{table}[H]
+\centering
+\caption{Internal object tagging for 64-bits mode}
+\label{tab:tagged-gc64}
+\begin{tabular}{l|c|c|c|c|}
+\cline{2-5}
+                                      & \multicolumn{3}{c|}{MSW}         & LSW         \\ \hline
+\multicolumn{1}{|l|}{size}            & 13-bits & 4-bits & 15-bits       & 32-bits     \\ \hline
+\multicolumn{1}{|l|}{primitive types} & 1...1   & itype  & \multicolumn{2}{c|}{1...1}  \\
+\multicolumn{1}{|l|}{lightuserdata}   & 1...1   & itype  & \multicolumn{2}{c|}{void *} \\
+\multicolumn{1}{|l|}{GC objects}      & 1...1   & itype  & \multicolumn{2}{c|}{GCRef}  \\
+\multicolumn{1}{|l|}{int}             & 1...1   & itype  & 0...0         & int         \\
+\multicolumn{1}{|l|}{number}          & \multicolumn{4}{c|}{double}                    \\ \hline
+\end{tabular}
+\end{table}
+
 \section{String Internalization}
 \label{Sec:string-inter}
 
