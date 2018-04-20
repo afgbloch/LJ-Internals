@@ -165,6 +165,51 @@ typedef struct GCState {
 } GCState;
 \end{lstlisting}
 
+\section{Allocator}
+\label{Sec:alloc}
+LuaJIT has its own embedded allocator that is a customized version of \emph{dlmalloc}
+(Doug Lea's Malloc). Information on the original implementation can be found on
+the web article \cite{dlmalloc-art} or in the comment of the code
+\cite{dlmalloc-impl}. The allocator is implemented in the \emph{lj\_alloc.c}
+file. It's main structure \emph{malloc\_state} is shown bellow. Memory on the
+heap are allocated in chunk. Free chunk are managed as double linked-list with
+the size of the chunk at the beginning and end of it. Unallocated memory are
+grouped in bins of corresponding size. There is two types of bins. The
+smaller one contains chunck of same size and the top are anchored in
+\emph{smallbins}. The bigger one are stored as bitwise digital tree (aka tries)
+keyed by size were the top of a tree is anchored in \emph{treebins}. The
+allocator differentiates with two types of memory allocation, if it is higher than
+128KB then it ask the operating system for a new memory segment using mmap, if
+it is lower than that it use chunks from the current segment. All allocated
+segments are kept in a linked list anchored in \emph{seg}. For such smaller
+allocation the allocator first try to find an exact fit from the available
+chunks to optimize for internal fragmentation. If it cannot find one and that
+the requested size is smaller than \emph{dvsize} then it use the \emph{dv}
+chunk (designated victim) which is the last chunk that has been split. It does
+so to optimize for locality. Otherwise it goes for a best-fit match. If no chunk
+big enough is available it ask the system to extend the segment and use the
+boundary chunk \emph{top} (kept always free). When memory is freed it does chunk
+coalescing to avoid memory fragmentation. If \emph{topsize} is bigger than
+\emph{trim\_check}, then the current segment is shrinked and the memory is given
+back to the os. \emph{release\_checks} is a decreasing counter that when it
+riches zero triggers a check of all segments to release empty ones back to the os.
+
+\begin{lstlisting}[style=CStyle]
+struct malloc_state {
+  binmap_t  smallmap;       /* marking non-empty smallbins */
+  binmap_t  treemap;        /* marking non-empty treebins  */
+  size_t    dvsize;         /* designated victim size      */
+  size_t    topsize;        /* boundary chunk size         */
+  mchunkptr dv;             /* designated victim           */
+  mchunkptr top;            /* boundary chunk              */
+  size_t    trim_check;     /* threshold size to release   */
+  size_t    release_checks; /* counter for mmap release    */
+  mchunkptr smallbins[...]; /* anchor for top small bins   */
+  tbinptr   treebins[...];  /* anchor for top tree bins    */
+  msegment  seg;            /* anchor for chained segments */
+};
+\end{lstlisting}
+
 \section{Function}
 \label{Sec:func}
 

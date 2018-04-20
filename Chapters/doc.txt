@@ -48,6 +48,7 @@ traces can have flow controle ? (if statement ?)
 ================================================================================
 - jflush option : does it mean that codes can be keept from a run to the other ?
 ================================================================================
-- randre a gcobject never collectable by by gc.
-- why allocator is global ?
+- make a GCObj never collectable by gc.
+- why allocator is global ? -> It is not :)
 - does gc goes through the lua stack.
+================================================================================
