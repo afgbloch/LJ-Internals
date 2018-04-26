@@ -1,0 +1,48 @@
+%!TEX root = ../FYP_Dissertation.tex
+
+\section{Standard library}
+\label{Sec:std-lib}
+
+LuaJIT is providing a full compatibility with Lua 5.1 and to do so, it
+implements the standard library. The code is copied and adapted from the
+\emph{PUC-RIO} Lua interpreter. A list of the corresponding files and the
+descriptions of what they are doing can be found in table
+\ref{tab:library-std-files}.
+
+\begin{table}[H]
+\centering
+\caption{Implementation's files of the Lua standard library}
+\label{tab:library-std-files}
+\begin{tabular}{|l|l|}
+\hline
+\multicolumn{1}{|c|}{File name} & \multicolumn{1}{c|}{Description}                     \\ \hline
+lib\_base.c                     & Base and coroutine library.                          \\
+lib\_debug.c                    & Debug library.                                       \\
+lib\_init.c                     & Load and initialize standard libraries.              \\
+lib\_io.c                       & Files and I/O library.                               \\
+lib\_math.c                     & Math library (abs, sqrt, log, random, etc...).       \\
+lib\_os.c                       & OS library (date, time, execute, remove, etc...).    \\
+lib\_package.c                  & Package library (load, require, etc...).             \\
+lib\_string.c                   & String library (gsub, match, etc...).                \\
+lib\_table.c                    & Table library (new, clear, insert, foreach, etc...). \\ \hline
+\end{tabular}
+\end{table}
+
+\section{LuaJIT extensions}
+\label{Sec:lj-extensions}
+
+In addition of the standard library, luaJIT comes equipped with some library
+extensions \cite{extensions}. In addition of a few improvements of existing
+modules it provides three new extension modules, namely, \emph{bit} in
+\emph{lib\_bit.c} that provides with bitwise operations \cite{bitOp}, \emph{ffi}
+in \emph{lib\_ffi.c} that provide functions to interact with the FFI library
+(see FFI Chapter \ref{Chapt:FFI} for more) and \emph{jit} in \emph{lib\_jit.c}
+that provide functions allowing to control the behavior of the JIT compiler
+engine (see JIT Part \ref{Part:JIT}).
+
+\section{The C API}
+\label{Sec:c-api}
+
+
+
+  % lib_aux.c     : Auxiliary library for the Lua/C API.
