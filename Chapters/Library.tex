@@ -45,8 +45,170 @@ engine (see JIT Part \ref{Part:JIT}).
 
 All those libraries are implemented using the Lua C API that allows to create
 and manipulate lua data, manage de lua stack etc... The implementation for those
-functions can be found in \emph{lj\_api.c} and in \emph{lib\_aux.c}.
+functions can be found in \emph{lj\_api.c}, \emph{lj\_lib.c} and \emph{lib\_aux.c}.
 
-\section{Build VM}
-\label{Sec:c-api}
+\section{Build Library}
+\label{Sec:build-lib}
 
+LuaJIT use multiple tricks to generate files automatically that are included
+during compilation to help with the building and loading of the standard library
+without the need for manual maintenance. We will describe here the different
+steps and what they are useful for.
+
+First of all if no lua interpreter
+(either PUC-Lua or LuaJIT) is available on the machine a simplified and
+minimized one is build from the \emph{minilua.c} file. Then the interpreter is
+used to run \emph{genlibbc.lua} that will be responsible for parsing all LuaJIT's
+source files searching for the \emph{LJLIB\_LUA} macro that surrounds library
+functions name, written in lua. it then generate the \emph{buildbm\_libbc.h}
+file that contains the lua byte codes for all those functions in the
+\emph{libbc\_code} array and a mapping of the function name and the bytecodes
+offset for that function in \emph{libbc\_map}.
+
+This newly generated file is
+build along with all \emph{buildvm\_*} files to create the \emph{buildvm}
+program that is used to parse from the library source code all other
+\emph{LJLIB\_*} macro and generates some files
+(\emph{lj\_bcdef.h, lj\_libdef.h, lj\_ffdef.h, lj\_recdef.h and vmdef.lua})
+that will be added to LuaJIT compilation. You can see, in Table
+\ref{tab:library-macro} the description of the macros and in Table
+\ref{tab:library-generated-files} the description of the corresponding generated
+file.
+
+\begin{table}
+\centering
+\caption{Library Macro definitions}
+\label{tab:library-macro}
+\begin{tabularx}{\textwidth}{|l|X|}
+\hline
+\multicolumn{1}{|c|}{Macro}          & \multicolumn{1}{c|}{Description}                     \\\hline
+LJLIB\_MODULE\_*                     & register new module.                                 \\\hline
+LJLIB\_CF(name)                      & register c function.                                 \\\hline
+LJLIB\_ASM(name)                     & register fast function fallback handler.             \\\hline
+LJLIB\_ASM\_(name)                   &
+  \begin{tabular}[c]{@{}l@{}}
+  register fast function that uses previous\\
+  LJLIB\_ASM fallback handler.
+  \end{tabular}                                                                             \\\hline
+LJLIB\_LUA(name)                     & register lua function.                               \\\hline
+\multirow{4}{*}{LJLIB\_SET(name)}    &
+  \begin{tabular}[c]{@{}l@{}}
+  register previous Lua stack value into the module\\
+  table with \emph{name} has key.
+  \end{tabular}
+  \begin{itemize}
+  \item '!' : last stack value became next function's env
+  \end{itemize}                                                                             \\\hline
+\multirow{7}{*}{LJLIB\_PUSH(val)}    & push \emph{val} on the lua stask.
+  \begin{itemize}
+  \item 'lastcl'  : copy last stack value
+  \item 'top-x'   : copy last x stack value
+  \item ' "..." ' : push internalized string
+  \end{itemize}                                                                             \\\hline
+\multirow{8}{*}{LJLIB\_REC(handler)} & register a handler to record a function.
+  \begin{itemize}
+  \item '.' : get the function's name
+  \item 'name data' :
+    \begin{itemize}
+      \item \emph{name} of recorder
+      \item auxiliary \emph{data} to put in \emph{recff\_idmap}
+    \end{itemize}
+  \end{itemize}                                                                             \\\hline
+LJLIB\_NOREGUV                       & to not register this function in module.             \\\hline
+LJLIB\_NOREG                         & to not register a function in lj\_lib\_cf\_*.        \\\hline
+\end{tabularx}
+\end{table}
+
+\begin{table}
+\centering
+\caption{Generated files description}
+\label{tab:library-generated-files}
+\begin{tabularx}{\textwidth}{|l|X|}
+\hline
+\multicolumn{1}{|c|}{File}          & \multicolumn{1}{c|}{Description}                      \\\hline
+\emph{lj\_bcdef.h}                  &
+  for each fast functions, \emph{lj\_bc\_ofs} contains the offset from
+  \emph{lj\_vm\_asm\_begin} (in \emph{lj\_vm.h}) to the mcode of the function
+  and \emph{lj\_bc\_mode} contains the byte code operande mode (all set to
+  \emph{BCMODE\_FF}) (see \emph{lj\_bc.h} and this \emph{Introduction} section
+  of the wiki \cite{luajit-bc}).                                                            \\\hline
+\emph{lj\_ffdef.h}                  & list of all library function name                     \\\hline
+\emph{lj\_libdef.h}                 &
+  \emph{lj\_lib\_cf\_*} arrays contains the list of function pointers for the
+  * library. \emph{lj\_lib\_init\_*} are arrays of packed data describing how
+  the corresponding library should be loaded (see \emph{lj\_lib\_register} in
+  \emph{lj\_lib.c} for the function that parse those data).                                 \\\hline
+\emph{lj\_recdef.h}                 &
+  for each library functions \emph{recff\_idmap} contains an optional auxiliary
+  data (opcode, literal etc.) allowing to handle similar functionality in a
+  common handler. \emph{recff\_func} contains the list of record handler.                   \\\hline
+\emph{vmdef.lua}                    &
+  contains all vm definition for use in lua.
+  \begin{itemize}
+  \item bcnames  : bytecode names
+  \item irnames  : IR instructions names
+  \item irfpm    : floating point math function names
+  \item irfield  : maps field id to field name (specific field the IR instruction access to)
+  \item ircall   : name of special function for calls instruction.
+  \item traceerr : maps error num to error message
+  \item ffnames  : maps library function id to function name
+  \end{itemize}                                                                             \\\hline
+\end{tabularx}
+\end{table}
+
+% BUILD_bcdef  : lj_bc_ofs contains bytes offset for the ASMFunction
+  % for each ff (ASM, ASM_) in the asm from lj_vm_asm_begin (lj_vm.h).
+  % lj_bc_mode set byte code operande mode to none for all ff.
+  % (generates lj_bcdef.h )
+% BUILD_ffdef  : list of all fast function name (generates lj_ffdef.h )
+% BUILD_libdef : (generates lj_libdef.h)
+  % lj_lib_cf_* : list c function pointer of * library.
+  % lj_lib_init_* : table of packed data.
+    % lua bytcode for lua function (function name len, function name, function bytecode)
+% BUILD_recdef : recff_idmap : Per-ffid auxiliary data (opcode, literal etc.)
+  % This allows handling similar functionality in a common handler.
+  % recff_func : the list of fast function record handler (generates lj_recdef.h)
+% BUILD_vmdef  : contains all vm definition for use in lua. (generates vmdef.lua  )
+  % bcnames  : list all bytecode names
+  % irnames  : list all IR names
+  % irfpm    : floating point math function name
+  % irfield  : field id to field name (specific field the IR instruction access to)
+  % ircall   : name of special function for calls instruction.
+  % traceerr : map : error num -> error message
+  % ffnames  : map : fast function id -> function name
+
+% buildvm_lib.c
+% lj_lib.[ch] : lj_lib_register()
+ % list of searched macro
+% LJLIB_MODULE_*     : register a new module (BUILD_libdef)
+% LJLIB_CF(name)     : register c function. (BUILD_libdef, BUILD_ffdef, BUILD_recdef, BUILD_vmdef, BUILD_bcdef)
+% LJLIB_ASM(name)    : register fast function fallback handler.
+% LJLIB_ASM_(name)   : register fast function that uses previous LJLIB_ASM fallback handler.
+% LJLIB_LUA(name)    : register lua function (BUILD_libdef)
+% LJLIB_SET(name)    : register previous Lua stack value into the module table with name has key ('!' special value : set last pushed value has next functions environments) (BUILD_libdef)
+% LJLIB_PUSH(arg)    : push on the lua stask during the library registration (on load) ('lastcl' : copy last stack value, 'top-x' copy last x stack value, '"..."' push internalized string) (BUILD_libdef)
+% LJLIB_REC(handler) : register a handler to record a fast function. ('.' special value : get the function's name, otherwise 1st part is  name of recoder before mangling and second part is the auxiliary data to put in recff_idmap) (BUILD_recdef)
+% LJLIB_NOREGUV      : to not put this function public (not register his name in module)
+% LJLIB_NOREG        : to not register a function in lj_lib_cf_* (is private)(BUILD_libdef)
+
+% ------------------------------------------------------------------------------
+% ???? what are fallback handlers for : fast pass vs slow pass for fast function ????
+
+% /*
+% ** A fallback handler is called by the assembler VM if the fast path fails:
+% **
+% ** - too few arguments:   unrecoverable.
+% ** - wrong argument type:   recoverable, if coercion succeeds.
+% ** - bad argument value:  unrecoverable.
+% ** - stack overflow:        recoverable, if stack reallocation succeeds.
+% ** - extra handling:        recoverable.
+% **
+% ** The unrecoverable cases throw an error with lj_err_arg(), lj_err_argtype(),
+% ** lj_err_caller() or lj_err_callermsg().
+% ** The recoverable cases return 0 or the number of results + 1.
+% ** The assembler VM retries the fast path only if 0 is returned.
+% ** This time the fallback must not be called again or it gets stuck in a loop.
+% */
+
+% "ffid" -> all library function
+% "recff" record handler for all
