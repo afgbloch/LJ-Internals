@@ -156,41 +156,6 @@ LJLIB\_NOREG                         & to not register a function in lj\_lib\_cf
 \end{tabularx}
 \end{table}
 
-% BUILD_bcdef  : lj_bc_ofs contains bytes offset for the ASMFunction
-  % for each ff (ASM, ASM_) in the asm from lj_vm_asm_begin (lj_vm.h).
-  % lj_bc_mode set byte code operande mode to none for all ff.
-  % (generates lj_bcdef.h )
-% BUILD_ffdef  : list of all fast function name (generates lj_ffdef.h )
-% BUILD_libdef : (generates lj_libdef.h)
-  % lj_lib_cf_* : list c function pointer of * library.
-  % lj_lib_init_* : table of packed data.
-    % lua bytcode for lua function (function name len, function name, function bytecode)
-% BUILD_recdef : recff_idmap : Per-ffid auxiliary data (opcode, literal etc.)
-  % This allows handling similar functionality in a common handler.
-  % recff_func : the list of fast function record handler (generates lj_recdef.h)
-% BUILD_vmdef  : contains all vm definition for use in lua. (generates vmdef.lua  )
-  % bcnames  : list all bytecode names
-  % irnames  : list all IR names
-  % irfpm    : floating point math function name
-  % irfield  : field id to field name (specific field the IR instruction access to)
-  % ircall   : name of special function for calls instruction.
-  % traceerr : map : error num -> error message
-  % ffnames  : map : fast function id -> function name
-
-% buildvm_lib.c
-% lj_lib.[ch] : lj_lib_register()
- % list of searched macro
-% LJLIB_MODULE_*     : register a new module (BUILD_libdef)
-% LJLIB_CF(name)     : register c function. (BUILD_libdef, BUILD_ffdef, BUILD_recdef, BUILD_vmdef, BUILD_bcdef)
-% LJLIB_ASM(name)    : register fast function fallback handler.
-% LJLIB_ASM_(name)   : register fast function that uses previous LJLIB_ASM fallback handler.
-% LJLIB_LUA(name)    : register lua function (BUILD_libdef)
-% LJLIB_SET(name)    : register previous Lua stack value into the module table with name has key ('!' special value : set last pushed value has next functions environments) (BUILD_libdef)
-% LJLIB_PUSH(arg)    : push on the lua stask during the library registration (on load) ('lastcl' : copy last stack value, 'top-x' copy last x stack value, '"..."' push internalized string) (BUILD_libdef)
-% LJLIB_REC(handler) : register a handler to record a fast function. ('.' special value : get the function's name, otherwise 1st part is  name of recoder before mangling and second part is the auxiliary data to put in recff_idmap) (BUILD_recdef)
-% LJLIB_NOREGUV      : to not put this function public (not register his name in module)
-% LJLIB_NOREG        : to not register a function in lj_lib_cf_* (is private)(BUILD_libdef)
-
 % ------------------------------------------------------------------------------
 % ???? what are fallback handlers for : fast pass vs slow pass for fast function ????
 
