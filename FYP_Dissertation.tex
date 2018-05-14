@@ -54,6 +54,7 @@
 \usepackage{algpseudocode}        % more layout options for algorithm pseudo code
 \usepackage{listings}             % to add non-formatted text e.g. source code
 
+\usepackage{tabularx}
 \usepackage{multirow}
 \usepackage{todonotes}
 \usepackage{adjustbox}
@@ -121,7 +122,7 @@
 %--------------------------------------------------------------------------------
 
 \thesistitle{LuaJIT Internals \\ {\large v2.1.0-beta3 (1 May 2017)}} % title
-\authors{A. \textsc{Bloch} and L. \textsc{Deniau}}	% your name
+\authors{A. \textsc{Bloch}\\ Supervised by: L. \textsc{Deniau}}	% your name
 \keywords{LuaJIT, technical documentation}         	% keywords
 %\department{}                						% department name
 %\Udegree{}
@@ -273,22 +274,27 @@
 
   \chapter{Frontend}
   \label{Chapt:frontend}
+  \lhead{Chapter \thechapter. \emph{Frontend}}
   \input{./Chapters/Frontend}
 
   \chapter{Internals}
   \label{Chapt:Internals}
+  \lhead{Chapter \thechapter. \emph{Internals}}
   \input{./Chapters/Internals}
 
   \chapter{Bytecode interpreter}
   \label{Chapt:BI}
+  \lhead{Chapter \thechapter. \emph{Bytecode interpreter}}
   \input{./Chapters/Bytecode-interpreter}
 
   \chapter{Library}
   \label{Chapt:Library}
+  \lhead{Chapter \thechapter. \emph{Library}}
   \input{./Chapters/Library}
 
   \chapter{Foreign function interface}
   \label{Chapt:FFI}
+  \lhead{Chapter \thechapter. \emph{Foreign function interface}}
   \input{./Chapters/FFI}
 
 \part{JIT}
