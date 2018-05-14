@@ -242,3 +242,15 @@ typedef struct GCproto {
   [...]
 } GCproto;
 \end{lstlisting}
+
+\section{Fast Function}
+\label{Sec:ffunc}
+
+Fast functions are specially optimize standard library function. There is two
+part for each function, the implementation part and the fallback handler.
+The implementation part is done in assembly in the \emph{vm\_*.dasc} files and
+handle the general case, called the fast pass. If the fast pass fail, the vm
+call the corresponding fallback handler (all \emph{LJLIB\_ASM} marked functions)
+that will tries to recover from the failure if possible. Example of recoverable
+cases might be : a wrong argument type if coercion succeeds or a stack overflow
+if stack reallocation succeeds (see comment in lj\_lib.h).
