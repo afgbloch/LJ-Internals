@@ -55,3 +55,20 @@ traces can have flow controle ? (if statement ?)
 - why allocator is global ? -> It is not :)
 - does gc goes through the lua stack.
 ================================================================================
+- jit.flush doesn''t remove blacklistings
+- function that ends by a c api/ffi tail-call can not be compile in standalone.
+  - potential solution is wrapping return value with ().
+- lua_setmetatable run flushall mcode because cdata metatamethode lookup is specialise
+  metatable is immutable.
+- does jit.on remove the blacklist of a given function ? -> yes
+- Inject changes after the first test failed:
+  - white list only doesn''t work
+  - white list + clear penalty cache doesn''t work
+  - white list + clear penalty cache + clear hotcount +
+    clear J->prngstate doesn''t work
+  - white list + flush does cure the problem
+  - flush only does cure the problem (normal ???)
+- No performance loss if flushall remove blacklisting
+================================================================================
+  - LJ_PRNG_BITS in lj_jit.h for penalty used for penalty randomization.
+================================================================================

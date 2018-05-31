@@ -1,7 +1,8 @@
 %!TEX root = ../FYP_Dissertation.tex
 \section{How to use it}
 \label{Sec:dump-usage}
-This module can be used to debug the JIT compiler itself. It dumps the
+This module can be used to debug the JIT compiler itself or to analyze its
+behavior regarding a piece of code. It dumps the
 code representations and structures used in various compiler stages.
 
 Example usage:
@@ -48,6 +49,16 @@ The output format can be set with the following characters:
 \end{itemize}
 The default output format is plain text. It's set to ANSI-colored text
 if the COLORTERM variable is set.
+
+We can also use this module programmatically like in the example bellow. The
+\emph{on} function can take 2 arguments, the list of options (describe above)
+and the output file.
+\begin{lstlisting}[style=LuaStyle]
+local dump = require"jit.dump"
+dump.on("tbimT", "outfile.txt")
+  -- Code to analyze here
+dump.off()
+\end{lstlisting}
 
 \section{Understanding states dump}
 \label{Sec:dump-states}
