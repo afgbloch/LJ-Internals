@@ -12,23 +12,134 @@ lj_crecord.c: records C data ops
  - other-1... : bc arguments
  - last       : comment corresponding lua code
 ================================================================================
-JIT
+ - Hashed profile counters: Bytecode instructions to trigger the
+  start of a hot trace use low-overhead hashed profiling counters.
+  The profile is imprecise because collisions are ignored. The
+  hash table is kept very small to reduce D-cache impact (only two
+  hot cache lines). Since NLF weeds out most false positives, this
+  doesn''t deteriorate hot trace detection.
+
+  [Neither using hashed profile counters, nor imprecise profiling,
+  nor using profiling to detect hot loops is new. But the specific
+  combination may be original.]
+================================================================================
+Recording:
+----------
+- natural-loop first (NLF) -> region-selection
 - lj_trace.c
   - trace_state : State machine for the trace compiler.
     - LJ_TRACE_START : start recording (call to trace_start).
-    - LJ_TRACE_RECORD : recording in process.
-    - LJ_TRACE_END : end of recording + apply optimizations on IR.
-    - LJ_TRACE_ASM : assemble the trace.
+      change state to LJ_TRACE_RECORD.
+    - LJ_TRACE_RECORD : recording in process (looping over "lj_record_ins").
+    - LJ_TRACE_END : end of recording + apply pending bytcode patch
+      + apply optimizations on IR.
+    - LJ_TRACE_ASM : assemble the trace and call trace_stop().
     - LJ_TRACE_ERR : abort (trace_abort).
-  - trace_start
-  - trace_stop
-  - trace_abort
+  - trace_start: does jit_State setup and allocations.
+  - trace_stop: patch the bc to use the compiled version instead of the interpreted
+    once.
+  - trace_abort: does state cleanup, handle Penalize or blacklist.
+- lj_record_ins: is a huge switch case on the bc to record a specific bytcode
+  instruction and generate the corresponding specialized IR code of the instruction
+  before execution. (executed inside a pcall -> _ERR bu throwing lua intarnal exception)
+- lj_record_stop
+  - trace stitching (call to c using c API)
+  - end of the hotloop
+  - hit an other already compiled loop (link to it)
+  - return statement
+    - return to interpretor for unhandled cases
+    - when downrec limit reach for side-trace (nagative frame depth)
+    - tail-rec is detected (limit reach in the same framedepth)
+    - limit reach in up recursion (positive frame depth)
+  - hit a compiled function (link to its trace)
+- there exist two types of trace
+  - parent trace ->
+  - side trace (recursive) ?? ->
+- hot is detected ->
+  - recorde a parent trace
+  - change of the J->state to become LJ_TRACE_START
+  - start recording the first bytecode (run trace_state until abort _ERR or _END)
+- recording is the fact of executing the code while remembering dynamic data/type
+  /controlflow decision to generate a specialized version of this code that
+- Reason to abort -> see abort.txt
 ================================================================================
+Optimizations:
+--------------
+during LJ_TRACE_END state the following optimizations function are called
+  - lj_opt_dce: perform dce optimization
+  - lj_opt_loop:
+  - lj_opt_split:
+  - lj_opt_sink:
+- dce (dead code elimination)
+  - Pre-LOOP only - ASM already performs DCE.
+- loop optimizations
+  - Code hoisting via unrolling and copy-substitution (LOOP):
+    Traditional loop-invariant code motion (LICM) is mostly useless
+    for the IR resulting from dynamic languages. The IR has many
+    guards and most subsequent instructions are control-dependent on
+    them. The first non-hoistable guard would effectively prevent
+    hoisting of all subsequent instructions.
+
+    The LOOP pass does synthetic unrolling of the recorded IR,
+    combining copy-substitution with redundancy elimination to
+    achieve code hoisting. The unrolled and copy-substituted
+    instructions are simply fed back into the compiler pipeline,
+    which allows reuse of all optimizations for redundancy
+    elimination. Loop recurrences are detected on-the-fly and a
+    minimized set of PHIs is generated.
+- split optimizations
+- sink optimizations
+- Fold optimizations:
+  - Rule-based FOLD engine: The FOLD engine is primarily used for
+    constant folding, algebraic simplifications and reassociation.
+    Most traditional compilers have an evolutionary grown set of
+    implicit rules, spread over thousands of hand-coded tiny
+    conditionals.
+
+    The rule-based FOLD engine uses a declarative approach to
+    combine the first and second level of lookup. It allows wildcard
+    lookup with masked keys, too. A pre-processor generates a
+    semi-perfect hash table for constant-time rule lookup. It''s able
+    to deal with thousands of rules in a uniform manner without
+    performance degradation. A declarative approach is also much
+    easier to maintain.
+-  Narrowing optimizations
+  - Narrowing of numbers to integers: Predictive narrowing is used
+    for induction variables. Demand-driven narrowing is used for
+    index expressions using a backpropagation algorithm.
+
+    This avoids the complexity associated with speculative, eager
+    narrowing, which also causes excessive control-flow dependencies
+    due to the many overflow checks. Selective narrowing is better
+    at exploiting the combined bandwidth of the FP and integer units
+    of the CPU and avoids clogging up the branch unit.
+================================================================================
+IR:
+----
+- SSA (Static single assignment) based (cf : https://www.wikiwand.com/en/Static_single_assignment_form)
+- Data-flow for loops is represented using PHI-instructions.
+- Control-flow is always implicit.
+- operands are 16 bit references
+- implemented with a bidirectionally growable array
+- Skip-list chains: The IR is threaded with segregated, per-opcode
+  skip-list chains. The links are stored in a multi-purpose 16 bit
+  field in the instruction. This facilitates low-overhead lookup
+  for CSE, DSE and alias analysis. Back-linking enables short-cut
+  searches (average overhead is less than 1 lookup). Incremental
+  build-up is trivial. No hashes, no sets, no complex updates.
+- a single High-level IR across all optimization stage.
 - Trace IR code is represented as an array in memory.
 - The array includes two different things: instructions and constants.
 - Instructions are stored at "upwards" indices 0,1,2,...
 - Constants are stored at "downwards" indices -1,-2,-3,...
 - References to array elements are "biased" by adding 0x8000.
+- Every instruction has an output data type.
+- IR constants are interned and can be compared for equality only by looking at their references.
+- Guarded assertions have a dual purpose
+  - They provide an assertion about their operands.
+  - They are emitted by the backend as branching comparisons,
+    - true ->  fall-through path.
+    - false ->  outcome exits the trace and restores the state using last snapshot.
 ================================================================================
 Programming advice:
   1) for i=1,#s do end
@@ -71,4 +182,68 @@ traces can have flow controle ? (if statement ?)
 - No performance loss if flushall remove blacklisting
 ================================================================================
   - LJ_PRNG_BITS in lj_jit.h for penalty used for penalty randomization.
+================================================================================
+LuaJIT Multithreading:
+----------------------
+GG_State     : Global state, main thread and extra fields are allocated together.
+global_State : Global state, shared by all threads of a Lua universe.
+
+lua_open <=> luaL_newstate : create a fully separate LuaJIT with everything separated
+  - allocator
+  - garbage collector
+  - GG_State
+  - global_State
+  - Jit_state
+================================================================================
+Loom: Mostly usefull to use hypetext link to navigate between traces
+-----
+- launch loom programmatically
+  local loom = require"ljit_loom"
+  local tmpl = loom.template("loom.html")
+  loom.on()
+  local out  = loom.off(tmpl)
+  local file = assert(io.open("report.html", "w"))
+  file:write(out)
+  file:close()
+- launch loom through the command line
+  rlwrap ./mad -jloom=,out.html test.lua
+NB:
+  - flushs make loom crash (tmp fix)
+  - MAD.tostring export (in all.mad) makes loom crash
+================================================================================
+- function call are always inlined into the trace when possible
+  - need to be verified ?
+  - what are the conditions ?
+================================================================================
+- Controle flow is strictly linear (no branch inside a trace)
+================================================================================
+- Use the model object for has a full example
+================================================================================
+- lookup the same constant keys in hashtables of many different shapes and sizes
+is bad !!!!
+================================================================================
+https://github.com/lukego/blog/issues/28
+================================================================================
+Advice for Report: (brain dump)
+------------------
+- keep the detailed ans structured LuaJIT doc in annexe (?)
+- say that annex took a lot of time (no documentation existing)
+- focus on explaining from context -> through mad
+- a big part on luajit (overall, scheamatic of luajit)
+- a big part on why mad
+- talk about sequence, element, tracking, survey, model object
+- talk about instability
+- talk about dumps
+- talk about the miss of tools
+- talk about the miss of predictabilty
+- talk about different version of the model object
+- tiny talk about madx -> mad-ng
+- trace explosion
+- talk about performance in matrix ffi.cast and issues with the gc.
+- talk about gc64 mode
+- talk about permanent blacklisting
+- talk about collision in hot detection (run dependent)
+- add a section on RaptorJIT
+- profiler issues
+- gdb
 ================================================================================
