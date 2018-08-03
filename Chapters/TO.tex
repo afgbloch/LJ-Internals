@@ -32,7 +32,7 @@ This a very useful optimization that allows to avoid many temporaries and
 unnecessary memory accesses and allocations by keeping the values of interest
 directly in register. We thus have to remember how the memory should have been
 modified in case those access escape our execution path (are not temporary
-anymore), for this purpose snapshot are used (See Section \ref{Sec:ir-snap}). This optimization is implemented
+anymore), for this purpose snapshot are used (See Section \ref{Sec:snap}). This optimization is implemented
 in the \emph{lj\_opt\_sink.c} file. A detailed explanation of this optimization
 is available on the wiki \cite{luajit-sink}.
 
