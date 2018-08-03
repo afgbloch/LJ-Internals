@@ -1,6 +1,12 @@
 %!TEX root = ../FYP_Dissertation.tex
+
+%===============================================================================
+% How to use it
+%===============================================================================
+
 \section{How to use it}
 \label{Sec:dump-usage}
+
 This module can be used to debug the JIT compiler itself or to analyze its
 behavior regarding a piece of code. It dumps the
 code representations and structures used in various compiler stages.
@@ -60,8 +66,13 @@ dump.on("tbimT", "outfile.txt")
 dump.off()
 \end{lstlisting}
 
+%===============================================================================
+% Understanding states dump
+%===============================================================================
+
 \section{Understanding states dump}
 \label{Sec:dump-states}
+
 This command looks like the verbose mode (-jv) and print informations for each start,
 end or abortion of a trace. The output can have one of those three shapes.
 \begin{verbatim}
@@ -108,8 +119,13 @@ As you can see the trace prior to the stitching has its link marked as
 \emph{stitch} and the one after is shown like a side trace but with
 \emph{stitch} instead of the number of the side exit.
 
+%===============================================================================
+% Understanding BC dump
+%===============================================================================
+
 \section{Understanding BC dump}
 \label{Sec:dump-bc}
+
 Bellow is a example of how a BC instruction is shown in the dump. For a complete
 list of BC instruction and their corresponding arguments look at the wiki page
 \cite{luajit-bc}.
@@ -124,9 +140,14 @@ list of BC instruction and their corresponding arguments look at the wiki page
   \item last       : comment helping to tie the instruction to the lua code.
 \end{itemize}
 
+%===============================================================================
+% Understanding IR dump
+%===============================================================================
+
 \section{Understanding IR dump}
-Bellow are some example of dumps of IR instructions.
 \label{Sec:dump-ir}
+
+Bellow are some example of dumps of IR instructions.
 \begin{verbatim}
 0001 rax   >  tab SLOAD  #46   T
 0014 rbp      int TOBIT  0005  bias
@@ -196,9 +217,13 @@ The i-th value in the snapshot list represents the IR instruction number of the
 instruction that wrote a value in slot number i. '- - - -' indicates that the slot
 has not been modified. Function frames are separated by '$\vert$'.
 
+%===============================================================================
+% Understanding mcode dump
+%===============================================================================
 
 \section{Understanding mcode dump}
 \label{Sec:dump-mcode}
+
 Bellow is a example of a small typical trace. It start with some initialization
 followed most of the time by a loop part clearly indicated by the label.
 Each line is composed of two parts, the mcode instruction's address and the
@@ -227,6 +252,10 @@ corresponding assembler instruction.
 10020ffea  jle 0x10020ffd0  ->LOOP
 10020ffec  jmp 0x100200028  ->6
 \end{verbatim}
+
+%===============================================================================
+% How does it works
+%===============================================================================
 
 \section{How does it works}
 \label{Sec:dump-internals}

@@ -1,5 +1,9 @@
 %!TEX root = ../FYP_Dissertation.tex
 
+%===============================================================================
+% Tagged value
+%===============================================================================
+
 \section{Tagged value}
 \label{Sec:tagged-value}
 
@@ -49,6 +53,10 @@ object.
 \end{tabular}
 \end{table}
 
+%===============================================================================
+% String Internalization
+%===============================================================================
+
 \section{String Internalization}
 \label{Sec:string-inter}
 
@@ -76,6 +84,10 @@ typedef struct global_State {
   [...]
 }
 \end{lstlisting}
+
+%===============================================================================
+% Lua table
+%===============================================================================
 
 \section{Lua table}
 \label{Sec:table}
@@ -121,6 +133,10 @@ typedef struct GCtab {
 } GCtab;
 \end{lstlisting}
 
+%===============================================================================
+% Garbage collector
+%===============================================================================
+
 \section{Garbage collector}
 \label{Sec:gc}
 
@@ -165,8 +181,13 @@ typedef struct GCState {
 } GCState;
 \end{lstlisting}
 
+%===============================================================================
+% Allocator
+%===============================================================================
+
 \section{Allocator}
 \label{Sec:alloc}
+
 LuaJIT has its own embedded allocator that is a customized version of \emph{dlmalloc}
 (Doug Lea's Malloc). Information on the original implementation can be found on
 the web article \cite{dlmalloc-art} or in the comment of the code
@@ -210,6 +231,10 @@ struct malloc_state {
 };
 \end{lstlisting}
 
+%===============================================================================
+% Function
+%===============================================================================
+
 \section{Function}
 \label{Sec:func}
 
@@ -242,6 +267,10 @@ typedef struct GCproto {
   [...]
 } GCproto;
 \end{lstlisting}
+
+%===============================================================================
+% Fast Function
+%===============================================================================
 
 \section{Fast Function}
 \label{Sec:ffunc}

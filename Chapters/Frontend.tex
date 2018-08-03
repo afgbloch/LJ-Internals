@@ -1,5 +1,9 @@
 %!TEX root = ../FYP_Dissertation.tex
 
+%===============================================================================
+% Lexer
+%===============================================================================
+
 \section{Lexer}
 \label{Sec:Lexer}
 
@@ -43,6 +47,10 @@ typedef struct LexState {
 } LexState;
 \end{lstlisting}
 
+%===============================================================================
+% Parser
+%===============================================================================
+
 \section{Parser}
 \label{Sec:Parser}
 
@@ -84,6 +92,11 @@ typedef struct FuncState {
   VarIndex uvtmp[...];    /* Temporary upvalue map. */
 } FuncState;
 \end{lstlisting}
+
+%===============================================================================
+% Bytecode frontend
+%===============================================================================
+
 \section{Bytecode frontend}
 \label{Sec:bc-frontend}
 

@@ -1,5 +1,9 @@
 %!TEX root = ../FYP_Dissertation.tex
 
+%===============================================================================
+% Standard library
+%===============================================================================
+
 \section{Standard library}
 \label{Sec:std-lib}
 
@@ -28,6 +32,10 @@ lib\_table.c                    & Table library (new, clear, insert, foreach, et
 \end{tabular}
 \end{table}
 
+%===============================================================================
+% LuaJIT extensions
+%===============================================================================
+
 \section{LuaJIT extensions}
 \label{Sec:lj-extensions}
 
@@ -40,12 +48,20 @@ in \emph{lib\_ffi.c} that provide functions to interact with the FFI library
 that provide functions allowing to control the behavior of the JIT compiler
 engine (see JIT Part \ref{Part:JIT}).
 
+%===============================================================================
+% The C API
+%===============================================================================
+
 \section{The C API}
 \label{Sec:c-api}
 
 All those libraries are implemented using the Lua C API that allows to create
 and manipulate lua data, manage de lua stack etc... The implementation for those
 functions can be found in \emph{lj\_api.c}, \emph{lj\_lib.c} and \emph{lib\_aux.c}.
+
+%===============================================================================
+% Build Library
+%===============================================================================
 
 \section{Build Library}
 \label{Sec:build-lib}
