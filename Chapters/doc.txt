@@ -9,6 +9,10 @@ Interesting LuaJIT Presentation: https://mrale.ph/talks/vmss16/#/
  - other-1... : bc arguments
  - last       : comment corresponding lua code
 ================================================================================
+ - there exist two types of trace
+   - parent trace ->
+   - side trace (recursive) ?? ->
+================================================================================
 Paragraph on flush policies ??
 ================================================================================
 how can we intern lua table slot in traces.

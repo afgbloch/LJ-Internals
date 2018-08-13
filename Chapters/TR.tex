@@ -6,12 +6,19 @@
 
 \section{Hot path detection}
 \label{Sec:hot-path}
+
 LuaJIT does trace compilation. For that, it needs to detect that a certain
 portion of the code gets hot and compile it as a trace. Two types of trace entry
 are detected, loops and function. In the vm (See Part \ref{Part:VM}) each
-traceable loop-like or call-like BC (byte-code) decrement a counter that is the
-hashed pc (program counter) position of a (64-entries) table. When the counter underflows it start recording. At the end of the recording phase, it patch the
-BC with a call to the compiled trace.
+traceable loop-like or call-like BC (bytecode) decrement a low-overhead profile
+counter that is at the hashed PC (program counter) position of a 64-entries table.
+When the counter underflows, it start recording. Bellow is the call order that
+trigger a recording depending of the bytecode. This counter table being small
+and collision being ignored false positive may occur.
+It must be noted that LuaJIT perform a natural-loop first (NLF) region selection.
+This can be noted in two ways. First, when the BC is a loop the counters are
+decremented twice as fast as for function call. Second, In most cases, if a
+parent trace hit an inner loop, the parent trace is aborted.
 
 \paratitle{Loops:}
 
@@ -28,8 +35,14 @@ jmp to vm\_hotloop if it underflows (vm\_(arch).dasc).
 	\item \emph{hotcall} : hash the pc, decrement the corresponding counter and
 jmp to vm\_hotcall if it underflows (vm\_(arch).dasc).
 	\item \emph{vm\_hotcall} : Prepare the stack and call lj\_dispatch\_call.
-	\item \emph{lj\_dispatch\_call} : start recording a trace (lj\_dispatch.c).
+	\item \emph{lj\_dispatch\_call} : perform initialization
+	and call \emph{lj\_trace\_hot} that start recording a trace (lj\_dispatch.c).
 \end{itemize}
+
+\emph{lj\_trace\_hot} start the recording of a parent trace by changing
+\emph{J$->$state} to \emph{LJ\_TRACE\_START}, starting the recorder state
+machine, described in the next section.
+
 
 %===============================================================================
 % Recorder state machine
@@ -38,58 +51,43 @@ jmp to vm\_hotcall if it underflows (vm\_(arch).dasc).
 \section{Recorder state machine}
 \label{Sec:recorder-state-machine}
 
-% Recording:
-% ----------
-%  - Hashed profile counters: Bytecode instructions to trigger the
-%   start of a hot trace use low-overhead hashed profiling counters.
-%   The profile is imprecise because collisions are ignored. The
-%   hash table is kept very small to reduce D-cache impact (only two
-%   hot cache lines). Since NLF weeds out most false positives, this
-%   doesn''t deteriorate hot trace detection.
+Recording is the fact of executing the bytecode while remembering dynamic
+data/type and generating on the fly the IR specialized for this recording. In
+doing so, the control flow is flattened meaning that only taken branch are
+recorded and function call are inlined. The code responsible for that lie in, the
+\emph{lj\_trace.c} file for the state machine presented bellow and the helper
+functions, the \emph{lj\_record.c} for most of the bytecode recording,
+the \emph{lj\_ffrecord.c} for the data of fast function call and
+\emph{lj\_crecord.c} for the cdata operations.
 
-%   [Neither using hashed profile counters, nor imprecise profiling,
-%   nor using profiling to detect hot loops is new. But the specific
-%   combination may be original.]
-% - talk about penalty
-% - natural-loop first (NLF) -> region-selection
-% - lj_trace.c
-%   - trace_state : State machine for the trace compiler.
-%     - LJ_TRACE_START : start recording (call to trace_start).
-%       change state to LJ_TRACE_RECORD.
-%     - LJ_TRACE_RECORD : recording in process (looping over "lj_record_ins").
-%     - LJ_TRACE_END : end of recording + apply pending bytcode patch
-%       + apply optimizations on IR.
-%     - LJ_TRACE_ASM : assemble the trace and call trace_stop().
-%     - LJ_TRACE_ERR : abort (trace_abort).
-%   - trace_start: does jit_State setup and allocations.
-%   - trace_stop: patch the bc to use the compiled version instead of the interpreted
-%     once.
-%   - trace_abort: does state cleanup, handle Penalize or blacklist.
-% - lj_record_ins: is a huge switch case on the bc to record a specific bytcode
-%   instruction and generate the corresponding specialized IR code of the instruction
-%   before execution. (executed inside a pcall -> _ERR bu throwing lua intarnal exception)
-% - lj_record_stop
-%   - trace stitching (call to c using c API)
-%   - end of the hotloop
-%   - hit an other already compiled loop (link to it)
-%   - return statement
-%     - return to interpretor for unhandled cases
-%     - when downrec limit reach for side-trace (nagative frame depth)
-%     - tail-rec is detected (limit reach in the same framedepth)
-%     - limit reach in up recursion (positive frame depth)
-%   - hit a compiled function (link to its trace)
-% - there exist two types of trace
-%   - parent trace ->
-%   - side trace (recursive) ?? ->
-% - hot is detected ->
-%   - recorde a parent trace
-%   - change of the J->state to become LJ_TRACE_START
-%   - start recording the first bytecode (run trace_state until abort _ERR or _END)
-% - recording is the fact of executing the code while remembering dynamic data/type
-%   /controlflow decision to generate a specialized version of this code that
-% - Reason to abort -> see abort.txt
-% - lj_ffrecord.c: records data for fast function call
-% - lj_crecord.c: records C data ops
+\includegraphics[width=\textwidth]{./Images/FSM.pdf}
+
+\begin{table}[H]
+\centering
+\caption{Library Macro definitions}
+\label{tab:library-macro}
+\begin{tabularx}{\textwidth}{|c|X|}
+\hline
+\multicolumn{1}{|c|}{Macro}          & \multicolumn{1}{c|}{Description}                     \\\hline
+Start                   &
+  \begin{tabular}[c]{@{}l@{}}
+  Call trace\_start that perform jit\_State setup and \\allocations.
+  Change state to LJ\_TRACE\_RECORD.
+  \end{tabular}                                                                             \\\hline
+Record                  & Recording in progress. It loop over the
+	lj\_record\_ins function, which is a huge switch case that record a specific
+  bytecode instruction and generate the corresponding specialized IR code of the
+  BC before execution. It is executed inside a pcall and jump to the
+  \emph{Error} state if a lua exception is thrown. \\\hline%
+End                     &
+  End of recording. It applies optimizations on the IR (see Chapter \ref{Chapt:TO}).        \\\hline
+ASM                     &
+	Assemble the trace and call trace\_stop to patch the BC (see Chapter \ref{Chapt:TA}).     \\\hline
+Error                   &
+	Abort the recording of the current trace, perform state cleanup, penalize the
+	corresponding hot BC or apply blacklisting (see Section \ref{Sec:abort})                  \\\hline
+\end{tabularx}
+\end{table}
 
 %===============================================================================
 % Abortion and blacklisting
@@ -97,6 +95,26 @@ jmp to vm\_hotcall if it underflows (vm\_(arch).dasc).
 
 \section{Abortion and blacklisting}
 \label{Sec:abort}
+
+There exist multiple reason that might cause a recording to abort. Such reason
+could be that the unroll limit is reached, that the trace is too long, that the
+jit is disable for a specific function or many other. (see \emph{lj\_traceerr.h}
+for the list of possible abort messages). To trigger an abortion, a lua error is
+thrown during the recording which transition the recorder state machine to the
+\emph{LJ\_TRACE\_ERR} state. Then, the \emph{penalty\_pc} function is called on
+the hot bytecode that triggered the recording. The penalty mechanism consist of
+a 64-entry table, where each entry is a structure containing the exact PC of the
+penalized bytecode, the penalty value, and the reason of the abortion. The
+\emph{penaltyslot} variable is a round-robin index inside the table indicating
+the next entry to use if a new bytecode needs to be penalized. It as to be noted
+that on the contrary of the hotcount mechanisme, here the full PC is used to
+identify a slot making it free of false positive. However, since the entry is
+only 64 entry, penalized bytecode can easily be forgotten in a big code base.
+If the penalty for a given bytecode exceeds a threshold then the hot bytecode
+responsible for starting the recording gets blacklisted. It meaning that this
+bytecode can never become hot again to start a recording and that if this
+bytecode try to be recorded inside another trace, this trace get aborted too
+(in most cases). A blacklisted bytecode is never whitelisted by the system.
 
 %===============================================================================
 % Intermediate representation
