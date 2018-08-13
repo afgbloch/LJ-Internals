@@ -1,0 +1,27 @@
+%!TEX root = ../FYP_Dissertation.tex
+
+% Assembler:
+% ----------
+% - lj_asm.c and lj_asm.h
+% - lj_asm_(target).c spezialized part for each platform (target)
+% - lj_emit_(target).h:
+% - lj_asm_trace() is the main function called in the LJ_TRACE_ASM state
+%   - loop on asm_ir for each ir instruction
+% - use ASMState
+% - Assemble a trace in linear backwards order
+% - At the end of the assembler phase, it patch the
+% BC with a call to the compiled trace.
+% patch the bc to use the compiled version instead of the interpreted
+%     once.
+
+% in lj_trace.c ? (verify)
+% - lj_record_stop
+%   - trace stitching (call to c using c API)
+%   - end of the hotloop
+%   - hit an other already compiled loop (link to it)
+%   - return statement
+%     - return to interpretor for unhandled cases
+%     - when downrec limit reach for side-trace (nagative frame depth)
+%     - tail-rec is detected (limit reach in the same framedepth)
+%     - limit reach in up recursion (positive frame depth)
+%   - hit a compiled function (link to its trace)
