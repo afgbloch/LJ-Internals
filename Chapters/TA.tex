@@ -1,19 +1,21 @@
 %!TEX root = ../FYP_Dissertation.tex
 
-% Assembler:
-% ----------
-% - lj_asm.c and lj_asm.h
-% - lj_asm_(target).c spezialized part for each platform (target)
-% - lj_emit_(target).h:
-% - lj_asm_trace() is the main function called in the LJ_TRACE_ASM state
-%   - loop on asm_ir for each ir instruction
-% - use ASMState
-% - Assemble a trace in linear backwards order
-% - At the end of the assembler phase, it patch the
-% BC with a call to the compiled trace.
-% patch the bc to use the compiled version instead of the interpreted
-%     once.
+When the recorder state machine reach the \emph{LJ\_TRACE\_ASM} state, the
+\emph{lj\_asm\_trace} main assembler function is called. This function is
+responsible for the setup and teardown of the assembler phase. Each IR
+instruction of the trace is assembled through the \emph{asm\_ir} function which
+is a switch case on the opcode. The implementation of the assembler is divided
+in three different files. \emph{lj\_asm.c} contains the assembler code that is
+agnostic of the platform, \emph{lj\_asm\_(target).h} contains the assembler code
+specific to a particular target (i.e. x86), and \emph{lj\_emit\_(target).h}
+contain the helper functions for generating instructions for a specific
+instruction-set. A trace is assembled in linear backwards order. It uses
+\emph{ASMState} has the main data structure that help with, physical register
+allocation, machine code and IR traversal, and snapshot handling. At the end of
+the assembler phase, the bytecode is patched to use instead of the interpreted
+bytecode a call to the compiled trace.
 
+% -- TO BE ADDED ????
 % in lj_trace.c ? (verify)
 % - lj_record_stop
 %   - trace stitching (call to c using c API)
