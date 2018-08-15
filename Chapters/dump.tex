@@ -4,8 +4,8 @@
 % How to use it
 %===============================================================================
 
-\section{How to use it}
-\label{Sec:dump-usage}
+\subsection{How to use it}
+\label{Subsec:dump-usage}
 
 This module can be used to debug the JIT compiler itself or to analyze its
 behavior regarding a piece of code. It dumps the
@@ -70,8 +70,8 @@ dump.off()
 % Understanding states dump
 %===============================================================================
 
-\section{Understanding states dump}
-\label{Sec:dump-states}
+\subsection{Understanding states dump}
+\label{Subsec:dump-states}
 
 This command looks like the verbose mode (-jv) and print informations for each start,
 end or abortion of a trace. The output can have one of those three shapes.
@@ -123,8 +123,8 @@ As you can see the trace prior to the stitching has its link marked as
 % Understanding BC dump
 %===============================================================================
 
-\section{Understanding BC dump}
-\label{Sec:dump-bc}
+\subsection{Understanding BC dump}
+\label{Subsec:dump-bc}
 
 Bellow is a example of how a BC instruction is shown in the dump. For a complete
 list of BC instruction and their corresponding arguments look at the wiki page
@@ -144,8 +144,8 @@ list of BC instruction and their corresponding arguments look at the wiki page
 % Understanding IR dump
 %===============================================================================
 
-\section{Understanding IR dump}
-\label{Sec:dump-ir}
+\subsection{Understanding IR dump}
+\label{Subsec:dump-ir}
 
 Bellow are some example of dumps of IR instructions.
 \begin{verbatim}
@@ -207,7 +207,7 @@ Bellow are some example of dumps of IR instructions.
 \paratitle{Snapshot}\\
 Each snaphot (SNAP), lists the modified stack slots and the corresponding values.
 Bellow are two examples of how snapshots are shown in ir dump. For further
-comments on why snapshots are used, see Section \ref{Sec:snap}. Bellow is an
+comments on why snapshots are used, see Section \ref{Subsec:snap}. Bellow is an
 example of how snapshot can be shown in the dump.
 \begin{verbatim}
 ....    SNAP   #1   [ ---- ---- ---- ---- 0069 0070 0071 ---- ]
@@ -221,8 +221,8 @@ has not been modified. Function frames are separated by '$\vert$'.
 % Understanding mcode dump
 %===============================================================================
 
-\section{Understanding mcode dump}
-\label{Sec:dump-mcode}
+\subsection{Understanding mcode dump}
+\label{Subsec:dump-mcode}
 
 Bellow is a example of a small typical trace. It start with some initialization
 followed most of the time by a loop part clearly indicated by the label.
@@ -257,14 +257,14 @@ corresponding assembler instruction.
 % How does it works
 %===============================================================================
 
-\section{How does it works}
-\label{Sec:dump-internals}
+\subsection{How does it works}
+\label{Subsec:dump-internals}
 
 This section briefly present the parts of the code of luaJIT involved in the process of
 emitting the dump. The dump module (dump.lua) is responsible of the set up of the
 jit to emit traces and also for printing the results in a human understandable
 format. Depending of the dump it has to print (with respect to the provided
-parameters, see Section \ref{Sec:dump-usage}) it attach some handler
+parameters, see Section \ref{Subsec:dump-usage}) it attach some handler
 (callback lua function) to specific VM event using jit\_attach (see lib\_jit.c).
 The predefined VM event used here are : BC, TRACE, RECORD, TEXIT
 (see VMEvent in lj\_vmevent.h). In the jit, lj\_vmevent\_send (see lj\_vmevent.h)

@@ -4,8 +4,8 @@
 % Tagged value
 %===============================================================================
 
-\section{Tagged value}
-\label{Sec:tagged-value}
+\subsection{Tagged value}
+\label{Subsec:tagged-value}
 
 LuaJIT represent all internal element as 64-bits \emph{TValue} (tagged value).
 It use the nan-tagging technique to differentiate between numbers and other
@@ -57,8 +57,8 @@ object.
 % String Internalization
 %===============================================================================
 
-\section{String Internalization}
-\label{Sec:string-inter}
+\subsection{String Internalization}
+\label{Subsec:string-inter}
 
 All strings that are manipulated by LuaJIT are internalized. This includes, all
 the strings literals of the user lua code, all identifier and tokens of the lua
@@ -89,8 +89,8 @@ typedef struct global_State {
 % Lua table
 %===============================================================================
 
-\section{Lua table}
-\label{Sec:table}
+\subsection{Lua table}
+\label{Subsec:table}
 
 Tables are garbage collectible objects represented by the structure bellow
 (\emph{GCtab} in \emph{lj\_obj.h}). Functions to manipulate them are in
@@ -137,8 +137,8 @@ typedef struct GCtab {
 % Garbage collector
 %===============================================================================
 
-\section{Garbage collector}
-\label{Sec:gc}
+\subsection{Garbage collector}
+\label{Subsec:gc}
 
 LuaJIT garbage collector has currently a tri-color, incremental mark and sweep
 types implementation. You can find a presentation of it on the wiki
@@ -185,8 +185,8 @@ typedef struct GCState {
 % Allocator
 %===============================================================================
 
-\section{Allocator}
-\label{Sec:alloc}
+\subsection{Allocator}
+\label{Subsec:alloc}
 
 LuaJIT has its own embedded allocator that is a customized version of \emph{dlmalloc}
 (Doug Lea's Malloc). Information on the original implementation can be found on
@@ -235,8 +235,8 @@ struct malloc_state {
 % Function
 %===============================================================================
 
-\section{Function}
-\label{Sec:func}
+\subsection{Function}
+\label{Subsec:func}
 
 There are two distinct representation for function, the function's prototype,
 and the function's closure. the Lua functions' prototypes are represented by \emph{GCproto} (\emph{lj\_obj.h}), and are followed by the functions' bytecodes in memory.
@@ -272,8 +272,8 @@ typedef struct GCproto {
 % Fast Function
 %===============================================================================
 
-\section{Fast Function}
-\label{Sec:ffunc}
+\subsection{Fast Function}
+\label{Subsec:ffunc}
 
 Fast functions are specially optimize standard library function. There is two
 part for each function, the implementation part and the fallback handler.

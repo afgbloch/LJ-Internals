@@ -4,12 +4,12 @@
 % Hot path detection
 %===============================================================================
 
-\section{Hot path detection}
-\label{Sec:hot-path}
+\subsection{Hot path detection}
+\label{Subsec:hot-path}
 
 LuaJIT does trace compilation. For that, it needs to detect that a certain
 portion of the code gets hot and compile it as a trace. Two types of trace entry
-are detected, loops and function. In the vm (See Part \ref{Part:VM}) each
+are detected, loops and function. In the vm (See Part \ref{Chapt:VM}) each
 traceable loop-like or call-like BC (bytecode) decrement a low-overhead profile
 counter that is at the hashed PC (program counter) position of a 64-entries table.
 When the counter underflows, it start recording. Bellow is the call order that
@@ -48,8 +48,8 @@ machine, described in the next section.
 % Recorder state machine
 %===============================================================================
 
-\section{Recorder state machine}
-\label{Sec:recorder-state-machine}
+\subsection{Recorder state machine}
+\label{Subsec:recorder-state-machine}
 
 Recording is the fact of executing the bytecode while remembering dynamic
 data/type and generating on the fly the IR specialized for this recording. In
@@ -64,11 +64,11 @@ the \emph{lj\_ffrecord.c} for the data of fast function call and
 
 \begin{table}[H]
 \centering
-\caption{Library Macro definitions}
-\label{tab:library-macro}
+\caption{States description}
+\label{tab:states}
 \begin{tabularx}{\textwidth}{|c|X|}
 \hline
-\multicolumn{1}{|c|}{Macro}          & \multicolumn{1}{c|}{Description}                     \\\hline
+\multicolumn{1}{|c|}{States}          & \multicolumn{1}{c|}{Description}                     \\\hline
 Start                   &
   \begin{tabular}[c]{@{}l@{}}
   Call trace\_start that perform jit\_State setup and \\allocations.
@@ -80,12 +80,12 @@ Record                  & Recording in progress. It loop over the
   BC before execution. It is executed inside a pcall and jump to the
   \emph{Error} state if a lua exception is thrown. \\\hline%
 End                     &
-  End of recording. It applies optimizations on the IR (see Chapter \ref{Chapt:TO}).        \\\hline
+  End of recording. It applies optimizations on the IR (see Chapter \ref{Sec:TO}).        \\\hline
 ASM                     &
-	Assemble the trace and call trace\_stop to patch the BC (see Chapter \ref{Chapt:TA}).     \\\hline
+	Assemble the trace and call trace\_stop to patch the BC (see Chapter \ref{Sec:TA}).     \\\hline
 Error                   &
 	Abort the recording of the current trace, perform state cleanup, penalize the
-	corresponding hot BC or apply blacklisting (see Section \ref{Sec:abort})                  \\\hline
+	corresponding hot BC or apply blacklisting (see Section \ref{Subsec:abort})                  \\\hline
 \end{tabularx}
 \end{table}
 
@@ -93,8 +93,8 @@ Error                   &
 % Abortion and blacklisting
 %===============================================================================
 
-\section{Abortion and blacklisting}
-\label{Sec:abort}
+\subsection{Abortion and blacklisting}
+\label{Subsec:abort}
 
 There exist multiple reason that might cause a recording to abort. Such reason
 could be that the unroll limit is reached, that the trace is too long, that the
@@ -120,8 +120,8 @@ bytecode try to be recorded inside another trace, this trace get aborted too
 % Intermediate representation
 %===============================================================================
 
-\section{Intermediate representation}
-\label{Sec:IR}
+\subsection{Intermediate representation}
+\label{Subsec:IR}
 
 LuaJIT use a single high-level intermediate representation (IR) across all
 optimization stage. As stated, it is generated on the fly during recording and
@@ -179,8 +179,8 @@ prev  & per-opcode skip-list chains \\ \hline
 % Snapshots
 %===============================================================================
 
-\section{Snapshots}
-\label{Sec:snap}
+\subsection{Snapshots}
+\label{Subsec:snap}
 
 Snapshot is an important mechanism used in trace compilation. The VM should
 always be in a consistent state, meaning that all updates should respect the

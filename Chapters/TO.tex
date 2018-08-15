@@ -5,18 +5,19 @@ First of all there are the optimizations present in the optimization engine.
 They are implemented in the \emph{lj\_opt\_*.c} files and thus easy to spot out.
 Those optimization are of two kind, global optimization that are run on the
 entire IR at once at the end of the recording phase, during the
-\emph{LJ\_TRACE\_END} state (See \ref{Sec:opt-dce}, \ref{Sec:opt-loop},
-\ref{Sec:opt-split}, \ref{Sec:opt-sinking}) and the local optimizations that are
-applied while recording a trace (See \ref{Sec:narrowing}, \ref{Subsec:fold},
-\ref{Subsec:mao}). Finally, there is a plethora of optimization and heuristic
-applied here and there (See luaJIT wiki on optimization \cite{luajit-opt}).
+\emph{LJ\_TRACE\_END} state (See \ref{Subsec:opt-dce}, \ref{Subsec:opt-loop},
+\ref{Subsec:opt-split}, \ref{Subsec:opt-sinking}) and the local optimizations
+that are applied while recording a trace (See \ref{Subsec:narrowing},
+\ref{Subsubsec:fold}, \ref{Subsubsec:mao}). Finally, there is a plethora of
+optimization and heuristic applied here and there (See luaJIT wiki on
+optimization \cite{luajit-opt}).
 
 %===============================================================================
 % Dead code elimination
 %===============================================================================
 
-\section{Dead code elimination}
-\label{Sec:opt-dce}
+\subsection{Dead code elimination}
+\label{Subsec:opt-dce}
 
 DCE or Dead Code Elimination is performed by the lj\_opt\_dce main function
 in two phases. During the first phase called mark snap, it mark all IR
@@ -28,8 +29,8 @@ marked IR instruction while replacing non-marked IR instruction by nops.
 % Loop optimizations
 %===============================================================================
 
-\section{Loop optimizations}
-\label{Sec:opt-loop}
+\subsection{Loop optimizations}
+\label{Subsec:opt-loop}
 
 The loop optimization is a way to improve code hoisting for trace based around
 loops. In fact LuaJIT should try to hoist most invariant instruction and guards
@@ -46,8 +47,8 @@ all the other loop iteration executing only the variant once.
 % Split optimizations
 %===============================================================================
 
-\section{Split optimizations}
-\label{Sec:opt-split}
+\subsection{Split optimizations}
+\label{Subsec:opt-split}
 
 The split optimizations is only use by 32-bits architecture and splits the
 64-bits IR instructions into multiple 32-bits onces.
@@ -56,22 +57,22 @@ The split optimizations is only use by 32-bits architecture and splits the
 % Sinking optimizations
 %===============================================================================
 
-\section{Sinking optimizations}
-\label{Sec:opt-sinking}
+\subsection{Sinking optimizations}
+\label{Subsec:opt-sinking}
 This a very useful optimization that allows to avoid many temporaries and
 unnecessary memory accesses and allocations by keeping the values of interest
 directly in register. We thus have to remember how the memory should have been
 modified in case those access escape our execution path (are not temporary
-anymore), for this purpose snapshot are used (See Section \ref{Sec:snap}). This
-optimization is implemented in the \emph{lj\_opt\_sink.c} file. A detailed
+anymore), for this purpose snapshot are used (See Section \ref{Subsec:snap}).
+This optimization is implemented in the \emph{lj\_opt\_sink.c} file. A detailed
 explanation of this optimization is available on the wiki \cite{luajit-sink}.
 
 %===============================================================================
 % Narrowing optimizations
 %===============================================================================
 
-\section{Narrowing optimizations}
-\label{Sec:narrowing}
+\subsection{Narrowing optimizations}
+\label{Subsec:narrowing}
 
 It performs the narrowing of lua numbers (double) into integers when it seems
 to be useful. LuaJIT use demand-driven (by the backend) narrowing for index
@@ -84,8 +85,8 @@ see the comment section in the \emph{lj\_opt\_narrow.c} file.
 % Fold engine
 %===============================================================================
 
-\section{Fold engine}
-\label{Sec:fold}
+\subsection{Fold engine}
+\label{Subsec:fold}
 
 The fold engine implement a rule-based mechanism. Rules are declared using the
 LJFOLD macro which contains the IR opcode and a rule on the parametters it
@@ -108,16 +109,16 @@ index fold table & fold instr opcode & left instr opcode & \multicolumn{2}{c|}{l
 \end{tabular}
 \end{table}
 
-\subsection{Fold optimizations}
-\label{Subsec:fold}
+\subsubsection{Fold optimizations}
+\label{Subsubsec:fold}
 
 The fold optimizations preformed by the FOLD engine are implemented in the
 \emph{lj\_opt\_fold.c} file and can be separated in five well known techniques,
 constant folding, algebraic simplifications, reassociation, common subexpression
 elimination and Array bounds check elimination.
 
-\subsection{Memory access optimizations}
-\label{Subsec:mao}
+\subsubsection{Memory access optimizations}
+\label{Subsubsec:mao}
 
 The memory access optimization perform by the FOLD engine and implemented
 in the lj\_opt\_mem.c file consist of three component, the alias

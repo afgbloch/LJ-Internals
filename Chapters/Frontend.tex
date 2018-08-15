@@ -4,8 +4,8 @@
 % Lexer
 %===============================================================================
 
-\section{Lexer}
-\label{Sec:Lexer}
+\subsection{Lexer}
+\label{Subsec:Lexer}
 
 The lexer is implemented in the \emph{lj\_lex.c} and \emph{lj\_lex.h} files.
 It use \emph{LexState} as a principal data structure. The user-provided
@@ -51,8 +51,8 @@ typedef struct LexState {
 % Parser
 %===============================================================================
 
-\section{Parser}
-\label{Sec:Parser}
+\subsection{Parser}
+\label{Subsec:Parser}
 
 The parser of luaJIT is implemented in \emph{lj\_parse.c} and \emph{lj\_parse.h}
 files. it also use \emph{LexState} as the principal data-structure. it is the on
@@ -97,8 +97,8 @@ typedef struct FuncState {
 % Bytecode frontend
 %===============================================================================
 
-\section{Bytecode frontend}
-\label{Sec:bc-frontend}
+\subsection{Bytecode frontend}
+\label{Subsec:bc-frontend}
 
 Another frontend feature provided by luaJIT is the possibility to save and load
 bytecode directly, allowing to skip the lexer and parser phase.

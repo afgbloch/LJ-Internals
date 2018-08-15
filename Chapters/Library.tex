@@ -4,8 +4,8 @@
 % Standard library
 %===============================================================================
 
-\section{Standard library}
-\label{Sec:std-lib}
+\subsection{Standard library}
+\label{Subsec:std-lib}
 
 LuaJIT is providing a full compatibility with Lua 5.1 and to do so, it
 implements the standard library. The code is copied and adapted from the
@@ -36,24 +36,24 @@ lib\_table.c                    & Table library (new, clear, insert, foreach, et
 % LuaJIT extensions
 %===============================================================================
 
-\section{LuaJIT extensions}
-\label{Sec:lj-extensions}
+\subsection{LuaJIT extensions}
+\label{Subsec:lj-extensions}
 
 In addition of the standard library, luaJIT comes equipped with some library
 extensions \cite{extensions}. In addition of a few improvements of existing
 modules it provides three new extension modules, namely, \emph{bit} in
 \emph{lib\_bit.c} that provides with bitwise operations \cite{bitOp}, \emph{ffi}
 in \emph{lib\_ffi.c} that provide functions to interact with the FFI library
-(see FFI Chapter \ref{Chapt:FFI} for more) and \emph{jit} in \emph{lib\_jit.c}
+(see FFI Chapter \ref{Sec:FFI} for more) and \emph{jit} in \emph{lib\_jit.c}
 that provide functions allowing to control the behavior of the JIT compiler
-engine (see JIT Part \ref{Part:JIT}).
+engine (see JIT Part \ref{Chapt:JIT}).
 
 %===============================================================================
 % The C API
 %===============================================================================
 
-\section{The C API}
-\label{Sec:c-api}
+\subsection{The C API}
+\label{Subsec:c-api}
 
 All those libraries are implemented using the Lua C API that allows to create
 and manipulate lua data, manage de lua stack etc... The implementation for those
@@ -63,8 +63,8 @@ functions can be found in \emph{lj\_api.c}, \emph{lj\_lib.c} and \emph{lib\_aux.
 % Build Library
 %===============================================================================
 
-\section{Build Library}
-\label{Sec:build-lib}
+\subsection{Build Library}
+\label{Subsec:build-lib}
 
 LuaJIT use multiple tricks to generate files automatically that are included
 during compilation to help with the building and loading of the standard library
