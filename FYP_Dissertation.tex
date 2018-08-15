@@ -177,7 +177,7 @@
 %--------------------------------------------------------------------------------
 % Prints out the title page
 %--------------------------------------------------------------------------------
-\input{./Chapters/TitlePage}
+\input{./Tex/TitlePage}
 
 % -------------------------------------------------------------------------------
 % Prints out the copyright page (you do not need to modify this)
@@ -190,14 +190,14 @@
 % You will need to change the text in the file to reflect your own abstract
 %--------------------------------------------------------------------------------
 \clearpage
-\input{./Chapters/Abstract}
+\input{./Tex/Abstract}
 
 %--------------------------------------------------------------------------------
 % Prints out the acknowledgements page
 % You will need to change the text to reflect your own acknowledgements
 %--------------------------------------------------------------------------------
 \clearpage
-\input{./Chapters/Acknowledgements}
+\input{./Tex/Acknowledgements}
 
 %--------------------------------------------------------------------------------
 % Prints out the list of contents, figures and tables
@@ -240,12 +240,6 @@
 \mainmatter
 \pagestyle{fancy}
 
-\clearpage
-\chapter{Overview}
-\label{Chapt:Overview}
-\lhead{Chapter \thechapter. \emph{Overview}}
-\input{./Chapters/Overview}
-
 \part{LuaJIT documentation}
 \label{Part:luajit-doc}
 
@@ -255,22 +249,22 @@
     \section{Verbose mode}
     \label{Sec:Verbose}
     \lhead{Chapter \thechapter. \emph{Verbose mode}}
-    \input{./Chapters/verbose}
+    \input{./Tex/Part-II/Chap-I/verbose}
 
     \section{Profiler}
     \label{Sec:Profiler}
     \lhead{Chapter \thechapter. \emph{Profiler}}
-    \input{./Chapters/profiler}
+    \input{./Tex/Part-II/Chap-I/profiler}
 
     \section{Dump mode}
     \label{Sec:Dump-mode}
     \lhead{Chapter \thechapter. \emph{Dump mode}}
-    \input{./Chapters/dump}
+    \input{./Tex/Part-II/Chap-I/dump}
 
     \section{Valgrind}
     \label{Sec:Valgrind}
     \lhead{Chapter \thechapter. \emph{Valgrind}}
-    \input{./Chapters/valgrind}
+    \input{./Tex/Part-II/Chap-I/valgrind}
 
   \chapter{Virtual Machine}
   \label{Chapt:VM}
@@ -278,42 +272,42 @@
     \section{Frontend}
     \label{Sec:frontend}
     \lhead{Chapter \thechapter. \emph{Frontend}}
-    \input{./Chapters/Frontend}
+    \input{./Tex/Part-II/Chap-II/Frontend}
 
     \section{Internals}
     \label{Sec:Internals}
     \lhead{Chapter \thechapter. \emph{Internals}}
-    \input{./Chapters/Internals}
+    \input{./Tex/Part-II/Chap-II/Internals}
 
     \section{Bytecode interpreter}
     \label{Sec:BI}
     \lhead{Chapter \thechapter. \emph{Bytecode interpreter}}
-    \input{./Chapters/Bytecode-interpreter}
+    \input{./Tex/Part-II/Chap-II/Bytecode-interpreter}
 
     \section{Library}
     \label{Sec:Library}
     \lhead{Chapter \thechapter. \emph{Library}}
-    \input{./Chapters/Library}
+    \input{./Tex/Part-II/Chap-II/Library}
 
     \section{Foreign function interface}
     \label{Sec:FFI}
     \lhead{Chapter \thechapter. \emph{Foreign function interface}}
-    \input{./Chapters/FFI}
+    \input{./Tex/Part-II/Chap-II/FFI}
 
   \chapter{JIT}
   \label{Chapt:JIT}
 
     \section{Trace recorder}
     \label{Sec:TR}
-    \input{./Chapters/TR.tex}
+    \input{./Tex/Part-II/Chap-III/TR.tex}
 
     \section{Trace optimizer}
     \label{Sec:TO}
-    \input{./Chapters/TO.tex}
+    \input{./Tex/Part-II/Chap-III/TO.tex}
 
     \section{Assembler}
     \label{Sec:TA}
-    \input{./Chapters/TA.tex}
+    \input{./Tex/Part-II/Chap-III/TA.tex}
 %--------------------------------------------------------------------------------
 % Prints out any appendices (comment/delete if you do not need any)
 %--------------------------------------------------------------------------------
@@ -334,17 +328,17 @@
 \chapter{Dump values}
 \label{Apendix:dump-values}
 \lhead{Appendix \ref{Apendix:dump-values}. \emph{Dump values}}
-\input{./Chapters/Dump-values}
+\input{./Tex/Appendix/Dump-values}
 
 \chapter{Flame graphs}
 \label{Apendix:fl}
 \lhead{Appendix \ref{Apendix:fl}. \emph{Flame graphs}}
-\input{./Chapters/Flame}
+\input{./Tex/Appendix/Flame}
 
 \chapter{DynASM: Assembler}
 \label{Apendix:DynASM}
 \lhead{Appendix \ref{Apendix:DynASM}. \emph{DynASM: Assembler}}
-\input{./Chapters/DynASM}
+\input{./Tex/Appendix/DynASM}
 
 \addtocontents{toc}{\vspace{2em}} % Add a gap in the Contents, for aesthetics
 
@@ -359,7 +353,7 @@
 \lhead{\emph{Bibliography}}
 \renewcommand{\bibname}{References}
 \bibliographystyle{MyBibliographyStyle}
-\bibliography{./Chapters/FYPBibliography}
+\bibliography{./Tex/FYPBibliography}
 
 
 \end{document}
