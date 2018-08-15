@@ -4,27 +4,57 @@ We can differentiate in the code, three types of optimizations.
 First of all there are the optimizations present in the optimization engine.
 They are implemented in the \emph{lj\_opt\_*.c} files and thus easy to spot out.
 Those optimization are of two kind, global optimization that are run on the
-entire IR at once at the end of the recording phase (See \ref{Sec:opt-dce}, \ref{Sec:opt-loop}, \ref{Sec:opt-split}, \ref{Sec:opt-sinking}) and the local
-optimizations that are applied while recording a trace (See \ref{Sec:narrowing},
-\ref{Sec:mao}, \ref{Sec:fold}).
-Finally, there is a plethora of optimization and heuristic applied here and
-there (See ).\todo{add references}
-% ------------------------------------------------------------------------------
-% Optimization Engine : Global Optimizations (end of recording phase)
-% ------------------------------------------------------------------------------
+entire IR at once at the end of the recording phase, during the
+\emph{LJ\_TRACE\_END} state (See \ref{Sec:opt-dce}, \ref{Sec:opt-loop},
+\ref{Sec:opt-split}, \ref{Sec:opt-sinking}) and the local optimizations that are
+applied while recording a trace (See \ref{Sec:narrowing}, \ref{Subsec:fold},
+\ref{Subsec:mao}). Finally, there is a plethora of optimization and heuristic
+applied here and there (See luaJIT wiki on optimization \cite{luajit-opt}).
 
 %===============================================================================
-% TODO
+% Dead code elimination
 %===============================================================================
 
 \section{Dead code elimination}
 \label{Sec:opt-dce}
 
+DCE or Dead Code Elimination is performed by the lj\_opt\_dce main function
+in two phases. During the first phase called mark snap, it mark all IR
+instructions that are referenced by a snapshot. The second phases called
+propagate, iteratively mark all IR instruction that are referenced by an already
+marked IR instruction while replacing non-marked IR instruction by nops.
+
+%===============================================================================
+% Loop optimizations
+%===============================================================================
+
 \section{Loop optimizations}
 \label{Sec:opt-loop}
 
+The loop optimization is a way to improve code hoisting for trace based around
+loops. In fact LuaJIT should try to hoist most invariant instruction and guards
+in such a way that trace that doesn't match the current dynamic profile of
+the code (assumption on data or type) are exited as soon as possible.
+Unfortunately due to the dynamic nature of the IR generated, it contains many
+guards a thus, are control-dependent making little room for loop-invariant
+code motion (LICM). The solution used here is a copy-substitution of the body
+of the loop. It basically consist in always unrolling the loop once before the
+actual loop instruction, performing invariant instruction there and making
+all the other loop iteration executing only the variant once.
+
+%===============================================================================
+% Split optimizations
+%===============================================================================
+
 \section{Split optimizations}
 \label{Sec:opt-split}
+
+The split optimizations is only use by 32-bits architecture and splits the
+64-bits IR instructions into multiple 32-bits onces.
+
+%===============================================================================
+% Sinking optimizations
+%===============================================================================
 
 \section{Sinking optimizations}
 \label{Sec:opt-sinking}
@@ -32,131 +62,64 @@ This a very useful optimization that allows to avoid many temporaries and
 unnecessary memory accesses and allocations by keeping the values of interest
 directly in register. We thus have to remember how the memory should have been
 modified in case those access escape our execution path (are not temporary
-anymore), for this purpose snapshot are used (See Section \ref{Sec:snap}). This optimization is implemented
-in the \emph{lj\_opt\_sink.c} file. A detailed explanation of this optimization
-is available on the wiki \cite{luajit-sink}.
+anymore), for this purpose snapshot are used (See Section \ref{Sec:snap}). This
+optimization is implemented in the \emph{lj\_opt\_sink.c} file. A detailed
+explanation of this optimization is available on the wiki \cite{luajit-sink}.
 
-
-% ------------------------------------------------------------------------------
-% Optimization Engine : Local Optimizations (During recording phase)
-% ------------------------------------------------------------------------------
+%===============================================================================
+% Narrowing optimizations
+%===============================================================================
 
 \section{Narrowing optimizations}
 \label{Sec:narrowing}
 
-\section{Memory access optimizations}
-\label{Sec:mao}
+It performs the narrowing of lua numbers (double) into integers when it seems
+to be useful. LuaJIT use demand-driven (by the backend) narrowing for index
+expressions, integer arguments (FFI), and bit operations and predictive
+narrowing for induction variables. It emit overflow check instruction when
+necessary. Most arithmetic operations are never narrowed. To learn more on why,
+see the comment section in the \emph{lj\_opt\_narrow.c} file.
 
-\section{Fold optimizations}
+%===============================================================================
+% Fold engine
+%===============================================================================
+
+\section{Fold engine}
 \label{Sec:fold}
 
-% ------------------------------------------------------------------------------
-% Embeded Optimizations
-% ------------------------------------------------------------------------------
+The fold engine implement a rule-based mechanism. Rules are declared using the
+LJFOLD macro which contains the IR opcode and a rule on the parametters it
+applies to. During the LuaJIT buildvm (more precisely the \emph{buildvm\_fold.c}
+file) those rules are scanned and the \emph{lj\_foldef.h} file gets generated.
+It contains a semi-perfect hash table for constant-time rule lookup, where each
+entry respect the format depicted in Table \ref{tab:fold-format}. It also
+contains a second table containing the function to call if a corresponding rule
+match.
 
+\begin{table}[H]
+\centering
+\caption{Fold hash table, bit pattern entry}
+\label{tab:fold-format}
+\begin{tabular}{|c|c|c|c|c|}
+\hline
+8                & 7                 & 7                 & 2        & 8                       \\ \hline
+index fold table & fold instr opcode & left instr opcode & 00       & right instr opcode      \\ \hline
+index fold table & fold instr opcode & left instr opcode & \multicolumn{2}{c|}{literal field} \\ \hline
+\end{tabular}
+\end{table}
 
+\subsection{Fold optimizations}
+\label{Subsec:fold}
 
-% ================================================================================
-% ================================================================================
-% Optimizations:
-% --------------
-% during LJ_TRACE_END state the following optimizations function are called
-%   - lj_opt_dce: perform dce optimization
-%   - lj_opt_loop:
-%   - lj_opt_split:
-%   - lj_opt_sink:
-% - dce (dead code elimination) (2)
-%   - in lj_opt_dce
-%   - Pre-LOOP only - ASM already performs DCE.
-%   - performed durring trace end.
-%   - performed in two phases
-%     - 1st: called mark snap mark all ir reference in snapshots
-%     - 2nd: called propagate that iteratively mark operands of maked ir
-%     and replace non-marked ir by nop isftructions.
-% - loop optimizations (3) (add a trace dump or images to illustrate this
-%   - Code hoisting via unrolling and copy-substitution (LOOP):
-%     Traditional loop-invariant code motion (LICM) is mostly useless
-%     for the IR resulting from dynamic languages. The IR has many
-%     guards and most subsequent instructions are control-dependent on
-%     them. The first non-hoistable guard would effectively prevent
-%     hoisting of all subsequent instructions.
+The fold optimizations preformed by the FOLD engine are implemented in the
+\emph{lj\_opt\_fold.c} file and can be separated in five well known techniques,
+constant folding, algebraic simplifications, reassociation, common subexpression
+elimination and Array bounds check elimination.
 
-%     The LOOP pass does synthetic unrolling of the recorded IR,
-%     combining copy-substitution with redundancy elimination to
-%     achieve code hoisting. The unrolled and copy-substituted
-%     instructions are simply fed back into the compiler pipeline,
-%     which allows reuse of all optimizations for redundancy
-%     elimination. Loop recurrences are detected on-the-fly and a
-%     minimized set of PHIs is generated.
+\subsection{Memory access optimizations}
+\label{Subsec:mao}
 
-%   -- That's why we use a special form of unrolling using copy-substitution,
-%   -- combined with redundancy elimination:
-%   --
-%   -- The recorded instruction stream is re-emitted to the compiler pipeline
-%   -- with substituted operands. The substitution table is filled with the
-%   -- refs returned by re-emitting each instruction. This can be done
-%   -- on-the-fly, because the IR is in strict SSA form, where every ref is
-%   -- defined before its use.
-%   --
-%   -- This aproach generates two code sections, separated by the LOOP
-%   -- instruction:
-%   --
-%   -- 1. The recorded instructions form a kind of pre-roll for the loop. It
-%   -- contains a mix of invariant and variant instructions and performs
-%   -- exactly one loop iteration (but not necessarily the 1st iteration).
-%   --
-%   -- 2. The loop body contains only the variant instructions and performs
-%   -- all remaining loop iterations.
-
-% - split optimizations (only for 32bits architecture)
-% - sink optimizations
-% - Fold optimizations:(lj_opt_fold.c) (1)
-%   lj_foldef.h is generated by buildvm_fold.c at compile time (see build lib section).
-%   rules are declared using the LJFOLD macro they contains the ir opcode and a rule
-%   on the parametters it applies to.
-%   lj_opt_fold is the engine (main) function.
-%   -- Every entry in the generated hash table is a 32 bit pattern:
-%   --
-%   -- xxxxxxxx iiiiiii lllllll rrrrrrrrrr
-%   --
-%   --   xxxxxxxx = 8 bit index into fold function table
-%   --    iiiiiii = 7 bit folded instruction opcode
-%   --    lllllll = 7 bit left instruction opcode
-%   -- rrrrrrrrrr = 8 bit right instruction opcode or 10 bits from literal field
-%   lj_opt_fold.c:
-%     - constant folding
-%     - algebraic simplifications
-%     - reassociation
-%     - common subexpression elimination
-%     - Array bounds check elimination
-%   lj_opt_mem.c: Memory access optimizations
-%     - AA  : Alias Analysis using high-level semantic disambiguation.
-%     - FWD : Load Forwarding (L2L) + Store Forwarding (S2L).
-%     - DSE : Dead-Store Elimination.
-%   lj_opt_narrow.c:
-%     - narrowing
-%   - Rule-based FOLD engine: The FOLD engine is primarily used for
-%     constant folding, algebraic simplifications and reassociation.
-%     Most traditional compilers have an evolutionary grown set of
-%     implicit rules, spread over thousands of hand-coded tiny
-%     conditionals.
-
-%     The rule-based FOLD engine uses a declarative approach to
-%     combine the first and second level of lookup. It allows wildcard
-%     lookup with masked keys, too. A pre-processor generates a
-%     semi-perfect hash table for constant-time rule lookup. It''s able
-%     to deal with thousands of rules in a uniform manner without
-%     performance degradation. A declarative approach is also much
-%     easier to maintain.
-% -  Narrowing optimizations
-%   - Narrowing of numbers to integers: Predictive narrowing is used
-%     for induction variables. Demand-driven narrowing is used for
-%     index expressions using a backpropagation algorithm.
-
-%     This avoids the complexity associated with speculative, eager
-%     narrowing, which also causes excessive control-flow dependencies
-%     due to the many overflow checks. Selective narrowing is better
-%     at exploiting the combined bandwidth of the FP and integer units
-%     of the CPU and avoids clogging up the branch unit.
-% ================================================================================
-% ================================================================================
+The memory access optimization perform by the FOLD engine and implemented
+in the lj\_opt\_mem.c file consist of three component, the alias
+analysis using high-level semantic disambiguation, Load to load and store to load
+forwarding, and finally dead-store elimination.
