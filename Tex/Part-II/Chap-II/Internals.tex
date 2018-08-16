@@ -1,4 +1,4 @@
-%!TEX root = ../FYP_Dissertation.tex
+%!TEX root = ../../../FYP_Dissertation.tex
 
 %===============================================================================
 % Tagged value
@@ -7,14 +7,14 @@
 \subsection{Tagged value}
 \label{Subsec:tagged-value}
 
-LuaJIT represent all internal element as 64-bits \emph{TValue} (tagged value).
-It use the nan-tagging technique to differentiate between numbers and other
+LuaJIT represent all internal elements as 64-bits \emph{TValue} (tagged value).
+It uses the nan-tagging technique to differentiate between numbers and other
 types of element. In fact, \emph{lua\_number} are 64-bits floating-points numbers
 following the \emph{ieee} standard. Doing so, numeric nan are canonized by the
 cpu FPU (0xfff8 in msb and zero otherwise), letting the possibility to use the
 lower bits to represent arbitrary data. Internally, LuaJIT has two different
 representations, one for x86 and another for x64 bit (\emph{LJ\_GC64}) mode
-(see Table \ref{tab:tagged-gc32} and \ref{tab:tagged-gc64}). In those table,
+(see Tables \ref{tab:tagged-gc32} and \ref{tab:tagged-gc64}). In those tables,
 \emph{itypes} are numbers identifying the type of the object.
 GC object (Garbage Collectible Object) represent all allocated object
 that are managed by the garbage collector. \emph{GCRef} are references to such
@@ -61,10 +61,10 @@ object.
 \label{Subsec:string-inter}
 
 All strings that are manipulated by LuaJIT are internalized. This includes, all
-the strings literals of the user lua code, all identifier and tokens of the lua
+the strings literals of the user lua code, all identifiers and tokens of the lua
 code itself and also all the strings used internally by LuaJIT. Internalization
-mechanism does that, only one copy of a specific strings is kept in memory. If
-multiple copy of a same string are requested, a pointer to the internalized
+mechanism does that, only one copy of a specific string is kept in memory. If
+multiple copies of a same string is requested, a pointer to the internalized
 version of the string is returned, instead of doing a new string allocation.
 Strings need to be immutable and are zero-terminated. Strings function are
 implemented in the \emph{lj\_str.c} file and internalization is done by the
@@ -92,7 +92,7 @@ typedef struct global_State {
 \subsection{Lua table}
 \label{Subsec:table}
 
-Tables are garbage collectible objects represented by the structure bellow
+Tables are garbage collectible objects represented by the structure below
 (\emph{GCtab} in \emph{lj\_obj.h}). Functions to manipulate them are in
 \emph{lj\_tab.c} and \emph{lj\_tab.h} files. It is composed of an array part and
 a hash part. If the array part is small, it is allocated directly after the
@@ -101,14 +101,14 @@ hash part is a hash table used to store all non-integer key (or integer too big
 to fit in the array part). It is implemented has an array using singly-linked
 list for collision, where nodes of the linked list are within the array (not
 allocated) and a variation of \emph{Brent's hashing methods} is used.
-New integer key that are bigger than the array part are always inserted
-in the hash part until this one is full. It then trigger the resizing of the
+New integer keys that are bigger than the array part are always inserted
+in the hash part until this one is full. It then triggers the resizing of the
 table. The new \emph{asize} and \emph{hmask} are both power of 2. The
-new \emph{asize} value correspond to the biggest power of 2 such that at least
-50 percent of the integers bellow it are used as key. The new \emph{hmask} is
-picket such that all non-integer keys plus the integer keys that are bigger than
+new \emph{asize} value corresponds to the biggest power of 2 such that at least
+50 percent of the integers below it are used as key. The new \emph{hmask} is
+picked such that all non-integer keys plus the integer keys that are bigger than
 the new \emph{asize} fit in it. When a resizing occur the hash values are
-re-hashed and integer key that does fit now in the array part are reintroduce
+re-hashed and integer key that does fit now in the array part are reintroduced
 there.
 
 The \emph{nomm} field of GCtab is a
@@ -140,13 +140,13 @@ typedef struct GCtab {
 \subsection{Garbage collector}
 \label{Subsec:gc}
 
-LuaJIT garbage collector has currently a tri-color, incremental mark and sweep
-types implementation. You can find a presentation of it on the wiki
+LuaJIT garbage collector has currently a tricolor, incremental mark and sweep
+type implementation. You can find a presentation of it on the wiki
 \cite{luajit-gc} in the tri-color section. Its source code can be found in the
 \emph{lj\_gc.h} and \emph{lj\_gc.c} files. It uses the GCState structure has a
 principal structure. The \emph{gc\_onestep} function is the principal one as it
-implement the stat machine of the gc. Principal state with their meaning can be
-found in the enum bellow.
+implements the states machine of the gc. Principal states with their meaning can be
+found in the enum below.
 
 \begin{lstlisting}[style=CStyle]
 enum {
@@ -192,28 +192,28 @@ LuaJIT has its own embedded allocator that is a customized version of \emph{dlma
 (Doug Lea's Malloc). Information on the original implementation can be found on
 the web article \cite{dlmalloc-art} or in the comment of the code
 \cite{dlmalloc-impl}. The allocator is implemented in the \emph{lj\_alloc.c}
-file. It's main structure \emph{malloc\_state} is shown bellow. Memory on the
-heap are allocated in chunk. Free chunk are managed as double linked-list with
+file. Its main structure \emph{malloc\_state} is shown below. Memory on the
+heap are allocated in chunks. Free chunks are managed as double linked-list with
 the size of the chunk at the beginning and end of it. Unallocated memory are
-grouped in bins of corresponding size. There is two types of bins. The
-smaller one contains chunck of same size and the top are anchored in
-\emph{smallbins}. The bigger one are stored as bitwise digital tree (aka tries)
+grouped in bins of corresponding size. There are two types of bins. The
+smaller one contains chunk of same size and the top are anchored in
+\emph{smallbins}. The bigger one are stored as bitwise digital trees (aka tries)
 keyed by size were the top of a tree is anchored in \emph{treebins}. The
 allocator differentiates with two types of memory allocation, if it is higher than
-128KB then it ask the operating system for a new memory segment using mmap, if
-it is lower than that it use chunks from the current segment. All allocated
+128KB then it asks the operating system for a new memory segment using mmap, if
+it is lower than that it uses chunks from the current segment. All allocated
 segments are kept in a linked list anchored in \emph{seg}. For such smaller
 allocation the allocator first try to find an exact fit from the available
 chunks to optimize for internal fragmentation. If it cannot find one and that
-the requested size is smaller than \emph{dvsize} then it use the \emph{dv}
+the requested size is smaller than \emph{dvsize} then it uses the \emph{dv}
 chunk (designated victim) which is the last chunk that has been split. It does
 so to optimize for locality. Otherwise it goes for a best-fit match. If no chunk
-big enough is available it ask the system to extend the segment and use the
-boundary chunk \emph{top} (kept always free). When memory is freed it does chunk
+big enough is available, it asks the system to extend the segment and use the
+boundary chunk \emph{top} (always kept free). When memory is freed it does chunk
 coalescing to avoid memory fragmentation. If \emph{topsize} is bigger than
 \emph{trim\_check}, then the current segment is shrinked and the memory is given
-back to the os. \emph{release\_checks} is a decreasing counter that when it
-riches zero triggers a check of all segments to release empty ones back to the os.
+back to the OS. \emph{release\_checks} is a decreasing counter that when it
+riches zero triggers a check of all segments to release empty ones back to the OS.
 
 \begin{lstlisting}[style=CStyle]
 struct malloc_state {
@@ -241,10 +241,10 @@ struct malloc_state {
 There are two distinct representation for function, the function's prototype,
 and the function's closure. the Lua functions' prototypes are represented by \emph{GCproto} (\emph{lj\_obj.h}), and are followed by the functions' bytecodes in memory.
 The closures are represented by the GCfuncL for lua function and GCfuncC for
-c function (using lua's api). They contains the necessary information for
+c function (using lua's api). They contain the necessary information for
 upvalues. Upvalues are represented by the \emph{GCupval} that if close, contains
 the corresponding value or a reference to the stack slot containing the
-appropriate value otherwise. Closure can be manage by the functions present in
+appropriate value otherwise. Closure can be managed by the functions present in
 \emph{lj\_func.c} allowing to create them, destroy them and closing their
 upvalues.
 
@@ -275,11 +275,11 @@ typedef struct GCproto {
 \subsection{Fast Function}
 \label{Subsec:ffunc}
 
-Fast functions are specially optimize standard library function. There is two
-part for each function, the implementation part and the fallback handler.
+Fast functions are specially optimized standard library function. There are two
+parts for each function, the implementation part and the fallback handler.
 The implementation part is done in assembly in the \emph{vm\_*.dasc} files and
 handle the general case, called the fast pass. If the fast pass fail, the vm
 call the corresponding fallback handler (all \emph{LJLIB\_ASM} marked functions)
-that will tries to recover from the failure if possible. Example of recoverable
+that will try to recover from the failure if possible. Examples of recoverable
 cases might be : a wrong argument type if coercion succeeds or a stack overflow
 if stack reallocation succeeds (see comment in lj\_lib.h).

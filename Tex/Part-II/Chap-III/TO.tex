@@ -1,9 +1,9 @@
-%!TEX root = ../FYP_Dissertation.tex
+%!TEX root = ../../../FYP_Dissertation.tex
 
 We can differentiate in the code, three types of optimizations.
-First of all there are the optimizations present in the optimization engine.
+First of all, there are the optimizations present in the optimization engine.
 They are implemented in the \emph{lj\_opt\_*.c} files and thus easy to spot out.
-Those optimization are of two kind, global optimization that are run on the
+Those optimization are of two kinds, global optimization that are run on the
 entire IR at once at the end of the recording phase, during the
 \emph{LJ\_TRACE\_END} state (See \ref{Subsec:opt-dce}, \ref{Subsec:opt-loop},
 \ref{Subsec:opt-split}, \ref{Subsec:opt-sinking}) and the local optimizations
@@ -32,16 +32,16 @@ marked IR instruction while replacing non-marked IR instruction by nops.
 \subsection{Loop optimizations}
 \label{Subsec:opt-loop}
 
-The loop optimization is a way to improve code hoisting for trace based around
+The loop optimization is a way to improve code hoisting for trace based on
 loops. In fact LuaJIT should try to hoist most invariant instruction and guards
 in such a way that trace that doesn't match the current dynamic profile of
 the code (assumption on data or type) are exited as soon as possible.
 Unfortunately due to the dynamic nature of the IR generated, it contains many
 guards a thus, are control-dependent making little room for loop-invariant
 code motion (LICM). The solution used here is a copy-substitution of the body
-of the loop. It basically consist in always unrolling the loop once before the
+of the loop. It basically consists in always unrolling the loop once before the
 actual loop instruction, performing invariant instruction there and making
-all the other loop iteration executing only the variant once.
+all the other loop iterations executing only the variant once.
 
 %===============================================================================
 % Split optimizations
@@ -50,8 +50,8 @@ all the other loop iteration executing only the variant once.
 \subsection{Split optimizations}
 \label{Subsec:opt-split}
 
-The split optimizations is only use by 32-bits architecture and splits the
-64-bits IR instructions into multiple 32-bits onces.
+The split optimization is only used by 32-bits architecture and splits the
+64-bits IR instructions into multiple 32-bits once.
 
 %===============================================================================
 % Sinking optimizations
@@ -63,7 +63,7 @@ This a very useful optimization that allows to avoid many temporaries and
 unnecessary memory accesses and allocations by keeping the values of interest
 directly in register. We thus have to remember how the memory should have been
 modified in case those access escape our execution path (are not temporary
-anymore), for this purpose snapshot are used (See Section \ref{Subsec:snap}).
+anymore), for this purpose snapshots are used (See Section \ref{Subsec:snap}).
 This optimization is implemented in the \emph{lj\_opt\_sink.c} file. A detailed
 explanation of this optimization is available on the wiki \cite{luajit-sink}.
 
@@ -77,7 +77,7 @@ explanation of this optimization is available on the wiki \cite{luajit-sink}.
 It performs the narrowing of lua numbers (double) into integers when it seems
 to be useful. LuaJIT use demand-driven (by the backend) narrowing for index
 expressions, integer arguments (FFI), and bit operations and predictive
-narrowing for induction variables. It emit overflow check instruction when
+narrowing for induction variables. It emits overflow check instruction when
 necessary. Most arithmetic operations are never narrowed. To learn more on why,
 see the comment section in the \emph{lj\_opt\_narrow.c} file.
 
@@ -89,10 +89,10 @@ see the comment section in the \emph{lj\_opt\_narrow.c} file.
 \label{Subsec:fold}
 
 The fold engine implement a rule-based mechanism. Rules are declared using the
-LJFOLD macro which contains the IR opcode and a rule on the parametters it
+LJFOLD macro which contains the IR opcode and a rule on the parameters it
 applies to. During the LuaJIT buildvm (more precisely the \emph{buildvm\_fold.c}
 file) those rules are scanned and the \emph{lj\_foldef.h} file gets generated.
-It contains a semi-perfect hash table for constant-time rule lookup, where each
+It contains a semi-perfect hash table for constant-time rule lookups, where each
 entry respect the format depicted in Table \ref{tab:fold-format}. It also
 contains a second table containing the function to call if a corresponding rule
 match.
@@ -113,14 +113,14 @@ index fold table & fold instr opcode & left instr opcode & \multicolumn{2}{c|}{l
 \label{Subsubsec:fold}
 
 The fold optimizations preformed by the FOLD engine are implemented in the
-\emph{lj\_opt\_fold.c} file and can be separated in five well known techniques,
+\emph{lj\_opt\_fold.c} file and can be separated in five well-known techniques,
 constant folding, algebraic simplifications, reassociation, common subexpression
-elimination and Array bounds check elimination.
+elimination and array bounds check elimination.
 
 \subsubsection{Memory access optimizations}
 \label{Subsubsec:mao}
 
 The memory access optimization perform by the FOLD engine and implemented
-in the lj\_opt\_mem.c file consist of three component, the alias
+in the lj\_opt\_mem.c file consists of three components, the alias
 analysis using high-level semantic disambiguation, Load to load and store to load
 forwarding, and finally dead-store elimination.

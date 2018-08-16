@@ -1,4 +1,4 @@
-%!TEX root = ../FYP_Dissertation.tex
+%!TEX root = ../../../FYP_Dissertation.tex
 
 %===============================================================================
 % Standard library
@@ -39,13 +39,13 @@ lib\_table.c                    & Table library (new, clear, insert, foreach, et
 \subsection{LuaJIT extensions}
 \label{Subsec:lj-extensions}
 
-In addition of the standard library, luaJIT comes equipped with some library
+In addition to the standard library, luaJIT comes equipped with some library
 extensions \cite{extensions}. In addition of a few improvements of existing
 modules it provides three new extension modules, namely, \emph{bit} in
 \emph{lib\_bit.c} that provides with bitwise operations \cite{bitOp}, \emph{ffi}
-in \emph{lib\_ffi.c} that provide functions to interact with the FFI library
+in \emph{lib\_ffi.c} that provides functions to interact with the FFI library
 (see FFI Chapter \ref{Sec:FFI} for more) and \emph{jit} in \emph{lib\_jit.c}
-that provide functions allowing to control the behavior of the JIT compiler
+that provides functions allowing to control the behavior of the JIT compiler
 engine (see JIT Part \ref{Chapt:JIT}).
 
 %===============================================================================
@@ -56,7 +56,7 @@ engine (see JIT Part \ref{Chapt:JIT}).
 \label{Subsec:c-api}
 
 All those libraries are implemented using the Lua C API that allows to create
-and manipulate lua data, manage de lua stack etc... The implementation for those
+and manipulate lua data, manage the lua stack etc... The implementation for those
 functions can be found in \emph{lj\_api.c}, \emph{lj\_lib.c} and \emph{lib\_aux.c}.
 
 %===============================================================================
@@ -71,18 +71,18 @@ during compilation to help with the building and loading of the standard library
 without the need for manual maintenance. We will describe here the different
 steps and what they are useful for.
 
-First of all if no lua interpreter
+First of all, if no lua interpreter
 (either PUC-Lua or LuaJIT) is available on the machine a simplified and
-minimized one is build from the \emph{minilua.c} file. Then the interpreter is
+minimized one is built from the \emph{minilua.c} file. Then the interpreter is
 used to run \emph{genlibbc.lua} that will be responsible for parsing all LuaJIT's
 source files searching for the \emph{LJLIB\_LUA} macro that surrounds library
-functions name, written in lua. it then generate the \emph{buildbm\_libbc.h}
+functions name, written in lua. It then generates the \emph{buildbm\_libbc.h}
 file that contains the lua byte codes for all those functions in the
 \emph{libbc\_code} array and a mapping of the function name and the bytecodes
 offset for that function in \emph{libbc\_map}.
 
 This newly generated file is
-build along with all \emph{buildvm\_*} files to create the \emph{buildvm}
+built along with all \emph{buildvm\_*} files to create the \emph{buildvm}
 program that is used to parse from the library source code all other
 \emph{LJLIB\_*} macro and generates some files
 (\emph{lj\_bcdef.h, lj\_libdef.h, lj\_ffdef.h, lj\_recdef.h and vmdef.lua})
@@ -91,7 +91,7 @@ that will be added to LuaJIT compilation. You can see, in Table
 \ref{tab:library-generated-files} the description of the corresponding generated
 file.
 
-\begin{table}
+\begin{table}[H]
 \centering
 \caption{Library Macro definitions}
 \label{tab:library-macro}
@@ -135,7 +135,7 @@ LJLIB\_NOREG                         & to not register a function in lj\_lib\_cf
 \end{tabularx}
 \end{table}
 
-\begin{table}
+\begin{table}[H]
 \centering
 \caption{Generated files description}
 \label{tab:library-generated-files}

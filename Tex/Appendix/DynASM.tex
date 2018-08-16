@@ -1,9 +1,9 @@
-%!TEX root = ../FYP_Dissertation.tex
+%!TEX root = ../../FYP_Dissertation.tex
 
 DynASM is a Dynamic Assembler for code generation engines, it has been developed
 primarily as a tool for LuaJIT and its source code can be found in the dynasm
 folder of the LuaJIT project \cite{luajit-src}. It is currently used in LuaJIT
-v2 has a tool to write the fast VM interpreting the bytecode. It support the
+v2 has a tool to write the fast VM interpreting the bytecode. It supports the
 following platforms : x86, x64, ARM, PowerPC, and MIPS. An unofficial
 documentation with tutorials is available \cite{dynasm}. In the remaining part
 of this appendix, a minimum amount of information is presented to give the
@@ -41,7 +41,7 @@ name:reg...                 & [reg + (int)(ptrdiff\_t)\&(((ctype*)0)...)]\\\hlin
 \paratitle{Line markers}\\
 Typical DynASM lines that emit some assembler instructions has to start with a
 vertical bare ("$\vert$"). If we want to emit some lines of \emph{C} code but
-still want DynASM's preprocessor to do substitution, the line has to start with a double vertical bar ("$\vert\vert$"). Finally lines with no starting markers are
+still want DynASM's preprocessor to do substitutions, the line has to start with a double vertical bar ("$\vert\vert$"). Finally lines with no starting markers are
 truly untouched and discarded by DynASM. To be noted that lines of \emph{C} code that
 has to be inlined with a macro must start with a double vertical bar. \\
 
@@ -49,7 +49,7 @@ has to be inlined with a macro must start with a double vertical bar. \\
 They exist multiple types of labels to refer to. The first category is global
 labels that have two types, static label ($\vert-$\textgreater name:) and dynamic ones ($\vert$=\textgreater imm32:).
 Those labels have to be unique in a DynASM file. The second category is local
-labels that use a single digit from 1 to 9 ($\vert$i:). They can be define
+labels that use a single digit from 1 to 9 ($\vert$i:). They can be defined
 multiple times inside a same DynASM file and are used by jump instructions by
 means of the syntax \textless i or \textgreater i. They respectively point to
 the most recent, the next definition of i as the jump target.

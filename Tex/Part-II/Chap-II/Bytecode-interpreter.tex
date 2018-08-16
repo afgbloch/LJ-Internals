@@ -1,10 +1,10 @@
-%!TEX root = ../FYP_Dissertation.tex
-Most a the VM mechanism is written using the DynASM syntax. To get a better
+%!TEX root = ../../../FYP_Dissertation.tex
+Most of the VM mechanism is written using the DynASM syntax. To get a better
 understanding of the underlining technology see Appendix \ref{Apendix:DynASM}.
 
 The low-level VM code written for each architecture using this assembler can be
 found in \emph{vm\_(target).dasc} files. It is mainly composed of the switch
-case that generate the assembly code for each byte code, but it also contains
+case that generates the assembly code for each byte code, but it also contains
 code for other part that requires low level implementation such as the
 stack unwinding or the implementation of the fast path of asm fast library functions
 (see section \ref{Subsec:ffunc} for more).

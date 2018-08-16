@@ -1,8 +1,8 @@
-%!TEX root = ../FYP_Dissertation.tex
+%!TEX root = ../../../FYP_Dissertation.tex
 
 The FFI (Foreign Function Interface) is one of LuaJIT extensions modules. It
 allows to call external C functions and use C data structures from pure Lua code.
-A very small (not representative) example can be seen bellow.
+A very small (not representative) example can be seen below.
 
 \begin{lstlisting}[style=LuaStyle]
 local ffi = require("ffi")
@@ -14,7 +14,7 @@ print(p1.x) --  1
 p1.x = 11
 print(p1.x) -- 11
 \end{lstlisting}
-There is some official documentation for FFI user on \emph{luajit.org}
+There is some official documentation for FFI users on \emph{luajit.org}
 where you can find the motivation for the FFI module \cite{ffi-motivation},
 a small tutorial \cite{ffi-tuto}, the API documentation \cite{ffi-api} and the
 FFI semantics \cite{ffi-semantics}. There is also an unofficial reflection
@@ -31,10 +31,10 @@ lua and c using the standard Lua \emph{C API}.
 It is also responsible for loading the FFI module (\emph{luaopen\_ffi}).
 This file mainly use and connect together functionalities implemented in other
 files. It is for example responsible to allocate and initialize the main state
-(\emph{CTState}) explained bellow.
+(\emph{CTState}) explained below.
 
 \paratitle{lj\_obj.h:}\\
-From this file, we are only interested for this chapter by the \emph{GCcdata}
+From this file, we are only interested in this chapter by the \emph{GCcdata}
 structure that is the garbage collectible object representing any c data use
 through and with the FFI. You can see its composition bellow. The main thing to
 see there is the \emph{ctypeid} which is the index of the ctype describing the
@@ -47,11 +47,11 @@ typedef struct GCcdata {
 \end{lstlisting}
 
 \paratitle{lj\_ctype.h:}\\
-Bellow is the \emph{CType} data structure responsible for describing to the ffi
+Below is the \emph{CType} data structure responsible for describing to the ffi
 what kind of data the \emph{cdata} represent (e.g. variable, struct,
-function etc...). A detailed breakdown of how the information are laid out can
+function etc...). A detailed breakdown of how the information is laid out can
 be seen in Table \ref{tab:ffi-ctype}. The meaning of the abbreviations used in
-the previouse table can be seen in Table \ref{tab:ffi-ctype2}.
+the previous table can be seen in Table \ref{tab:ffi-ctype2}.
 \begin{lstlisting}[style=CStyle]
 typedef struct CType {
   CTInfo info;   /* Type info. */
@@ -150,9 +150,9 @@ elsewhere ) containing all finalizer registered with the \emph{ffi.gc} method.
 \emph{miscmap} is a lua table mapping all metatable of ctypes registered using
 the \emph{ffi.metatype} method in the negative CTypeID range and all callback
 functions in the positive callback slot range. Any metatable added to miscmap is
-definitive and never collected. \emph{hash} is an array used as an hash table
-for quick CTypeID checks. It map both, the hashed name of named element and the
-hashed type (info and size) for unnamed element to the corresponding CTypeID.
+definitive and never collected. \emph{hash} is an array used as a hash table
+for quick CTypeID checks. It map both, the hashed name of named elements and the
+hashed type (info and size) for unnamed elements to the corresponding CTypeID.
 Collisions are handled in a linked list using the \emph{next} field of the
 \emph{CType} struct.
 
@@ -175,11 +175,11 @@ typedef struct CTState {
 \end{adjustbox}
 
 \paratitle{lj\_ctype.c:}\\
-This file provide functions to manage \emph{CType}. It is divided into three
+This file provides functions to manage \emph{CType}. It is divided into three
 parts. The first one is the allocation, creation and internalization of
 \emph{CType}. The second one is providing getters to get C type information.
 The last one is  type representation, providing the necessary functions to
-convert a \emph{CType} to an human readable string representation.
+convert a \emph{CType} to a human readable string representation.
 \emph{lj\_ctype\_repr} is the entry function that returns the internalize string
 representation. It uses the struct \emph{CTRepr} bellow to create the
 representation by appending/prepending characters through the pb/pe pointers
@@ -202,9 +202,9 @@ The cparser is responsible for parsing the string making the C declarations
 for types or external symbols. Its code structure is quite close to the
 lua lexer/parser. Its principal struct is the \emph{CPState} bellow which is
 similar to \emph{LexState}. In this struct, \emph{tmask} is a mask constraining
-the possible ctype of the next identifier. The \emph{mode} define the behavior
-of the parser with respect to the imput. It's different behavior can be of the
-type: accepting multiple declaration, skiping error, accept/reject abstract
+the possible ctype of the next identifier. The \emph{mode} defines the behavior
+of the parser with respect to the input. It's different behavior can be of the
+type: accepting multiple declaration, skipping errors, accept/reject abstract
 declarators, accept/reject implicit declarators etc... (see CPARSE\_MODE\_* for
 full definition).
 
@@ -234,8 +234,8 @@ typedef struct CPState {
 
 \paratitle{lj\_cparse.c:}\\
 This file contains the code of a simple lexer and a simplified, not valid c
-parser. It use the \emph{CPState} describe abose for the parsing of the input
-string and the \emph{CPDecl} structure bellow for the construction of the
+parser. It uses the \emph{CPState} for the parsing of the input
+string and the \emph{CPDecl} structure below for the construction of the
 corresponding CType. During parsing the typdef chain is unrolled (typdef are
 still internalized for future reference but are not chained to the created
 ctype.)
@@ -265,15 +265,15 @@ allocations, free, finilizer, getter, setter and indexing.
 
 \paratitle{lj\_cconv.c:}\\
 This file is responsible for ctype conversion. It is divided in 5 parts: C type
-compatibility checks, C type to C type conversion, C type to TValue conversion,
+compatibility checks, C type to C type conversion, C type to TValue conversion
 (from c to lua : i.e returned values), TValue to C type conversion (from lua to
 c: i.e passed arguments), and initializing C type with TValues (Initialization
 of struct/union/array with lua object)
 
 \paratitle{lj\_carith.c:}\\%
-This file contains the implementation far all built-in cdata arithmetics, such
-as pointers arithmetics and integer arithmetics. It mainly manipulate some
-\emph{CDArith} structure shown bellow.
+This file contains the implementation far all built-in cdata arithmetic, such
+as pointers arithmetic and integer arithmetic. It mainly manipulate some
+\emph{CDArith} structure shown below.
 \begin{lstlisting}[style=CStyle]
 typedef struct CDArith {
   uint8_t *p[2]; /* data  of the two operands */
@@ -284,11 +284,11 @@ typedef struct CDArith {
 \paratitle{lj\_ccall.c:}\\
 This file contains the code handling calls to c function. It does structure/array
 register classification (see CCALL\_RCL\_*), computing how it can be passed
-as argument/return values (in gp register, sse register or memory). it handle
+as argument/return values (in gp register, sse register or memory). It handles
 then the decomposition/packing depending of the calling convention picked.
 
 \paratitle{lj\_ccall.h:}\\
-Bellow is the main structure use for c function call.
+Below is the main structure use for c function call.
 \begin{lstlisting}[style=CStyle]
 typedef struct CCallState {
   void (*func)(void); /* Pointer to called function. */
@@ -306,13 +306,14 @@ typedef struct CCallState {
 
 \paratitle{lj\_ccallback.c:}\\
 This file contains the FFI C callback handling. The principal structure is the
-\emph{CCallback} bellow (see \emph{lj\_ctype.h}) mainly use through the cb field of the \emph{CTState}
+\emph{CCallback} below (see \emph{lj\_ctype.h}) mainly use through the cb field
+of the \emph{CTState}
 structure. Each callback is associated with a unique cb slot and the
 \emph{cts-$>$miscmap} contains the mapping between cb slot and function
 pointers. The \emph{cts.cb.cbid} is a table mapping cb slot to the corresponding
 CTypeID. \emph{cts.cb.mcode} is an mmap'ed executable page that contains a push
 of slot id and a jump to \emph{lj\_vm\_ffi\_callback} (the entry in this page
-correspond to the cb address provided to the c code). Bellow is a description
+corresponds to the cb address provided to the c code). Below is a description
 of the call order when a callback is called.
 
 \begin{itemize}
@@ -342,9 +343,9 @@ typedef struct CCallback {
 \end{lstlisting}
 
 \paratitle{lj\_clib.c:}\\
-This file contain the necessary code to load/unload ffi library. It also handle
-the indexing of the external library using named symbol. It use platform
-specific tool to explore the exposed symbol. Every symbol is resolved only once
+This file contains the necessary code to load/unload ffi library. It also handles
+the indexing of the external library using named symbol. It uses platform
+specific tools to explore the exposed symbols. Every symbol is resolved only once
 and cached in the \emph{CLibrary} cache table.
 
 \paratitle{lj\_clib.h:}\\

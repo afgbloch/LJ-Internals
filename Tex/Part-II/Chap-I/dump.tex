@@ -1,4 +1,4 @@
-%!TEX root = ../FYP_Dissertation.tex
+%!TEX root = ../../../FYP_Dissertation.tex
 
 %===============================================================================
 % How to use it
@@ -56,7 +56,7 @@ The output format can be set with the following characters:
 The default output format is plain text. It's set to ANSI-colored text
 if the COLORTERM variable is set.
 
-We can also use this module programmatically like in the example bellow. The
+We can also use this module programmatically like in the example below. The
 \emph{on} function can take 2 arguments, the list of options (describe above)
 and the output file.
 \begin{lstlisting}[style=LuaStyle]
@@ -73,7 +73,7 @@ dump.off()
 \subsection{Understanding states dump}
 \label{Subsec:dump-states}
 
-This command looks like the verbose mode (-jv) and print informations for each start,
+This command looks like the verbose mode (-jv) and print information for each start,
 end or abortion of a trace. The output can have one of those three shapes.
 \begin{verbatim}
 ---- TRACE 1 start foo.lua:125
@@ -83,8 +83,8 @@ end or abortion of a trace. The output can have one of those three shapes.
 The first one is emitted when a recording starts. It shows the potential
 trace number, the file and the source line where that trace start.
 The second one is emitted when a trace has been successfully recorded. In
-addition of the trace number, it shows to what the trace link to (See Table
-\ref{tab:dump-link} for [link] possible values). Finally the last one is emitted
+addition to the trace number, it shows to what the trace link to (See Table
+\ref{tab:dump-link} for [link] possible values). Finally, the last one is emitted
 when the recording of a trace is aborted. It shows the file and the source line
 responsible for the abortion and print a [message] depicting the reason. For
 a list of possible messages see TraceError in lj\_trace.h and macro in
@@ -95,18 +95,18 @@ When instruction of a trace marked as guard fail, the normal execution of a
 trace is interrupted. We then call that spot a side exit of the trace. When a
 given side exit is taken enough time, it is said to be hot and generate a new
 trace starting from it. This new trace is called a side trace of the first one
-called the parent trace. Bellow is how the start of the recording of a side
+called the parent trace. Below is how the start of the recording of a side
 trace is shown in the dump.
 \begin{verbatim}
 ---- TRACE 30 start 21/0 foo.lua:103
 \end{verbatim}
-Here 30 is the side trace number, 21 the parent trace from witch the side trace
+Here 30 is the side trace number, 21 the parent trace from which the side trace
 start from and 0 is the side exit number.
 
 \paratitle{Stitching}\\
-Trace stitching is feature which allows traces to stop at a classic C function
+Trace stitching is a feature which allows traces to stop at a classic C function
 or a not-compiled built-in, return to the interpreter, run the C function or
-built-in and then start a new trace after it returns. Bellow is an example of
+built-in and then start a new trace after it returns. Below is an example of
 how trace stitching due to a not-compiled built-in can be shown in the dump.
 \begin{verbatim}
 ---- TRACE 1 start foo.lua:6
@@ -126,7 +126,7 @@ As you can see the trace prior to the stitching has its link marked as
 \subsection{Understanding BC dump}
 \label{Subsec:dump-bc}
 
-Bellow is a example of how a BC instruction is shown in the dump. For a complete
+Below is an example of how a BC instruction is shown in the dump. For a complete
 list of BC instruction and their corresponding arguments look at the wiki page
 \cite{luajit-bc}.
 \begin{verbatim}
@@ -147,7 +147,7 @@ list of BC instruction and their corresponding arguments look at the wiki page
 \subsection{Understanding IR dump}
 \label{Subsec:dump-ir}
 
-Bellow are some example of dumps of IR instructions.
+Below are some example of dumps of IR instructions.
 \begin{verbatim}
 0001 rax   >  tab SLOAD  #46   T
 0014 rbp      int TOBIT  0005  bias
@@ -205,9 +205,9 @@ Bellow are some example of dumps of IR instructions.
 
 
 \paratitle{Snapshot}\\
-Each snaphot (SNAP), lists the modified stack slots and the corresponding values.
-Bellow are two examples of how snapshots are shown in ir dump. For further
-comments on why snapshots are used, see Section \ref{Subsec:snap}. Bellow is an
+Each snapshot (SNAP), lists the modified stack slots and the corresponding values.
+Below are two examples of how snapshots are shown in IR dump. For further
+comments on why snapshots are used, see Section \ref{Subsec:snap}. Below is an
 example of how snapshot can be shown in the dump.
 \begin{verbatim}
 ....    SNAP   #1   [ ---- ---- ---- ---- 0069 0070 0071 ---- ]
@@ -224,7 +224,7 @@ has not been modified. Function frames are separated by '$\vert$'.
 \subsection{Understanding mcode dump}
 \label{Subsec:dump-mcode}
 
-Bellow is a example of a small typical trace. It start with some initialization
+Below is an example of a small typical trace. It starts with some initialization
 followed most of the time by a loop part clearly indicated by the label.
 Each line is composed of two parts, the mcode instruction's address and the
 corresponding assembler instruction.
@@ -260,12 +260,12 @@ corresponding assembler instruction.
 \subsection{How does it works}
 \label{Subsec:dump-internals}
 
-This section briefly present the parts of the code of luaJIT involved in the process of
-emitting the dump. The dump module (dump.lua) is responsible of the set up of the
+This section briefly presents the parts of the code of luaJIT involved in the process of
+emitting the dump. The dump module (dump.lua) is responsible for the set up of the
 jit to emit traces and also for printing the results in a human understandable
-format. Depending of the dump it has to print (with respect to the provided
-parameters, see Section \ref{Subsec:dump-usage}) it attach some handler
-(callback lua function) to specific VM event using jit\_attach (see lib\_jit.c).
+format. Depending on the dump it has to print (with respect to the provided
+parameters, see Section \ref{Subsec:dump-usage}) it attaches some handler
+(callback lua function) to specific VM events using jit\_attach (see lib\_jit.c).
 The predefined VM event used here are : BC, TRACE, RECORD, TEXIT
 (see VMEvent in lj\_vmevent.h). In the jit, lj\_vmevent\_send (see lj\_vmevent.h)
 is used to send a VM event, lj\_vmevent\_prepare to find the handler attached to a

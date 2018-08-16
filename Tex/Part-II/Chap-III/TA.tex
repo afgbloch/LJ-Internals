@@ -1,6 +1,6 @@
-%!TEX root = ../FYP_Dissertation.tex
+%!TEX root = ../../../FYP_Dissertation.tex
 
-When the recorder state machine reach the \emph{LJ\_TRACE\_ASM} state, the
+When the recorder state machine reaches the \emph{LJ\_TRACE\_ASM} state, the
 \emph{lj\_asm\_trace} main assembler function is called. This function is
 responsible for the setup and teardown of the assembler phase. Each IR
 instruction of the trace is assembled through the \emph{asm\_ir} function which
@@ -10,8 +10,8 @@ agnostic of the platform, \emph{lj\_asm\_(target).h} contains the assembler code
 specific to a particular target (i.e. x86), and \emph{lj\_emit\_(target).h}
 contain the helper functions for generating instructions for a specific
 instruction-set. A trace is assembled in linear backwards order. It uses
-\emph{ASMState} has the main data structure that help with, physical register
-allocation, machine code and IR traversal, and snapshot handling. At the end of
+\emph{ASMState} has the main data structure that helps with, physical register
+allocation, machine code and IR traversal, and snapshots handling. At the end of
 the assembler phase, the bytecode is patched to use instead of the interpreted
 bytecode a call to the compiled trace.
 
