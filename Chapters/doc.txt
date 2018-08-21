@@ -104,11 +104,10 @@ https://github.com/lukego/blog/issues/28
 ================================================================================
 Advice for Report: (brain dump)
 ------------------
-- keep the detailed ans structured LuaJIT doc in annexe (?)
+- a big part on why mad
+- a big part on luajit (overall, scheamatic of luajit)
 - say that annex took a lot of time (no documentation existing)
 - focus on explaining from context -> through mad
-- a big part on luajit (overall, scheamatic of luajit)
-- a big part on why mad
 - talk about sequence, element, tracking, survey, model object
 - talk about instability
 - talk about dumps
@@ -124,4 +123,6 @@ Advice for Report: (brain dump)
 - add a section on RaptorJIT
 - profiler issues
 - gdb
+------------------
+- keep the detailed ans structured LuaJIT doc in annexe (?)
 ================================================================================
