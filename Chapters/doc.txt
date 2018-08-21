@@ -104,7 +104,6 @@ https://github.com/lukego/blog/issues/28
 ================================================================================
 Advice for Report: (brain dump)
 ------------------
-- a big part on why mad
 - a big part on luajit (overall, scheamatic of luajit)
 - say that annex took a lot of time (no documentation existing)
 - focus on explaining from context -> through mad
@@ -114,7 +113,6 @@ Advice for Report: (brain dump)
 - talk about the miss of tools
 - talk about the miss of predictabilty
 - talk about different version of the model object
-- tiny talk about madx -> mad-ng
 - trace explosion
 - talk about performance in matrix ffi.cast and issues with the gc.
 - talk about gc64 mode
@@ -125,4 +123,6 @@ Advice for Report: (brain dump)
 - gdb
 ------------------
 - keep the detailed ans structured LuaJIT doc in annexe (?)
+- a big part on why mad
+- tiny talk about madx -> mad-ng
 ================================================================================
