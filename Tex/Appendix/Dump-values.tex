@@ -2,8 +2,14 @@
 
 In this appendix, is presented possible values that can be shown in some dump
 and their corresponding meaning.
-\begin{table}
+
+\begin{table}[H]
 \centering
+\caption{
+  Possible value for [link] \\(See jit\_trlinkname and TraceLink in lib\_jit.c
+  and lj\_jit.h)
+}
+\label{tab:dump-link}
 \begin{tabular}{|l|l|}
 \hline
 \multicolumn{1}{|c|}{value} & \multicolumn{1}{c|}{Meaning}\\\hline
@@ -18,14 +24,14 @@ down-recursion              & Down-recursion.\\\hline
 return                      & Return to interpreter.\\
 stitch                      & race stitching.\\\hline
 \end{tabular}
-\caption{
-  Possible value for [link] \\(See jit\_trlinkname and TraceLink in lib\_jit.c
-  and lj\_jit.h)
-}
-\label{tab:dump-link}
 \end{table}
-\begin{table}
+
+\begin{table}[H]
 \centering
+\caption{
+  Possible value for SLOAD argument \\(See lj\_ir.h)
+}
+\label{tab:dump-sload}
 \begin{tabular}{|l|l|l|}
 \hline
 P & IRSLOAD\_PARENT    & Coalesce with parent trace.\\
@@ -36,13 +42,14 @@ R & IRSLOAD\_READONLY  & Read-only, omit slot store.\\
 I & IRSLOAD\_INHERIT   & Inherited by exits/side traces.\\
 \hline
 \end{tabular}
-\caption{
-  Possible value for SLOAD argument \\(See lj\_ir.h)
-}
-\label{tab:dump-sload}
 \end{table}
-\begin{table}
+
+\begin{table}[H]
 \centering
+\caption{
+  Possible value for XLOAD argument \\(See lj\_ir.h)
+}
+\label{tab:dump-xload}
 \begin{tabular}{|l|l|l|}
 \hline
 R & IRXLOAD\_READONLY  & Load from read-only data.\\
@@ -50,58 +57,61 @@ V & IRXLOAD\_VOLATILE  & Load from volatile data.\\
 U & IRXLOAD\_UNALIGNED & Unaligned load.\\
 \hline
 \end{tabular}
-\caption{
-  Possible value for XLOAD argument \\(See lj\_ir.h)
-}
-\label{tab:dump-xload}
 \end{table}
-\begin{table}
+
+\begin{table}[H]
 \centering
+\caption{
+  Possible value for FLOAD or FREF argument \\(See lj\_ir.h)
+}
+\label{tab:dump-fload-fref}
 \begin{tabular}{|l|l|l|}
 \hline
-str.len        & IRFL\_STR\_LEN        & \\
-func.env       & IRFL\_FUNC\_ENV       & \\
-func.pc        & IRFL\_FUNC\_PC        & \\
-func.ffid      & IRFL\_FUNC\_FFID      & Function id\\
-thread.env     & IRFL\_THREAD\_ENV     & \\
-tab.meta       & IRFL\_TAB\_META       & \\
-tab.array      & IRFL\_TAB\_ARRAY      & \\
-tab.node       & IRFL\_TAB\_NODE       & Hash part\\
+str.len        & IRFL\_STR\_LEN        & String length \\
+func.env       & IRFL\_FUNC\_ENV       & function's environment for up-values \\
+func.pc        & IRFL\_FUNC\_PC        & PC of the function's prototype \\
+func.ffid      & IRFL\_FUNC\_FFID      & Function id \\
+thread.env     & IRFL\_THREAD\_ENV     & Thread environment for up-values \\
+tab.meta       & IRFL\_TAB\_META       & Metatable \\
+tab.array      & IRFL\_TAB\_ARRAY      & Table array part \\
+tab.node       & IRFL\_TAB\_NODE       & Table hash part \\
 tab.asize      & IRFL\_TAB\_ASIZE      & Size of array part\\
 tab.hmask      & IRFL\_TAB\_HMASK      & Size of hash part - 1\\\hline
 \multirow{3}{*}{tab.nomm} & \multirow{3}{*}{IRFL\_TAB\_NOMM} & Negative cache for fast \\
 & & metamethods bitmap, marking\\
 & & absent fields of the metatable\\\hline
-udata.meta     & IRFL\_UDATA\_META     & \\
+udata.meta     & IRFL\_UDATA\_META     & udata metatable\\
 udata.udtype   & IRFL\_UDATA\_UDTYPE   & See UDTYPE table\\
 udata.file     & IRFL\_UDATA\_FILE     & udata payload \\
-cdata.ctypeid  & IRFL\_CDATA\_CTYPEID  & \\
+cdata.ctypeid  & IRFL\_CDATA\_CTYPEID  & cdata's ctypeid\\
 cdata.ptr      & IRFL\_CDATA\_PTR      & cdata payload \\
 cdata.int      & IRFL\_CDATA\_INT      & cdata payload \\
 cdata.int64    & IRFL\_CDATA\_INT64    & cdata payload \\
 cdata.int64\_4 & IRFL\_CDATA\_INT64\_4 & cdata payload \\
 \hline
 \end{tabular}
-\caption{
-  Possible value for FLOAD or FREF argument \\(See lj\_ir.h)
-}
-\label{tab:dump-fload-fref}
 \end{table}
-\begin{table}
+
+\begin{table}[H]
 \centering
+\caption{
+  Possible value for userdata types \\(See lj\_obj.h)
+}
+\label{tab:dump-udata}
 \begin{tabular}{|l|l|}
 \hline
 UDTYPE\_USERDATA  & Regular userdata.\\
 UDTYPE\_IO\_FILE  & I/O library FILE.\\
 UDTYPE\_FFI\_CLIB & FFI C library namespace.\\\hline
 \end{tabular}
-\caption{
-  Possible value for userdata types \\(See lj\_obj.h)
-}
-\label{tab:dump-udata}
 \end{table}
-\begin{table}
+
+\begin{table}[H]
 \centering
+\caption{
+  Possible value for FPMATH argument \\(See lj\_ir.h)
+}
+\label{tab:dump-fpmath}
 \begin{tabular}{|l|l|}
 \hline
 floor & FPM\_FLOOR \\
@@ -118,35 +128,32 @@ cos   & FPM\_COS   \\
 tan   & FPM\_TAN   \\
 \hline
 \end{tabular}
-\caption{
-  Possible value for FPMATH argument \\(See lj\_ir.h)
-}
-\label{tab:dump-fpmath}
 \end{table}
-\begin{table}
+
+\begin{table}[H]
 \centering
+\caption{
+  Possible value for BUFHDR argument \\(See lj\_ir.h)
+}
+\label{tab:dump-bufhdr}
 \begin{tabular}{|l|l|}
 \hline
 IRBUFHDR\_RESET  & Reset buffer \\
 IRBUFHDR\_APPEND & Append to buffer \\
 \hline
 \end{tabular}
-\caption{
-  Possible value for BUFHDR argument \\(See lj\_ir.h)
-}
-\label{tab:dump-bufhdr}
 \end{table}
 
-\begin{table}
+\begin{table}[H]
 \centering
+\caption{
+  Possible value for TOSTR argument \\(See lj\_ir.h)
+}
+\label{tab:dump-tostr}
 \begin{tabular}{|l|l|l|}
 \hline
 INT  & IRTOSTR\_INT  & Convert integer to string.  \\
 NUM  & IRTOSTR\_NUM  & Convert number to string.  \\
 CHAR & IRTOSTR\_CHAR & Convert char value to string.  \\\hline
 \end{tabular}
-\caption{
-  Possible value for TOSTR argument \\(See lj\_ir.h)
-}
-\label{tab:dump-tostr}
 \end{table}
