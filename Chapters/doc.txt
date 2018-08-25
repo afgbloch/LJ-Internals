@@ -104,25 +104,26 @@ https://github.com/lukego/blog/issues/28
 ================================================================================
 Advice for Report: (brain dump)
 ------------------
-- say that annex took a lot of time (no documentation existing)
 - focus on explaining from context -> through mad
-- talk about sequence, element, tracking, survey, model object
-- talk about instability
 - talk about dumps
-- talk about the miss of tools
-- talk about the miss of predictabilty
 - talk about different version of the model object
 - trace explosion
 - talk about performance in matrix ffi.cast and issues with the gc.
 - talk about gc64 mode
 - talk about permanent blacklisting
 - talk about collision in hot detection (run dependent)
+------------------
+- profiler issues (if times ???)
 - add a section on RaptorJIT
-- profiler issues
 - gdb
 ------------------
 - a big part on luajit (overall, scheamatic of luajit)
 - keep the detailed ans structured LuaJIT doc in annexe (?)
 - a big part on why mad
 - tiny talk about madx -> mad-ng
+- talk about the miss of tools
+- talk about the miss of predictabilty
+- talk about sequence, element, tracking, survey, model object
+- say that annex took a lot of time (no documentation existing)
+- talk about instability
 ================================================================================
