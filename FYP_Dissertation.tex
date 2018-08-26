@@ -115,7 +115,12 @@
 \lstnewenvironment{code}[1]
   {\noindent\lstset{style=#1Style}\adjustbox{bgcolor=backgroundColour,max width=\textwidth}\bgroup}
   {\egroup}
-
+\newcommand{\blankpage}{
+\newpage
+\thispagestyle{empty}
+\mbox{}
+\newpage
+}
 % --------------------------------------------------------------------------------
 % Information relevant to your dissertation.
 % Substitute with your own name, supervisor and title details.
@@ -182,26 +187,26 @@
 % Prints out the title page
 %--------------------------------------------------------------------------------
 \input{./Tex/TitlePage}
+\blankpage
 
-% -------------------------------------------------------------------------------
+%--------------------------------------------------------------------------------
 % Prints out the copyright page (you do not need to modify this)
 %--------------------------------------------------------------------------------
-% \clearpage
 % \input{./Chapters/Copyright}
 
 %--------------------------------------------------------------------------------
 % Prints out the abstract
 % You will need to change the text in the file to reflect your own abstract
 %--------------------------------------------------------------------------------
-\clearpage
 \input{./Tex/Abstract}
+\blankpage
 
 %--------------------------------------------------------------------------------
 % Prints out the acknowledgements page
 % You will need to change the text to reflect your own acknowledgements
 %--------------------------------------------------------------------------------
-\clearpage
 \input{./Tex/Acknowledgements}
+\blankpage
 
 %--------------------------------------------------------------------------------
 % Prints out the list of contents, figures and tables
