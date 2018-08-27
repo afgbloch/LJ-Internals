@@ -1,0 +1,18 @@
+%!TEX root = ../../../FYP_Dissertation.tex
+
+When looking at the timing of individual tests of the MAD test suite we can see
+that most of the instability comes from the Model Object tests. In Figure
+\ref{fig:failed-test}, we can see a screenshot of three failed timing tests that
+were calibrated to run in roughly 0.5 seconds and that for this run needed respectively
+6, 4 and 68 seconds. We need then to investigate the reason for such results.
+
+\begin{figure}[H]
+    \centering
+	\includegraphics[width=0.8\textwidth]{./Images/failed-test.png}
+    \caption{Timing screenshot}
+    \label{fig:failed-test}
+\end{figure}
+
+The Lua programming language doesn't actually have an object model but provide
+mechanisms that allow anyone to build a custom object model fitting his needs.
+Next section will present the one that as been built for MAD.

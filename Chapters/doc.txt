@@ -62,13 +62,13 @@ https://github.com/lukego/blog/issues/28
 Advice for Report: (brain dump)
 ------------------
 - talk about different version of the model object
-- trace explosion
 - talk about performance in matrix ffi.cast and issues with the gc.
 - talk about gc64 mode
 ------------------
 - profiler issues (if times ???)
 - gdb
 ------------------
+- trace explosion
 - add a section on RaptorJIT
 - focus on explaining from context -> through mad
 - talk about collision in hot detection (run dependent)
