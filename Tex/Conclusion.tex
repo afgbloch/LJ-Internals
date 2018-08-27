@@ -1,0 +1,28 @@
+%!TEX root = ../FYP_Dissertation.tex
+
+In this project we aimed at studying some surprising performance irregularities
+when using LuaJIT in a demanding context. We unrevealed some incompatibility
+with the current way LuaJIT was reacted to some structural construct of CERN's
+MAD application and provided some insight and potential explanation for its
+performance drop. We have done this using the existing tooling provided by
+LuaJIT such has the \emph{dump} module and \emph{profiler} module that although
+very useful was not sufficient for studying context specific issues on a big code
+base. While doing so, we tackled down the problem of the lack of entry-level
+documentation that LuaJIT suffers. They do exist some information out there but
+it is scattered between a wiki, some Internet post on different websites and most
+importantly, sparingly in many mailing-list replies from the author of LuaJIT,
+Mike Pall. This work makes a compilation of all this important information
+also adding any interesting subtleties discovered while studding LuaJIT internal
+implementation.
+
+As for the future of this project, I would say that the next step would be to
+invest some amount of time and resources to develop visual tooling to be able
+to manipulate and make sense of the JIT reaction and trace dump when facing a
+very large number of generated traces. On this subject one shall definitely take
+a closer look at the work done by Luke Gorrie on \emph{RaptorJIT}
+\cite{RaptorJIT} (a fork of LuaJIT) and more especially on its dedicated
+visualization tool \emph{Studio} \cite{Studio}.
+
+I hope this report will help future newcomers to LuaJIT and more especially next
+students coming to pick up where we left off and kick-start their Knowledge on
+LuaJIT and MAD specificities.
