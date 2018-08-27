@@ -61,13 +61,12 @@ https://github.com/lukego/blog/issues/28
 ================================================================================
 Advice for Report: (brain dump)
 ------------------
-- talk about different version of the model object
 - talk about performance in matrix ffi.cast and issues with the gc.
-- talk about gc64 mode
 ------------------
 - profiler issues (if times ???)
 - gdb
 ------------------
+- talk about gc64 mode
 - trace explosion
 - add a section on RaptorJIT
 - focus on explaining from context -> through mad
@@ -84,4 +83,5 @@ Advice for Report: (brain dump)
 - say that annex took a lot of time (no documentation existing)
 - talk about instability
 - git log for before I arrived : f5092b3eae411971471792b3a2973ddc3083eead
+- talk about different version of the model object
 ================================================================================

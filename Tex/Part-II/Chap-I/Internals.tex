@@ -283,3 +283,19 @@ call the corresponding fallback handler (all \emph{LJLIB\_ASM} marked functions)
 that will try to recover from the failure if possible. Examples of recoverable
 cases might be : a wrong argument type if coercion succeeds or a stack overflow
 if stack reallocation succeeds (see comment in lj\_lib.h).
+
+%===============================================================================
+% GC64 mode
+%===============================================================================
+
+\subsection{GC64 mode}
+\label{Subsec:gc64}
+
+By default LuaJIT use 32-bit pointers which limit its memory on x86 to 4 GB on a
+32-bit platform and even 2 GB on a 64-bit platform (due to constant pointers being
+embedded as offsets in x86 addressing modes, which are signed 32-bit integers).
+This limitation has been there for many years but recently a \emph{GC64} mode
+has been developed and is currently in beta, allowing to fully use the well-known
+47-bit address space. To activate this mode you just have to uncomment in
+\emph{src/makefile} the LUAJIT\_ENABLE\_GC64 variable and to perform a full
+recompilation of LuaJIT.
