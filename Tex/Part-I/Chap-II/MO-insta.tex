@@ -62,5 +62,10 @@ blacklisted function or loop-like bytecode. The second idea was to slightly
 change the behavior of this \emph{cascading blacklisting} feature by letting
 traces record over blacklisted bytecode instead of aborting immediately.
 Unfortunately those two tried modifications didn't bring any substantial
-improvement over stability or performance. They can still be a general nice idea
-to keep in mind and might be reintroduced later.
+improvement over stability or performance. It as to be noted that
+blacklisting is here for a reason and do sometime improve performance as it
+prevents the JIT from spending time recording a trace that would end-up being aborted
+anyway. Plus we have to keep in mind that the VM is very well optimized and
+quite fast, making in certain cases the extra work done by the JIT not worth it.
+However, this can still be a general nice idea to keep in mind and might be
+reintroduced later.

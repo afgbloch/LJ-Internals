@@ -83,4 +83,5 @@ Advice for Report: (brain dump)
 - talk about sequence, element, tracking, survey, model object
 - say that annex took a lot of time (no documentation existing)
 - talk about instability
+- git log for before I arrived : f5092b3eae411971471792b3a2973ddc3083eead
 ================================================================================
