@@ -1,22 +1,6 @@
 ================================================================================
 Interesting LuaJIT Presentation: https://mrale.ph/talks/vmss16/#/
 ================================================================================
--JBC
-0006 => UGET     2   0      ; find
- - 1st column : bc number
- - 2nd column : branch targets of a function
- - 3rd column : bc instruction
- - other-1... : bc arguments
- - last       : comment corresponding lua code
-================================================================================
- - there exist two types of trace
-   - parent trace ->
-   - side trace (recursive) ?? ->
-================================================================================
-Paragraph on flush policies ??
-================================================================================
-how can we intern lua table slot in traces.
-================================================================================
 Programming advice:
   1) for i=1,#s do end
   2) for v in ipairs(s) do end
@@ -33,29 +17,10 @@ Indexing a table with a string should be as fast as with a reference (table).
 - check '?' in error messages (table.insert, table.remove, band) (builtin vs functions)
 - Where does the limit of 65000 identifier per chunk comes from.
 ================================================================================
-traces can have flow controle ? (if statement ?)
-  -> NO only implicitly : guards break the trace and restore the closest snapshot.
-================================================================================
-- jflush option : does it mean that codes can be keept from a run to the other ?
-================================================================================
-- make a GCObj never collectable by gc.
-- why allocator is global ? -> It is not :)
-- does gc goes through the lua stack.
-================================================================================
-- jit.flush doesn''t remove blacklistings
 - function that ends by a c api/ffi tail-call can not be compile in standalone.
   - potential solution is wrapping return value with ().
 - lua_setmetatable run flushall mcode because cdata metatamethode lookup is specialise
   metatable is immutable.
-- does jit.on remove the blacklist of a given function ? -> yes
-- Inject changes after the first test failed:
-  - white list only doesn''t work
-  - white list + clear penalty cache doesn''t work
-  - white list + clear penalty cache + clear hotcount +
-    clear J->prngstate doesn''t work
-  - white list + flush does cure the problem
-  - flush only does cure the problem (normal ???)
-- No performance loss if flushall remove blacklisting
 ================================================================================
   - LJ_PRNG_BITS in lj_jit.h for penalty used for penalty randomization.
 ================================================================================
@@ -89,14 +54,6 @@ NB:
   - flushs make loom crash (tmp fix)
   - MAD.tostring export (in all.mad) makes loom crash
 ================================================================================
-- function call are always inlined into the trace when possible
-  - need to be verified ?
-  - what are the conditions ?
-================================================================================
-- Controle flow is strictly linear (no branch inside a trace)
-================================================================================
-- Use the model object for has a full example
-================================================================================
 - lookup the same constant keys in hashtables of many different shapes and sizes
 is bad !!!!
 ================================================================================
@@ -104,16 +61,16 @@ https://github.com/lukego/blog/issues/28
 ================================================================================
 Advice for Report: (brain dump)
 ------------------
-- focus on explaining from context -> through mad
 - talk about different version of the model object
 - trace explosion
 - talk about performance in matrix ffi.cast and issues with the gc.
 - talk about gc64 mode
 ------------------
 - profiler issues (if times ???)
-- add a section on RaptorJIT
 - gdb
 ------------------
+- add a section on RaptorJIT
+- focus on explaining from context -> through mad
 - talk about collision in hot detection (run dependent)
 - talk about permanent blacklisting
 - talk about dumps
