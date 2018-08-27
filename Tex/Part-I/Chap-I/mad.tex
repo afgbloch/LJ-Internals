@@ -86,8 +86,8 @@ object that has the particularity of executing an \emph{exec} function
 (different for each type of command) with the user provided parameters.
 
 The two main data-structures are \emph{MTable} and \emph{Sequence}.
-\emph{Sequence} is used to represent, particle accelerator inside of MAD (See
-Chapter \ref{Chapt:seq} for more). it allows to build and edit them by
+\emph{Sequence} is used to represent, particle accelerator inside of MAD.
+it allows to build and edit them by
 composition of different \emph{Elements} with relative or absolute position.
 \emph{Elements} is the parent object of anything that can compose a
 \emph{sequence} such as magnets (sbend, rbend, quadrupole, sextupole, etc..),
@@ -96,7 +96,7 @@ etc...). \emph{MTable} is a dynamic table structure that offers multiple
 services, it grows and shrinks automatically, it can store heterogeneous data,
 columns and lines can be access by name or indexes and column containing only
 numbers can be specialized to vectors to allow faster and more convenient
-mathematical operations on them (see Chapter \ref{Chapt:mtable} for more).
+mathematical operations on them.
 
 Most of the usefulness of MAD comes from the provided high level \emph{Commands}.
 The \emph{Survey} command computes the coordinates of all machine elements in a
