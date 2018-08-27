@@ -105,18 +105,18 @@ https://github.com/lukego/blog/issues/28
 Advice for Report: (brain dump)
 ------------------
 - focus on explaining from context -> through mad
-- talk about dumps
 - talk about different version of the model object
 - trace explosion
 - talk about performance in matrix ffi.cast and issues with the gc.
 - talk about gc64 mode
-- talk about permanent blacklisting
-- talk about collision in hot detection (run dependent)
 ------------------
 - profiler issues (if times ???)
 - add a section on RaptorJIT
 - gdb
 ------------------
+- talk about collision in hot detection (run dependent)
+- talk about permanent blacklisting
+- talk about dumps
 - a big part on luajit (overall, scheamatic of luajit)
 - keep the detailed ans structured LuaJIT doc in annexe (?)
 - a big part on why mad
