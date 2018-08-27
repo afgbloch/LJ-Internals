@@ -1,4 +1,4 @@
-%!TEX root = ../FYP_Dissertation.tex
+%!TEX root = ../../../FYP_Dissertation.tex
 
 Valgrind is an instrumentation framework for building dynamic analysis tools.
 There are Valgrind tools that can automatically detect many memory management
@@ -7,9 +7,9 @@ able to debug your c code used through ffi with Valgrind, LuaJIT needs to be
 compiled with specific options. Some information on that can be found in the
 LuaJIT \emph{Makefile} but a summary of the way to proceed for linux is described
 here. First we need to uncomment in \emph{src/makefile}, \emph{CCDEBUG} to
-allow for debug information, \emph{DLUAJIT\_USE\_SYSMALLOC} to use the system
-allocator (to get useful memcheck information), \emph{DLUAJIT\_USE\_VALGRIND}
-and \emph{DLUAJIT\_ENABLE\_GC64} if run on a x64 platform. After recompiling
+allow for debug information, \emph{LUAJIT\_USE\_SYSMALLOC} to use the system
+allocator (to get useful memcheck information), \emph{LUAJIT\_USE\_VALGRIND}
+and \emph{LUAJIT\_ENABLE\_GC64} if run on a x64 platform. After recompiling
 with those options, you will need the suppression file \emph{src/lj.supp}
 (containing known false positive for memcheck) to run a valgrind command such as
 the following.
