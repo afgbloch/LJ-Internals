@@ -6,8 +6,8 @@ to talk about the iterator of the \emph{Sequence} data-structure.
 
 To recall,
 \emph{Sequence} is used to represent particle accelerator by composition of
-different Elements. In addition of the index, and the actual element the iterator
-return its \emph{spos} (distance in meters from the start of the sequence). The
+different Elements. The iterator returns, the element, its index, and its \emph{spos}
+(distance in meters from the start of the sequence). The
 only difference between forward and backward iterators is that for forward iterator
 the \emph{spos} is precomputed for each elements and stored in a table while for
 backward we need to take the \emph{spos} of the element and add its length. This

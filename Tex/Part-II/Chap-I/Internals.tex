@@ -16,7 +16,7 @@ lower bits to represent arbitrary data. Internally, LuaJIT has two different
 representations, one for 32-bits and another for 64-bits (\emph{LJ\_GC64}) mode
 (see Tables \ref{tab:tagged-gc32} and \ref{tab:tagged-gc64}). In those tables,
 \emph{itypes} are numbers identifying the type of the object.
-GC object (Garbage Collectible Object) represent all allocated object
+GC object (Garbage-Collected Object) represent all allocated object
 that are managed by the garbage collector. \emph{GCRef} are references to such
 object.
 
@@ -66,11 +66,11 @@ language itself and also all the strings used internally by LuaJIT. Internalizat
 mechanism does that, only one copy of a specific string is kept in memory. If
 multiple copies of a same string is requested, a pointer to the internalized
 version of the string is returned, instead of doing a new string allocation.
-Strings need to be immutable and are zero-terminated. String's function are
+Strings need to be immutable and are null-terminated. String's function are
 implemented in the \emph{lj\_str.c} file and internalization is done by the
 \emph{lj\_str\_new} function.
 
-For that, it implements a hash table and use a very sparse but fast hash
+For that, it implements a hash table and use a very sparse hash
 function. Collisions are handled by the use of singly-chained linked list.
 The table is resized and all string rehashed when a 100\% load is reached.
 The necessary states are saved in the \emph{global\_State} structure in the
@@ -92,7 +92,7 @@ typedef struct global_State {
 \subsection{Lua table}
 \label{Subsec:table}
 
-Tables are garbage collectible objects represented by the structure below
+Tables are garbage-collected objects represented by the structure below
 (\emph{GCtab} in \emph{lj\_obj.h}). Functions to manipulate them are in
 \emph{lj\_tab.c} and \emph{lj\_tab.h} files. It is composed of an array part and
 a hash part. If the array part is small, it is allocated directly after the
@@ -239,7 +239,7 @@ struct malloc_state {
 \label{Subsec:func}
 
 There are two distinct representation for function, the function's prototype,
-and the function's closure. the Lua functions' prototypes are represented by \emph{GCproto} (\emph{lj\_obj.h}), and are followed by the functions' bytecodes in memory.
+and the function's closure. Lua functions' prototypes are represented by \emph{GCproto} (\emph{lj\_obj.h}), and are followed by the functions' bytecodes in memory.
 The closures are represented by the GCfuncL for lua function and GCfuncC for
 c function (using lua's api). They contain the necessary information for
 upvalues. Upvalues are represented by the \emph{GCupval} that if close, contains

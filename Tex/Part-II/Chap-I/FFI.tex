@@ -17,7 +17,7 @@ print(p1.x) -- 11
 There is some official documentation for FFI users on \emph{luajit.org}
 where you can find the motivation for the FFI module \cite{ffi-motivation},
 a small tutorial \cite{ffi-tuto}, the API documentation \cite{ffi-api} and the
-FFI semantics \cite{ffi-semantics}. There is also an unofficial reflection
+FFI semantics \cite{ffi-semantics}. There is also a reflection
 library for FFI ctypes \cite{ffi-reflect} and its documentation
 \cite{ffi-reflect-doc} for anyone interested in exploring the ctype of a given cdata.
 
@@ -35,9 +35,9 @@ files. It is for example responsible to allocate and initialize the main state
 
 \paratitle{lj\_obj.h:}\\
 From this file, we are only interested in this chapter by the \emph{GCcdata}
-structure that is the garbage collectible object representing any c data use
+structure that is the garbage-collected object representing any c data use
 through and with the FFI. You can see its composition bellow. The main thing to
-see there is the \emph{ctypeid} which is the index of the ctype describing the
+see here is the \emph{ctypeid} which is the index of the ctype describing the
 attached data (the payload follows the structure in memory).
 \begin{lstlisting}[style=CStyle]
 typedef struct GCcdata {
@@ -49,7 +49,7 @@ typedef struct GCcdata {
 \paratitle{lj\_ctype.h:}\\
 Below is the \emph{CType} data structure responsible for describing to the ffi
 what kind of data the \emph{cdata} represent (e.g. variable, struct,
-function etc...). A detailed breakdown of how the information is laid out can
+function, etc.). A detailed breakdown of how the information is laid out can
 be seen in Table \ref{tab:ffi-ctype}. The meaning of the abbreviations used in
 the previous table can be seen in Table \ref{tab:ffi-ctype2}.
 \begin{lstlisting}[style=CStyle]
@@ -87,7 +87,7 @@ typedef struct CType {
 \begin{table}[p]
 \footnotesize
 \centering
-\caption{CType information summary}
+\caption{Summary of CType informations}
 \label{tab:ffi-ctype}
 \begin{tabular}{l|c|c|c|c|c|l|c|c|c|c|}
 \cline{2-11}
@@ -114,7 +114,7 @@ typedef struct CType {
 \begin{table}[p]
 \footnotesize
 \centering
-\caption{Definition of CType field}
+\caption{Definition of CType fields}
 \label{tab:ffi-ctype2}
 \begin{tabular}{ll|l|l|}
 \hline
@@ -236,7 +236,7 @@ typedef struct CPState {
 This file contains the code of a simple lexer and a simplified, not valid c
 parser. It uses the \emph{CPState} for the parsing of the input
 string and the \emph{CPDecl} structure below for the construction of the
-corresponding CType. During parsing the typdef chain is unrolled (typdef are
+corresponding CType. During parsing the chain of typdef is unrolled (typdef are
 still internalized for future reference but are not chained to the created
 ctype.)
 
@@ -282,7 +282,7 @@ typedef struct CDArith {
 \end{lstlisting}
 
 \paratitle{lj\_ccall.c:}\\
-This file contains the code handling calls to c function. It does structure/array
+This file contains the code handling calls to c function. It does struct/array
 register classification (see CCALL\_RCL\_*), computing how it can be passed
 as argument/return values (in gp register, sse register or memory). It handles
 then the decomposition/packing depending of the calling convention picked.

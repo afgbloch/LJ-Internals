@@ -18,7 +18,7 @@ and collision being ignored, false positive may occur.
 It must be noted that LuaJIT perform a natural-loop first (NLF) region selection.
 This can be noted in two ways. First, when the BC is a loop the counters are
 decremented twice as fast as for function call. Second, in most cases, if a
-parent trace hit an inner loop, the parent trace is aborted.
+parent trace hit an inner loop, it is aborted.
 
 \paratitle{Loops:}
 
@@ -52,7 +52,7 @@ machine, described in the next section.
 \label{Subsec:recorder-state-machine}
 
 Recording is the fact of executing the bytecode while remembering dynamic
-data/type and generating on the fly the IR specialized for this recording. In
+data/type and generating on the fly the IR specialized for this record. In
 doing so, the control flow is flattened meaning that only taken branch are
 recorded and function calls are inlined. The code responsible for that lie in, the
 \emph{lj\_trace.c} file for the state machine presented below and the helper
@@ -102,9 +102,9 @@ Error                   &
 \subsection{Abortion and blacklisting}
 \label{Subsec:abort}
 
-There exist multiple reason that might cause a recording to abort. Such reason
-could be that the unroll limit is reached, that the trace is too long, that the
-jit is disabled for a specific function or many others. (see \emph{lj\_traceerr.h}
+There exist multiple reason that might cause a recording to abort such as
+the unroll limit is reached, the trace is too long, the
+JIT is disabled for a specific function or many others (see \emph{lj\_traceerr.h}
 for the list of possible abort messages). To trigger an abortion, a lua error is
 thrown during the recording which transition the recorder state machine to the
 \emph{LJ\_TRACE\_ERR} state. Then, the \emph{penalty\_pc} function is called on
@@ -114,11 +114,11 @@ penalized bytecode, the penalty value, and the reason of the abortion. The
 \emph{penaltyslot} variable is a round-robin index inside the table indicating
 the next entry to use if a new bytecode needs to be penalized. It as to be noted
 that on the contrary of the hotcount mechanism, here the full PC is used to
-identify a slot making it free of false positive. However, since the entry is
+identify a slot making false positive impossible. However, since the entry is
 only 64 entry, penalized bytecode can easily be forgotten in a big code base.
-If the penalty for a given bytecode exceeds a threshold then the hot bytecode
+If the penalty of a bytecode exceeds a threshold then the hot bytecode
 responsible for starting the recording gets blacklisted. It means that this
-bytecode can never become hot again to start a recording and that if this
+bytecode can never become hot again and start a recording. It also means that if this
 bytecode try to be recorded inside another trace, this trace get aborted too
 (in most cases). A blacklisted bytecode is never whitelisted by the system.
 

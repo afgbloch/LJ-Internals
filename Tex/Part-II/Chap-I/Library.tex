@@ -76,8 +76,8 @@ First of all, if no lua interpreter
 minimized one is built from the \emph{minilua.c} file. Then the interpreter is
 used to run \emph{genlibbc.lua} that will be responsible for parsing all LuaJIT's
 source files searching for the \emph{LJLIB\_LUA} macro that surrounds library
-functions name, written in lua. It then generates the \emph{buildbm\_libbc.h}
-file that contains the lua byte codes for all those functions in the
+functions name that are written in lua. It then generates the \emph{buildbm\_libbc.h}
+file that contains the lua bytecodes for all those functions in the
 \emph{libbc\_code} array and a mapping of the function name and the bytecodes
 offset for that function in \emph{libbc\_map}.
 
@@ -93,7 +93,7 @@ file.
 
 \begin{table}[H]
 \centering
-\caption{Library Macro definitions}
+\caption{Definition of the macros used to build the library}
 \label{tab:library-macro}
 \begin{tabularx}{\textwidth}{|l|X|}
 \hline
@@ -156,7 +156,7 @@ LJLIB\_NOREG                         & to not register a function in lj\_lib\_cf
   \emph{lj\_lib.c} for the function that parse those data).                                 \\\hline
 \emph{lj\_recdef.h}                 &
   for each library functions \emph{recff\_idmap} contains an optional auxiliary
-  data (opcode, literal etc.) allowing to handle similar functionality in a
+  data (opcode, literal) allowing to handle similar functionalities in a
   common handler. \emph{recff\_func} contains the list of record handler.                   \\\hline
 \emph{vmdef.lua}                    &
   contains all vm definition for use in lua.

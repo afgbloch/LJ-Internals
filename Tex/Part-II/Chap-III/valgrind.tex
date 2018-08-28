@@ -11,8 +11,7 @@ allow for debug information, \emph{LUAJIT\_USE\_SYSMALLOC} to use the system
 allocator (to get useful memcheck information), \emph{LUAJIT\_USE\_VALGRIND}
 and \emph{LUAJIT\_ENABLE\_GC64} if run on a x64 platform. After recompiling
 with those options, you will need the suppression file \emph{src/lj.supp}
-(containing known false positive for memcheck) to run a valgrind command such as
-the following.
+(containing known false positive for memcheck) to run the Valgrind command.
 
 \begin{lstlisting}[style=CStyle]
 valgrind
@@ -21,7 +20,7 @@ valgrind
 		--track-origins=yes
 		--log-file='log.txt'
 		--suppressions=lj.supp
-		./luajit myprogram
+		./mad myprogram.mad
 \end{lstlisting}
 
 

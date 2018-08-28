@@ -11,7 +11,7 @@ the svg file. Assuming \emph{\$flamegraph} contains the path to the tool (/Flame
 \begin{center}
 \begin{lstlisting}
   export flamegraph=./FlameGraph/flamegraph.pl
-  luajit -jp=G,myapp.out myapp.lua
+  mad -jp=G,myapp.out myapp.lua
   $flamegraph myapp.out > myapp.svg
 \end{lstlisting}
 \end{center}

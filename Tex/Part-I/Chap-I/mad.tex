@@ -16,8 +16,8 @@ It presents itself as a command-line program that reads and execute its custom
 scripting language. This language has the particularity of having a single
 workspace where everything is global. There is no function but a simple macro
 system. Most of the functionalities are provided through high-level commands that
-can be customized by the user. Deferred expressions are heavily used with the
-presence of lazy evaluation everywhere. This code has been internally known to
+can be customized by the user. Deferred expressions are heavily used everywhere.
+This code has been internally known to
 be difficult to maintain and improve. In additions of that, developing new
 functionality for it takes a significant amount of time due to the fact that
 module are tightly coupled and modification on its big code base can have
@@ -40,10 +40,9 @@ a simple scripting language to offer easier and faster development, to propose
 a well-compartmented and modular design for scalability, to allow much more
 flexible user input, to reintroduce computer science good practices with scopes,
 functions, control-flow, etc.. It has to do so while being at least as performant
-as MAD-X, keeping the high level command-like philosophy and staying a stand
-alone single binary working out of the box without any installation procedure.
-The scripting language Lua through LuaJIT as been picked (see introduction in
-Section \ref{Sec:LuaJIT}).\\
+as MAD-X, keeping the high level command-like philosophy and staying a standalone
+single binary working out of the box without any installation procedure.
+The scripting language Lua through LuaJIT as been picked (see Section \ref{Sec:LuaJIT}).\\
 
 
 \subsubsection{MAD-NG packaging}
@@ -54,7 +53,7 @@ modification over LuaJIT has been done to allow it to be embedded inside of MAD.
 The source code of MAD is mainly implemented in lua (\emph{*.mad} extension
 files) but for performance reasons some physic calculations and algorithms are
 written in \emph{C}. A big advantage of LuaJIT is the efficiency of the FFI
-library (Foreign Function Interface) that allow us to use embedded \emph{C} code
+library (Foreign Function Interface) that allows to use embedded \emph{C} code
 or even \emph{C} libraries directly inside the lua application.
 
 \begin{figure}[H]
@@ -87,21 +86,22 @@ object that has the particularity of executing an \emph{exec} function
 time of definition.
 
 The two main data-structures are \emph{MTable} and \emph{Sequence}.
-\emph{Sequence} is used to represent, particle accelerator inside of MAD.
-it allows to build and edit them by
-composition of different \emph{Elements} with relative or absolute position.
-\emph{Elements} is the parent object of anything that can compose a
-\emph{sequence} such as magnets (sbend, rbend, quadrupole, sextupole, etc..),
+\emph{Sequence} is used to represent particle accelerator inside of MAD.
+It allows to build and edit them by
+composition of different \emph{Element} with relative or absolute position.
+\emph{Element} is the parent object of anything that can compose a
+\emph{sequence} such as magnets (sbend, rbend, quadrupole, sextupole),
 rfcavity or patch elements (translation, rotation, change of referential,
-etc...). \emph{MTable} is a dynamic table structure that offers multiple
+etc.). \emph{MTable} is a dynamic table structure that offers multiple
 services, it grows and shrinks automatically, it can store heterogeneous data,
 columns and lines can be access by name or indexes and column containing only
-numbers can be specialized to vectors to allow faster and more convenient
+numbers are specialized to vectors to allow faster and more convenient
 mathematical operations on them.
 
-Most of the usefulness of MAD comes from the provided high level \emph{Commands}.
-The \emph{Survey} command computes the coordinates of all machine elements in a
-global reference system for a provided \emph{Sequence} with global initial
-parameters. The \emph{Track} command allows to compute the evolution of a number
-of particles with given initial conditions through a \emph{Sequence}, either for
-a single passage or for many turns (to simulate ring-like particle accelerator).
+The core functionality of MAD comes from the provided high level \emph{Commands}.
+The \emph{Survey} command computes the geometrical layout of a \emph{Sequence}.
+It takes the initial parameters provided to calculate the coordinates of all
+machine elements in a global reference system. The \emph{Track} command allows
+to compute the evolution of a number of particles with given initial conditions
+through a \emph{Sequence}, for one or many turns (to simulate ring-like particle
+accelerator).

@@ -40,8 +40,8 @@ Unfortunately due to the dynamic nature of the IR generated, it contains many
 guards and thus are control-dependent, making little room for loop-invariant
 code motion (LICM). The solution used here is a copy-substitution of the body
 of the loop. It basically consists in always unrolling the loop once before the
-actual loop instruction, performing invariant instruction there and making
-all the other loop iterations executing only the variant once.
+actual loop instruction. This allows the code executed inside the loop to
+contains only variant instructions.
 
 %===============================================================================
 % Split optimizations
@@ -59,11 +59,11 @@ The split optimization is only used by 32-bits architecture and splits the
 
 \subsection{Sinking optimizations}
 \label{Subsec:opt-sinking}
-This a very useful optimization that allows to avoid many temporaries and
+This is a very useful optimization that allows to avoid many temporaries and
 unnecessary memory accesses and allocations by keeping the values of interest
-directly in register. We thus have to remember how the memory should have been
-modified in case those access escape our execution path (are not temporary
-anymore), for this purpose snapshots are used (See Section \ref{Subsec:snap}).
+directly in register. Since memory modifications are not performed, we need a way
+to remember the writes in case those value escape the execution path
+(are not temporary anymore). For this purpose snapshots are used (See Section \ref{Subsec:snap}).
 This optimization is implemented in the \emph{lj\_opt\_sink.c} file. A detailed
 explanation of this optimization is available on the wiki \cite{luajit-sink}.
 

@@ -55,7 +55,7 @@ typedef struct LexState {
 \label{Subsec:Parser}
 
 The parser of luaJIT is implemented in \emph{lj\_parse.c} and \emph{lj\_parse.h}
-files. It also uses \emph{LexState} as the principal data-structure. it is the on
+files. It also uses \emph{LexState} as the principal data-structure. it is
 responsible for calling the lexer to get tokens. LuaJIT doesn't really have an
 abstract syntax tree representation of the parsed code. Instead it directly
 generates the bytecode on the fly using helpers from \emph{lj\_bc.h}.

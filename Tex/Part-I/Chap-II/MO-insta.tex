@@ -21,14 +21,14 @@ We will still present here some insight on this issue with some unsuccessful
 tentative of solutions.
 
 The first thing is that in some run the \emph{\_\_index}
-function of the model object (presented in previous sections) gets blacklisted
+function of the object model (presented in previous sections) gets blacklisted
 (see Section \ref{Subsec:abort}). After that no hierarchy chaining can be
 successfully recorded inside another trace making all of them running
 exclusively in the VM. This is due to a mechanism of LuaJIT that we can call
 \emph{cascading blacklisting} that consist of blacklisting bytecode that tries to
 record a trace that hit another blacklisted bytecode. This is very inconvenient
 because it means that a piece of code that can't be properly compiled for
-whatever the reason can make the model object very slow for the rest of the run.
+whatever the reason can make the object model very slow for the rest of the run.
 This is even more problematic knowing that blacklisting is permanent for the
 lifetime of a particular bytecode, making it in this case for an entire run of
 LuaJIT.
@@ -51,7 +51,7 @@ internalized string and possibly different placement inside hash-tables. In Lua
 iterating over a hash-table can be done through the \emph{pairs} iterator that
 doesn't enforce any special order (it just iterate sequentially over the internal
 table structure), thus two runs can result in keys not being read in the same order,
-making the JIT "see" the codes in a different order possibly changing false positive
+making LuaJIT execute the codes in a different order possibly changing false positive
 and other behavior of the JIT.\\
 
 Now let's have a look at a few modifications of LuaJIT that has been done to try

@@ -8,25 +8,25 @@
 \label{Subsec:dump-usage}
 
 This module can be used to debug the JIT compiler itself or to analyze its
-behavior regarding a piece of code. It dumps the
+behavior when running a particular code. It dumps the
 code representations and structures used in various compiler stages.
 
 Example usage:
 \begin{lstlisting}
-  luajit -jdump -e "
+  mad -jdump -e "
     local x=0
     for i=1,1e6 do x=x+i end
     print(x)
   "
-  luajit -jdump=im -e "
+  mad -jdump=im -e "
     for i=1,1000 do
       for j=1,1000 do end
     end
   " | less -R
-  luajit -jdump=is myapp.lua | less -R
-  luajit -jdump=-b myapp.lua
-  luajit -jdump=+aH,myapp.html myapp.lua
-  luajit -jdump=ixT,myapp.dump myapp.lua
+  mad -jdump=is myapp.mad | less -R
+  mad -jdump=-b myapp.mad
+  mad -jdump=+aH,myapp.html myapp.mad
+  mad -jdump=ixT,myapp.dump myapp.mad
 \end{lstlisting}
 The first argument specifies the dump mode. The second argument gives
 the output file name. Default output is to stdout, unless the environment
@@ -100,8 +100,8 @@ trace is shown in the dump.
 \begin{verbatim}
 ---- TRACE 30 start 21/0 foo.lua:103
 \end{verbatim}
-Here 30 is the side trace number, 21 the parent trace from which the side trace
-start from and 0 is the side exit number.
+Here, 30 is the side trace number, 21 the parent trace from which the side trace
+start from and 0 is the side-exit number .
 
 \paratitle{Stitching}\\
 Trace stitching is a feature which allows traces to stop at a classic C function
@@ -214,7 +214,7 @@ example of how snapshot can be shown in the dump.
 ....    SNAP   #1   [ foo.lua:120|---- ---- false ]
 \end{verbatim}
 The i-th value in the snapshot list represents the IR instruction number of the
-instruction that wrote a value in slot number i. '- - - -' indicates that the slot
+instruction that wrote in slot number i. '- - - -' indicates that the slot
 has not been modified. Function frames are separated by '$\vert$'.
 
 %===============================================================================
@@ -261,8 +261,8 @@ corresponding assembler instruction.
 \label{Subsec:dump-internals}
 
 This section briefly presents the parts of the code of luaJIT involved in the process of
-emitting the dump. The dump module (dump.lua) is responsible for the set up of the
-jit to emit traces and also for printing the results in a human understandable
+emitting the dump. The dump module is responsible for the set up of the
+JIT to emit traces and also for printing the results in a human understandable
 format. Depending on the dump it has to print (with respect to the provided
 parameters, see Section \ref{Subsec:dump-usage}) it attaches some handler
 (callback lua function) to specific VM events using jit\_attach (see lib\_jit.c).

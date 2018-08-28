@@ -1,4 +1,4 @@
-%!TEX root = ../FYP_Dissertation.tex
+%!TEX root = ../../../FYP_Dissertation.tex
 
 This module is a simple command line interface to the built-in
 low-overhead profiler of LuaJIT. The lower-level API of the profiler
@@ -6,11 +6,11 @@ is accessible via the "jit.profile" module or the luaJIT\_profile\_* C API.
 
 Example usage:
 \begin{lstlisting}
-  luajit -jp myapp.lua
-  luajit -jp=s myapp.lua
-  luajit -jp=-s myapp.lua
-  luajit -jp=vl myapp.lua
-  luajit -jp=G,profile.txt myapp.lua
+  mad -jp myapp.mad
+  mad -jp=s myapp.mad
+  mad -jp=-s myapp.mad
+  mad -jp=vl myapp.mad
+  mad -jp=G,profile.txt myapp.mad
 \end{lstlisting}
 The following dump features are available:
  \begin{itemize}%[label={--}]

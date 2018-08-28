@@ -55,7 +55,7 @@ object (\emph{obj42}).
 Now let's extract some general understanding from this example. Fist, the actual loop
 is only the part in red labeled with the number three. We can see that it only
 consists of the loop's counter and the additions. All other operations
-from the model object has been successfully moved out of the loop making the loop
+from the object model has been successfully moved out of the loop making the loop
 itself very small and efficient. This is the power of luaJIT. It can do that
 using the loop optimization that consists of unrolling the loop once before the
 actual loop itself executing all invariant operation and guards only once
