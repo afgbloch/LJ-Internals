@@ -146,7 +146,7 @@ typedef struct CType {
 The most important struct of the FFI is the \emph{CTState} bellow. It contains
 all the internalize ctype in the \emph{tab} table. \emph{finalizer} is a weak
 keyed lua table (values can be garbage collected if the key is not referenced
-elsewhere ) containing all finalizer registered with the \emph{ffi.gc} method.
+elsewhere) containing all finalizer registered with the \emph{ffi.gc} method.
 \emph{miscmap} is a lua table mapping all metatable of ctypes registered using
 the \emph{ffi.metatype} method in the negative CTypeID range and all callback
 functions in the positive callback slot range. Any metatable added to miscmap is
@@ -198,7 +198,7 @@ typedef struct CTRepr {
 \end{lstlisting}
 
 \paratitle{lj\_cparse.h:}\\
-The cparser is responsible for parsing the string making the C declarations
+The cparser is responsible for parsing the string of the C declarations looking
 for types or external symbols. Its code structure is quite close to the
 lua lexer/parser. Its principal struct is the \emph{CPState} bellow which is
 similar to \emph{LexState}. In this struct, \emph{tmask} is a mask constraining
@@ -227,7 +227,7 @@ typedef struct CPState {
   uint32_t tmask;         /* Type mask for next identifier. */
   uint32_t mode;          /* C parser mode. */
   uint8_t packstack[...]; /* Stack for pack pragmas. */
-  uint8_t curpack;        /* Current position in pack pragma stack. */qerf
+  uint8_t curpack;        /* Current position in pack pragma stack. */
 } CPState;
 \end{lstlisting}
 \end{adjustbox}
@@ -352,6 +352,6 @@ and cached in the \emph{CLibrary} cache table.
 \begin{lstlisting}[style=CStyle]
 typedef struct CLibrary {
   void *handle; /* Opaque handle for dynamic library loader. */
-  GCtab *cache; /* Cache for resolved symbols. Anchored in ud->env. */
+  GCtab *cache; /* Cache resolved symbols. Anchored in ud->env. */
 } CLibrary;
 \end{lstlisting}

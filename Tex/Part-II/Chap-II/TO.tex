@@ -37,7 +37,7 @@ loops. In fact LuaJIT should try to hoist most invariant instruction and guards
 in such a way that trace that doesn't match the current dynamic profile of
 the code (assumption on data or type) are exited as soon as possible.
 Unfortunately due to the dynamic nature of the IR generated, it contains many
-guards a thus, are control-dependent making little room for loop-invariant
+guards and thus are control-dependent, making little room for loop-invariant
 code motion (LICM). The solution used here is a copy-substitution of the body
 of the loop. It basically consists in always unrolling the loop once before the
 actual loop instruction, performing invariant instruction there and making
@@ -103,7 +103,7 @@ match.
 \label{tab:fold-format}
 \begin{tabular}{|c|c|c|c|c|}
 \hline
-8                & 7                 & 7                 & 2        & 8                       \\ \hline
+8 bits           & 7 bits            & 7 bits            & 2 bits   & 8 bits                      \\ \hline
 index fold table & fold instr opcode & left instr opcode & 00       & right instr opcode      \\ \hline
 index fold table & fold instr opcode & left instr opcode & \multicolumn{2}{c|}{literal field} \\ \hline
 \end{tabular}

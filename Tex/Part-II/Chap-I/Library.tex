@@ -118,7 +118,7 @@ LJLIB\_LUA(name)                     & register lua function.                   
 \multirow{7}{*}{LJLIB\_PUSH(val)}    & push \emph{val} on the lua stask.
   \begin{itemize}
   \item 'lastcl'  : copy last stack value
-  \item 'top-x'   : copy last x stack value
+  \item 'top-x'   : copy last $x^{th}$ stack value
   \item ' "..." ' : push internalized string
   \end{itemize}                                                                             \\\hline
 \multirow{8}{*}{LJLIB\_REC(handler)} & register a handler to record a function.
@@ -164,7 +164,7 @@ LJLIB\_NOREG                         & to not register a function in lj\_lib\_cf
   \item bcnames  : bytecode names
   \item irnames  : IR instructions names
   \item irfpm    : floating point math function names
-  \item irfield  : maps field id to field name (specific field the IR instruction access to)
+  \item irfield  : maps field id to field name (specific field that the IR instruction is accessing)
   \item ircall   : name of special function for calls instruction.
   \item traceerr : maps error num to error message
   \item ffnames  : maps library function id to function name

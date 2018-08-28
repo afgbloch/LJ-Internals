@@ -13,12 +13,12 @@ particle accelerators. Its current version is called MAD-X. It was first release
 in 2002 and is the successor of  MAD-8 (see official website \cite{madx}).
 Its source code is mainly written in C, C++, Fortan77 and Fortran90.
 It presents itself as a command-line program that reads and execute its custom
-scripting languages. This language as the particularity of having a single
+scripting language. This language has the particularity of having a single
 workspace where everything is global. There is no function but a simple macro
 system. Most of the functionalities are provided through high-level commands that
 can be customized by the user. Deferred expressions are heavily used with the
 presence of lazy evaluation everywhere. This code has been internally known to
-be difficult to maintain and improve. In additions of that developing new
+be difficult to maintain and improve. In additions of that, developing new
 functionality for it takes a significant amount of time due to the fact that
 module are tightly coupled and modification on its big code base can have
 unexpected side effect if the developer is not careful. The need for
@@ -50,7 +50,7 @@ Section \ref{Sec:LuaJIT}).\\
 \label{Subsec:mad-pk}
 
 Figure \ref{fig:mad} shows how the MAD-NG application is being packaged. Some
-modification over luaJIT has been done to allow it to be embedded inside of MAD.
+modification over LuaJIT has been done to allow it to be embedded inside of MAD.
 The source code of MAD is mainly implemented in lua (\emph{*.mad} extension
 files) but for performance reasons some physic calculations and algorithms are
 written in \emph{C}. A big advantage of LuaJIT is the efficiency of the FFI
@@ -83,7 +83,8 @@ The two backbone modules are \emph{Object} and \emph{Commands}. The \emph{Object
 module is the one responsible for describing the object model use in MAD (see
 Chapter \ref{Chapt:MO} for more). The \emph{Commands} is a special kind of
 object that has the particularity of executing an \emph{exec} function
-(different for each type of command) with the user provided parameters.
+(different for each type of command) with the user provided parameters at the
+time of definition.
 
 The two main data-structures are \emph{MTable} and \emph{Sequence}.
 \emph{Sequence} is used to represent, particle accelerator inside of MAD.
