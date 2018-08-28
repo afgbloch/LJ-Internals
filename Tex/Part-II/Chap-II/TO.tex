@@ -9,7 +9,7 @@ entire IR at once at the end of the recording phase, during the
 \ref{Subsec:opt-split}, \ref{Subsec:opt-sinking}) and the local optimizations
 that are applied while recording a trace (See \ref{Subsec:narrowing},
 \ref{Subsubsec:fold}, \ref{Subsubsec:mao}). Finally, there is a plethora of
-optimization and heuristic applied here and there (See luaJIT wiki on
+optimization and heuristic applied here and there (See LuaJIT wiki on
 optimization \cite{luajit-opt}).
 
 %===============================================================================
@@ -74,7 +74,7 @@ explanation of this optimization is available on the wiki \cite{luajit-sink}.
 \subsection{Narrowing optimizations}
 \label{Subsec:narrowing}
 
-It performs the narrowing of lua numbers (double) into integers when it seems
+It performs the narrowing of Lua numbers (double) into integers when it seems
 to be useful. LuaJIT use demand-driven (by the backend) narrowing for index
 expressions, integer arguments (FFI), and bit operations and predictive
 narrowing for induction variables. It emits overflow check instruction when

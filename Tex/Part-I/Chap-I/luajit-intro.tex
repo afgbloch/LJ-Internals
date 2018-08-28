@@ -49,7 +49,7 @@ depicts a schematic view of LuaJIT internals.
 \end{figure}{}
 
 LuaJIT accepts two types of input,
-text files containing lua code or already converted object files. Lua files are
+text files containing Lua code or already converted object files. Lua files are
 first read by the \emph{Lexer} \ref{Subsec:Lexer} and \emph{Parser} \ref{Subsec:Parser} and
 converted in LuaJIT's bytecode instructions (BC). The other possibility is to provide
 object files that contain bytecodes already converted by LuaJIT used for
@@ -58,17 +58,17 @@ embedding code in binaries for examples. Those last files are read by the
 
 Once the source code as been converted in bytecode, it is fed to the \emph{bytecode
 interpreter} \ref{Sec:BI}. It is the central piece of code written in assembly
-that connect every component of luaJIT and is responsible for executing the BC.
+that connect every component of LuaJIT and is responsible for executing the BC.
 
-There is a certain number of libraries \ref{Sec:Library} packaged will luaJIT, here
+There is a certain number of libraries \ref{Sec:Library} packaged will LuaJIT, here
 to help the BC interpreter to do its work. We will mention a few of them here.
-First there is the \emph{FFI} \ref{Sec:FFI} library that allows to directly connect lua
-code with c code and c library without lua explicit c interface. The \emph{standard
-library} provides a explicit \emph{C} interface to manipulate lua data
+First there is the \emph{FFI} \ref{Sec:FFI} library that allows to directly connect Lua
+code with C code and C library without Lua explicit C interface. The \emph{standard
+library} provides a explicit \emph{C} interface to manipulate Lua data
 (stack, registry, etc.). Finally, the \emph{JIT} library provides functions
 allowing to configure the JIT engine.
 
-The last big part of luaJIT is obviously the \emph{JIT} engine \ref{Chapt:JIT}.
+The last big part of LuaJIT is obviously the \emph{JIT} engine \ref{Chapt:JIT}.
 It is actually a tracing JIT that needs to detect \emph{hot path}
 \ref{Subsec:hot-path} that would benefit from being compiled. Once such a piece
 of bytecode is detected the \emph{recorder} specialize this bytecode with runtime

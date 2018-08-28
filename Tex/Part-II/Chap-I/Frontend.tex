@@ -16,7 +16,7 @@ type of data to be processed (comment, string literal, long string, numbers
 etc...). TValues (\emph{tokval}, \emph{lookaheadval}) are used to store the
 token values were \emph{LexToken} (\emph{tok}, \emph{lookahead}) determine the
 type. The string buffer (\emph{sb}) is used to accumulate characters of a future
-string before internalizing it. All lua keyword are internalized as a string at
+string before internalizing it. All Lua keyword are internalized as a string at
 the very beginning, GCstr has the field \emph{reserved} for marking them.
 
 \begin{lstlisting}[style=CStyle]
@@ -54,7 +54,7 @@ typedef struct LexState {
 \subsection{Parser}
 \label{Subsec:Parser}
 
-The parser of luaJIT is implemented in \emph{lj\_parse.c} and \emph{lj\_parse.h}
+The parser of LuaJIT is implemented in \emph{lj\_parse.c} and \emph{lj\_parse.h}
 files. It also uses \emph{LexState} as the principal data-structure. it is
 responsible for calling the lexer to get tokens. LuaJIT doesn't really have an
 abstract syntax tree representation of the parsed code. Instead it directly
@@ -100,14 +100,14 @@ typedef struct FuncState {
 \subsection{Bytecode frontend}
 \label{Subsec:bc-frontend}
 
-Another frontend feature provided by luaJIT is the possibility to save and load
+Another frontend feature provided by LuaJIT is the possibility to save and load
 bytecode directly, allowing to skip the lexer and parser phase.
 
 The writing part is handled by the module \emph{bcsave.lua} that use the
 \emph{lj\_bcwrite} function from \emph{lj\_bcwrite.c} to generate the data to be written.
 
 The reading part is done by the code in \emph{lj\_bcread.c} file. When it is
-detected that the input file is a bc dump instead of a plain lua code,
+detected that the input file is a bc dump instead of a plain Lua code,
 \emph{cpparser} from \emph{lj\_load.c} calls \emph{lj\_bcread} instead of
 \emph{lj\_parse} normally. This reader also use \emph{LexState} as the principal
 data-structure.

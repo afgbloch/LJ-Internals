@@ -3,7 +3,7 @@
 Valgrind is an instrumentation framework for building dynamic analysis tools.
 There are Valgrind tools that can automatically detect many memory management
 and threading bugs, and profile programs in detail (cf \cite{valgrind}). To be
-able to debug your c code used through ffi with Valgrind, LuaJIT needs to be
+able to debug your C code used through ffi with Valgrind, LuaJIT needs to be
 compiled with specific options. Some information on that can be found in the
 LuaJIT \emph{Makefile} but a summary of the way to proceed for linux is described
 here. First we need to uncomment in \emph{src/makefile}, \emph{CCDEBUG} to

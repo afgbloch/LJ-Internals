@@ -27,7 +27,7 @@ The organisation of the information will follow the actual implementation files.
 \paratitle{lib\_ffi.c:}\\
 This file is the top level file of the FFI library. It contains the
 implementation of the FFI API, the function that makes the connection between
-lua and c using the standard Lua \emph{C API}.
+Lua and C using the standard Lua \emph{C API}.
 It is also responsible for loading the FFI module (\emph{luaopen\_ffi}).
 This file mainly use and connect together functionalities implemented in other
 files. It is for example responsible to allocate and initialize the main state
@@ -35,7 +35,7 @@ files. It is for example responsible to allocate and initialize the main state
 
 \paratitle{lj\_obj.h:}\\
 From this file, we are only interested in this chapter by the \emph{GCcdata}
-structure that is the garbage-collected object representing any c data use
+structure that is the garbage-collected object representing any C data use
 through and with the FFI. You can see its composition bellow. The main thing to
 see here is the \emph{ctypeid} which is the index of the ctype describing the
 attached data (the payload follows the structure in memory).
@@ -145,9 +145,9 @@ typedef struct CType {
 
 The most important struct of the FFI is the \emph{CTState} bellow. It contains
 all the internalize ctype in the \emph{tab} table. \emph{finalizer} is a weak
-keyed lua table (values can be garbage collected if the key is not referenced
+keyed Lua table (values can be garbage collected if the key is not referenced
 elsewhere) containing all finalizer registered with the \emph{ffi.gc} method.
-\emph{miscmap} is a lua table mapping all metatable of ctypes registered using
+\emph{miscmap} is a Lua table mapping all metatable of ctypes registered using
 the \emph{ffi.metatype} method in the negative CTypeID range and all callback
 functions in the positive callback slot range. Any metatable added to miscmap is
 definitive and never collected. \emph{hash} is an array used as a hash table
@@ -200,7 +200,7 @@ typedef struct CTRepr {
 \paratitle{lj\_cparse.h:}\\
 The cparser is responsible for parsing the string of the C declarations looking
 for types or external symbols. Its code structure is quite close to the
-lua lexer/parser. Its principal struct is the \emph{CPState} bellow which is
+Lua lexer/parser. Its principal struct is the \emph{CPState} bellow which is
 similar to \emph{LexState}. In this struct, \emph{tmask} is a mask constraining
 the possible ctype of the next identifier. The \emph{mode} defines the behavior
 of the parser with respect to the input. It's different behavior can be of the
@@ -266,9 +266,9 @@ allocations, free, finilizer, getter, setter and indexing.
 \paratitle{lj\_cconv.c:}\\
 This file is responsible for ctype conversion. It is divided in 5 parts: C type
 compatibility checks, C type to C type conversion, C type to TValue conversion
-(from c to lua : i.e returned values), TValue to C type conversion (from lua to
+(from C to Lua : i.e returned values), TValue to C type conversion (from Lua to
 c: i.e passed arguments), and initializing C type with TValues (Initialization
-of struct/union/array with lua object)
+of struct/union/array with Lua object)
 
 \paratitle{lj\_carith.c:}\\%
 This file contains the implementation far all built-in cdata arithmetic, such
@@ -282,13 +282,13 @@ typedef struct CDArith {
 \end{lstlisting}
 
 \paratitle{lj\_ccall.c:}\\
-This file contains the code handling calls to c function. It does struct/array
+This file contains the code handling calls to C function. It does struct/array
 register classification (see CCALL\_RCL\_*), computing how it can be passed
 as argument/return values (in gp register, sse register or memory). It handles
 then the decomposition/packing depending of the calling convention picked.
 
 \paratitle{lj\_ccall.h:}\\
-Below is the main structure use for c function call.
+Below is the main structure use for C function call.
 \begin{lstlisting}[style=CStyle]
 typedef struct CCallState {
   void (*func)(void); /* Pointer to called function. */
@@ -313,20 +313,20 @@ structure. Each callback is associated with a unique cb slot and the
 pointers. The \emph{cts.cb.cbid} is a table mapping cb slot to the corresponding
 CTypeID. \emph{cts.cb.mcode} is an mmap'ed executable page that contains a push
 of slot id and a jump to \emph{lj\_vm\_ffi\_callback} (the entry in this page
-corresponds to the cb address provided to the c code). Below is a description
+corresponds to the cb address provided to the C code). Below is a description
 of the call order when a callback is called.
 
 \begin{itemize}
-	\item c call a callback address
+	\item C call a callback address
 	\item arrive in the callback mcode page (push the appropriate slot id and call lj\_vm\_ffi\_callback)
 	\item arrive in lj\_vm\_ffi\_callback that charge in registers the callback.fpr/gpr + stack in registers
-	\item arrive in lj\_ccallback\_enter that prepare the lua state and do conversion of argument from c to lua type.
-	\item arrive in lj\_vm\_ffi\_callback : execute the callback with this lua state
-	\item lua callback
+	\item arrive in lj\_ccallback\_enter that prepare the Lua state and do conversion of argument from C to Lua type.
+	\item arrive in lj\_vm\_ffi\_callback : execute the callback with this Lua state
+	\item Lua callback
 	\item arrive in $|->$cont\_ffi\_callback: call lj\_ccallback\_leave
-	\item arrive in lj\_ccallback\_leave convert return value from lua to c.
-	\item arrive in $|->$cont\_ffi\_callback: return to c code with the return value in register/stack.
-	\item arrive in c code.
+	\item arrive in lj\_ccallback\_leave convert return value from Lua to C.
+	\item arrive in $|->$cont\_ffi\_callback: return to C code with the return value in register/stack.
+	\item arrive in C code.
 \end{itemize}
 
 \begin{lstlisting}[style=CStyle]

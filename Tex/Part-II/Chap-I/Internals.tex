@@ -61,7 +61,7 @@ object.
 \label{Subsec:string-inter}
 
 All strings that are manipulated by LuaJIT are internalized. This includes, all
-the strings literals of the user lua code, all identifiers and tokens of the lua
+the strings literals of the user Lua code, all identifiers and tokens of the Lua
 language itself and also all the strings used internally by LuaJIT. Internalization
 mechanism does that, only one copy of a specific string is kept in memory. If
 multiple copies of a same string is requested, a pointer to the internalized
@@ -240,8 +240,8 @@ struct malloc_state {
 
 There are two distinct representation for function, the function's prototype,
 and the function's closure. Lua functions' prototypes are represented by \emph{GCproto} (\emph{lj\_obj.h}), and are followed by the functions' bytecodes in memory.
-The closures are represented by the GCfuncL for lua function and GCfuncC for
-c function (using lua's api). They contain the necessary information for
+The closures are represented by the GCfuncL for Lua function and GCfuncC for
+c function (using Lua's api). They contain the necessary information for
 upvalues. Upvalues are represented by the \emph{GCupval} that if close, contains
 the corresponding value or a reference to the stack slot containing the
 appropriate value otherwise. Closure can be managed by the functions present in

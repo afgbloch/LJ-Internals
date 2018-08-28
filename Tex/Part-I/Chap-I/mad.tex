@@ -50,11 +50,11 @@ The scripting language Lua through LuaJIT as been picked (see Section \ref{Sec:L
 
 Figure \ref{fig:mad} shows how the MAD-NG application is being packaged. Some
 modification over LuaJIT has been done to allow it to be embedded inside of MAD.
-The source code of MAD is mainly implemented in lua (\emph{*.mad} extension
+The source code of MAD is mainly implemented in Lua (\emph{*.mad} extension
 files) but for performance reasons some physic calculations and algorithms are
 written in \emph{C}. A big advantage of LuaJIT is the efficiency of the FFI
 library (Foreign Function Interface) that allows to use embedded \emph{C} code
-or even \emph{C} libraries directly inside the lua application.
+or even \emph{C} libraries directly inside the Lua application.
 
 \begin{figure}[H]
     \centering

@@ -76,9 +76,9 @@ dump.off()
 This command looks like the verbose mode (-jv) and print information for each start,
 end or abortion of a trace. The output can have one of those three shapes.
 \begin{verbatim}
----- TRACE 1 start foo.lua:125
+---- TRACE 1 start foo.mad:125
 ---- TRACE 1 stop -> [link]
----- TRACE 1 abort foo.lua:142 -- [message]
+---- TRACE 1 abort foo.mad:142 -- [message]
 \end{verbatim}
 The first one is emitted when a recording starts. It shows the potential
 trace number, the file and the source line where that trace start.
@@ -98,7 +98,7 @@ trace starting from it. This new trace is called a side trace of the first one
 called the parent trace. Below is how the start of the recording of a side
 trace is shown in the dump.
 \begin{verbatim}
----- TRACE 30 start 21/0 foo.lua:103
+---- TRACE 30 start 21/0 foo.mad:103
 \end{verbatim}
 Here, 30 is the side trace number, 21 the parent trace from which the side trace
 start from and 0 is the side-exit number .
@@ -109,11 +109,11 @@ or a not-compiled built-in, return to the interpreter, run the C function or
 built-in and then start a new trace after it returns. Below is an example of
 how trace stitching due to a not-compiled built-in can be shown in the dump.
 \begin{verbatim}
----- TRACE 1 start foo.lua:6
+---- TRACE 1 start foo.mad:6
   [...]
   0000  . FUNCC               ; os.clock
 ---- TRACE 1 stop -> stitch
----- TRACE 2 start 1/stitch foo.lua:35
+---- TRACE 2 start 1/stitch foo.mad:35
 \end{verbatim}
 As you can see the trace prior to the stitching has its link marked as
 \emph{stitch} and the one after is shown like a side trace but with
@@ -137,7 +137,7 @@ list of BC instruction and their corresponding arguments look at the wiki page
   \item 2nd column : The dots represent the depth (call hierarchy).
   \item 3rd column : bc instruction.
   \item other-1... : bc arguments.
-  \item last       : comment helping to tie the instruction to the lua code.
+  \item last       : comment helping to tie the instruction to the Lua code.
 \end{itemize}
 
 %===============================================================================
@@ -194,7 +194,7 @@ Below are some example of dumps of IR instructions.
       \item '@\%d+' : indicate slot where the value of a key is to be found (in a table).
       \item 'bias' : Used by \emph{TOBIT} represent the constant
         $2^{52}+2^{51}$ added to the FP number.
-      \item \{0x\%d+\} : lua table.
+      \item \{0x\%d+\} : Lua table.
       \item 'userdata:\%p' : user data.
       \item 'my\_func:ligne' : functions.
       \item '(...)' : function arguments for call-type IR.
@@ -211,7 +211,7 @@ comments on why snapshots are used, see Section \ref{Subsec:snap}. Below is an
 example of how snapshot can be shown in the dump.
 \begin{verbatim}
 ....    SNAP   #1   [ ---- ---- ---- ---- 0069 0070 0071 ---- ]
-....    SNAP   #1   [ foo.lua:120|---- ---- false ]
+....    SNAP   #1   [ foo.mad:120|---- ---- false ]
 \end{verbatim}
 The i-th value in the snapshot list represents the IR instruction number of the
 instruction that wrote in slot number i. '- - - -' indicates that the slot
@@ -260,15 +260,15 @@ corresponding assembler instruction.
 \subsection{How does it works}
 \label{Subsec:dump-internals}
 
-This section briefly presents the parts of the code of luaJIT involved in the process of
+This section briefly presents the parts of the code of LuaJIT involved in the process of
 emitting the dump. The dump module is responsible for the set up of the
 JIT to emit traces and also for printing the results in a human understandable
 format. Depending on the dump it has to print (with respect to the provided
 parameters, see Section \ref{Subsec:dump-usage}) it attaches some handler
-(callback lua function) to specific VM events using jit\_attach (see lib\_jit.c).
+(callback Lua function) to specific VM events using jit\_attach (see lib\_jit.c).
 The predefined VM event used here are : BC, TRACE, RECORD, TEXIT
-(see VMEvent in lj\_vmevent.h). In the jit, lj\_vmevent\_send (see lj\_vmevent.h)
+(see VMEvent in lj\_vmevent.h). In the JIT, lj\_vmevent\_send (see lj\_vmevent.h)
 is used to send a VM event, lj\_vmevent\_prepare to find the handler attached to a
 specific event and lj\_vmevent\_call to call it (see lj\_vmevent.c).
-The lua module uses more function from lib\_jit.c (all jutil.* function
+The Lua module uses more function from lib\_jit.c (all jutil.* function
 in dump.lua) to extract more information.

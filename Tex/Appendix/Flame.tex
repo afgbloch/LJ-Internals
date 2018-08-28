@@ -5,13 +5,13 @@ First we need to get the FlameGraph \cite{flamegraph} tool.
   git clone https://github.com/brendangregg/FlameGraph
 \end{lstlisting}
 \end{center}
-Then we need to, generate the raw dump from luajit and use FlameGraph to generate
+Then we need to, generate the raw dump from LuaJIT and use FlameGraph to generate
 the svg file. Assuming \emph{\$flamegraph} contains the path to the tool (/FlameGraph/flamegraph.pl)
 
 \begin{center}
 \begin{lstlisting}
   export flamegraph=./FlameGraph/flamegraph.pl
-  mad -jp=G,myapp.out myapp.lua
+  mad -jp=G,myapp.out myapp.mad
   $flamegraph myapp.out > myapp.svg
 \end{lstlisting}
 \end{center}
