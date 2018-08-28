@@ -42,14 +42,24 @@ flexible user input, to reintroduce computer science good practices with scopes,
 functions, control-flow, etc.. It has to do so while being at least as performant
 as MAD-X, keeping the high level command-like philosophy and staying a standalone
 single binary working out of the box without any installation procedure.
-The scripting language Lua through LuaJIT as been picked (see Section \ref{Sec:LuaJIT}).\\
+The scripting language Lua through LuaJIT as been picked (see Section \ref{Sec:LuaJIT}).
+Figure \ref{fig:mad-screnshot} illustrates a run of the test suite of MAD-NG on
+a mac. The \emph{all.mad} file is the entry file for all tests and in this example,
+we specified that we wanted to run only the \emph{Sequence} tests.
 
+\begin{figure}[H]
+    \centering
+	\includegraphics[width=0.8\textwidth]{./Images/mad-screenshot}
+    \caption{Screenshot of a test run of MAD.}
+    \label{fig:mad-screnshot}
+\end{figure}
 
 \subsubsection{MAD-NG packaging}
 \label{Subsec:mad-pk}
 
 Figure \ref{fig:mad} shows how the MAD-NG application is being packaged. Some
-modification over LuaJIT has been done to allow it to be embedded inside of MAD.
+modifications over LuaJIT has been done to allow it to be embedded inside of MAD
+as by default LuaJIT cannot be moved after being installed.
 The source code of MAD is mainly implemented in Lua (\emph{*.mad} extension
 files) but for performance reasons some physic calculations and algorithms are
 written in \emph{C}. A big advantage of LuaJIT is the efficiency of the FFI
@@ -58,7 +68,7 @@ or even \emph{C} libraries directly inside the Lua application.
 
 \begin{figure}[H]
     \centering
-	\includegraphics[width=7cm]{./Images/MAD.pdf}
+	\includegraphics[width=9cm]{./Images/MAD.pdf}
     \caption{MAD-NG application}
     \label{fig:mad}
 \end{figure}
