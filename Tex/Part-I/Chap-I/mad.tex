@@ -59,7 +59,9 @@ we specified that we wanted to run only the \emph{Sequence} tests.
 
 Figure \ref{fig:mad} shows how the MAD-NG application is being packaged. Some
 modifications over LuaJIT has been done to allow it to be embedded inside of MAD
-as by default LuaJIT cannot be moved after being installed.
+as by default LuaJIT cannot be moved after being installed. Other patches of
+LuaJIT have been developed adding semantic and syntactic improvement over the
+original project necessitating internal knowledge on parser, bytecode, and IR.
 The source code of MAD is mainly implemented in Lua (\emph{*.mad} extension
 files) but for performance reasons some physic calculations and algorithms are
 written in \emph{C}. A big advantage of LuaJIT is the efficiency of the FFI
