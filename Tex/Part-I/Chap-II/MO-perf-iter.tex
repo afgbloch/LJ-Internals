@@ -6,37 +6,37 @@ to talk about the iterator of the \emph{Sequence} data-structure.
 
 To recall,
 \emph{Sequence} is used to represent particle accelerator by composition of
-different Elements. The iterator returns, the element, its index, and its \emph{spos}
+different Elements. The iterator returns, the current element, its index, and its \emph{spos}
 (distance in meters from the start of the sequence). The
 only difference between forward and backward iterators is that for forward iterator
-the \emph{spos} is precomputed for each elements and stored in a table while for
-backward we need to take the \emph{spos} of the element and add its length. This
-makes the difference of performance relying only on the access of the length of
-an element and a simple addition.
+the \emph{spos} is precomputed for each elements during the \emph{sequence} creation, while for
+backward we need to take the \emph{spos} of the element and add its length (i.e. make a lookup).
+The difference in performance between forward and backward relies only on the
+access of the length of an element.
 
 The code below shows the two examples that we are comparing. We iterate in each
-case 20000 times over the \emph{LHCB1} sequence (a circular accelerator) with
+case 20000 times over the \emph{LHCB1} sequence (a circular accelerator with 3000 elements) with
 the first case using the forward iterator and the second case using the backward
 iterator (iterate from the end of the sequence to the beginning).
 
-Figure \ref{fig:MO-seq-iter-curve}, shows the performance of ten independent
+The figure \ref{fig:MO-seq-iter-curve}, shows the performance of ten independent
 runs of the two cases. The forward iterator take around 0.3 seconds when the
-backward one takes around 30 seconds to complete. The first natural things to do
-to try to understand why is to study the trace dump. Figure \ref{fig:MO-seq-iter},
-shows a screenshot of the generated dump files and we can clearly this that
-something is wrong as it generates files over 300 times heavier.
+backward one takes around 30 seconds to complete. The first thing to do
+to try to understand the problem is to study the trace dump. The figure \ref{fig:MO-seq-iter}
+shows a screenshot of the generated dump files and we can clearly see that
+something goes wrong as it generates a file 300 times larger in the backward case.
 
-Indeed the simplest examples explored in Section \ref{Sec:MO-perf-analys} doesn't
-show what happens when each object that we query store the requested variable at
-a different hierarchy depth. This is exactly what we have here, Figure
-\ref{fig:MO-seq-iter-schematic} illustrates how the different elements that
-constitute a sequence might look like. The requested \emph{l} value (the length
+Indeed the simplest examples explored in Section \ref{Sec:MO-perf-analys} don't
+show what happens when each object that we query stores the requested variable at
+different hierarchy depths. This is exactly what we have here, the figure
+\ref{fig:MO-seq-iter-schematic} illustrates how the different elements
+constituting the sequence might look like. The requested \emph{l} value (the length
 of the corresponding element) might be stored at a different depth depending on
-the nature of the element. Since the hierarchical lookup is completely inlined
-in the trace, we end up needing to generate a different set of traces for each
+the kind of the element. Since the hierarchical lookup is completely inlined
+in the trace, we end up with many different set of traces for each
 depth.
 
-A potential quick fix for this particular case would be to also store the
+A potential fix for this particular case would be to also store the
 backward \emph{spos} in a table during the \emph{Sequence} construction.
 
 \begin{lstlisting}[style=LuaStyle]

@@ -4,20 +4,19 @@ The first thing interesting to note is that we can deactivate the JIT engine usi
 the \emph{-joff} command-line argument of LuaJIT and we can see that the VM is
 slightly faster than the worst case scenario with the JIT activated. This can
 be explained by the fact that in those cases the actual code is entirely run by
-the VM, plus the compiler spent some time trying to record and generate traces
-that end-up being aborted. Those claim can be verified by using the \emph{v}
-option of the profiler (see Section \ref{Sec:Profiler}). The question now is :
-why is it, that so much time is spent in the VM and why all those trace gets
-aborted. This is where things gets complicated. When run stand-alone the
-performance test mentioned earlier are always perfectly fine. It is depending of
-the context, meaning the code that has been run before, that sometime those
-tests take an incredible amount of time. In addition of that the dump module of
-LuaJIT is very useful when we want to study isolated problems but in this case
-where the amount of code run influence the result, this tool generate to much
-informations without much help to manipulate them, making it a needle in a
-haystack kind of problem.\\
+the VM, plus the time spent by the compiler trying to record and generate traces
+that are aborted. These claims can be verified by using the \emph{v}
+option of the profiler (see Section \ref{Sec:Profiler}). So
+why so much time is spent in the VM and why all these traces are
+aborted. This is where things gets complicated. When run alone the
+performance tests mentioned earlier are always perfectly fine. It depends on
+the context, i.e. the code run before, that sometime these
+tests take an incredible amount of time. In addition to that, the dump module of
+LuaJIT is very useful when we want to study isolated problems, but in this case
+where the amount of code run influence the result, this tool generates to much
+informations to be useful.\\
 
-We will still present here some insight on this issue with some unsuccessful
+We will still present here some insights on this issue with some unsuccessful
 tentative of solutions.
 
 The first thing is that in some run the \emph{\_\_index}
@@ -25,47 +24,47 @@ function of the object model (presented in previous sections) gets blacklisted
 (see Section \ref{Subsec:abort}). After that no hierarchy chaining can be
 successfully recorded inside another trace making all of them running
 exclusively in the VM. This is due to a mechanism of LuaJIT that we can call
-\emph{cascading blacklisting} that consist of blacklisting bytecode that tries to
-record a trace that hit another blacklisted bytecode. This is very inconvenient
+\emph{cascading blacklisting} that consists of blacklisting bytecodes while
+recording a trace that hit already blacklisted bytecodes. This is very inconvenient
 because it means that a piece of code that can't be properly compiled for
-whatever the reason can make the object model very slow for the rest of the run.
-This is even more problematic knowing that blacklisting is permanent for the
-lifetime of a particular bytecode, making it in this case for an entire run of
-LuaJIT.
+whatever reasons, can lead to very bad performance of the object model for the rest of the run.
+This is even more problematic knowing that blacklisting is permanent for
+an entire run of LuaJIT.
 
-A second interesting fact to try to explain the instability part of the problem
-is the fact that the hot path detection is very lazy and use the hashed program
-counter (see Section \ref{Subsec:hot-path}) making false positive very easy to
-occur. So any change to the code can change the bytecode alignment and the
-potential false positive, changing in its turn the entire profile of the code
+A second interesting fact to try to explain the observed performance instability
+is the hot path detection, which is very lazy and uses the hashed program
+counter (see Section \ref{Subsec:hot-path}) generating false positive easily.
+So any modifications to the code can change the bytecode alignment and create
+potential false positives, changing in its turn the entire profile of the code
 generated. This explanation is an educated guess and couldn't be formally proven
-to be explaining in its own the change of behavior seen when slightly modifying
+to explain the change in the observed behavior after modifying slightly the
 codes.
 
-Another thing to consider is that in LuaJIT strings are internalized (see
-Section \ref{Subsec:string-inter}) and that the memory address where they are
-stored is used has "identifier" for string comparisons or hash-table placements.
+Another thing to consider is that LuaJIT strings are internalized (see
+Section \ref{Subsec:string-inter}) and that memory addresses are used has
+"identifier" for their comparisons or hash-table slot selections.
 Due to the ASLR (Address Space Layout Randomization) of many operating systems,
-two consecutive runs of the exact same code will generate different address for
-internalized string and possibly different placement inside hash-tables. In Lua
+two consecutive runs of the exact same code will generate different addresses for
+internalized strings and possibly different placements inside the hash-tables.
+In Lua,
 iterating over a hash-table can be done through the \emph{pairs} iterator that
-doesn't enforce any special order (it just iterate sequentially over the internal
+doesn't enforce any special order (it just iterates sequentially over the internal
 table structure), thus two runs can result in keys not being read in the same order,
-making LuaJIT execute the codes in a different order possibly changing false positive
-and other behavior of the JIT.\\
+which makes LuaJIT execute the codes in a different order possibly triggering new
+false positives and changing the behavior of the JIT.\\
 
-Now let's have a look at a few modifications of LuaJIT that has been done to try
+Now let's have a look at few modifications performed on LuaJIT to try
 to circumvent the blacklisting problem. The first idea was that blacklisting
-should be context specific, so any compiler wide trace flush (that we can
-internally detect) should walk through the bytecode resetting the flag to any
-blacklisted function or loop-like bytecode. The second idea was to slightly
+should be context specific, so any compiler full traces flush (that we can
+internally detect) should walk through the bytecodes and reset the flag of
+blacklisted functions or loop-like bytecodes. The second idea was to slightly
 change the behavior of this \emph{cascading blacklisting} feature by letting
-traces record over blacklisted bytecode instead of aborting immediately.
-Unfortunately those two tried modifications didn't bring any substantial
-improvement over stability or performance. It as to be noted that
-blacklisting is here for a reason and do sometime improve performance as it
-prevents the JIT from spending time recording a trace that would end-up being aborted
-anyway. Plus we have to keep in mind that the VM is very well optimized and
+traces to record over blacklisted bytecodes instead of aborting immediately.
+Unfortunately these two tried modifications didn't bring any substantial
+improvement over stability or performance. It has to be noted that
+blacklisting is still useful and do sometime improves performance as it
+prevents the JIT from spending time recording a trace that would end-up to be aborted
+anyway. Moreover we have to keep in mind that the VM is very well optimized and
 quite fast, making in certain cases the extra work done by the JIT not worth it.
 However, this can still be a general nice idea to keep in mind and might be
 reintroduced later.

@@ -60,21 +60,21 @@ Once the source code as been converted in bytecode, it is fed to the \emph{bytec
 interpreter} \ref{Sec:BI}. It is the central piece of code written in assembly
 that connect every component of LuaJIT and is responsible for executing the BC.
 
-There is a certain number of libraries \ref{Sec:Library} packaged will LuaJIT, here
+There is a certain number of libraries \ref{Sec:Library} packaged with LuaJIT, here
 to help the BC interpreter to do its work. We will mention a few of them here.
 First there is the \emph{FFI} \ref{Sec:FFI} library that allows to directly connect Lua
 code with C code and C library without Lua explicit C interface. The \emph{standard
-library} provides a explicit \emph{C} interface to manipulate Lua data
+library} provides an explicit \emph{C} interface to manipulate Lua data
 (stack, registry, etc.). Finally, the \emph{JIT} library provides functions
 allowing to configure the JIT engine.
 
 The last big part of LuaJIT is obviously the \emph{JIT} engine \ref{Chapt:JIT}.
-It is actually a tracing JIT that needs to detect \emph{hot path}
+It is actually a tracing JIT that needs to detect \emph{hot paths}
 \ref{Subsec:hot-path} that would benefit from being compiled. Once such a piece
 of bytecode is detected the \emph{recorder} specialize this bytecode with runtime
 data and type information and generate an \emph{Intermediate Representation}
-equivalent \ref{Subsec:IR}. Then the Optimizer \ref{Sec:TO} modifies the IR by
+equivalent \ref{Subsec:IR}. Then the \emph{Optimizer} \ref{Sec:TO} modifies the IR by
 applying a bunch of optimizations on it. Finally, the \emph{Assembler} \ref{Sec:TA}
-transform the IR into a platform-specific executable binary and the BC that was
-detected to be hot is patched to replace his execution to a call to the
+transforms the IR into a platform-specific executable binary and the BC that was
+detected to be hot is patched to replace his execution by a call to the
 corresponding compiled trace.
